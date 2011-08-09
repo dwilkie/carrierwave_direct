@@ -2,6 +2,7 @@ require 'spec_helper'
 
 describe CarrierWaveDirect::Uploader do
   include UploaderHelpers
+  include ModelHelpers
 
   SAMPLE_DATA = {
     :path => "upload_dir/bliind.exe",
@@ -12,12 +13,15 @@ describe CarrierWaveDirect::Uploader do
     :max_file_size => 10485760,
     :file_url => "http://anyurl.com/any_path/image_dir/filename.jpg",
     :mounted_model_name => "Porno",
-    :mounted_as => :video
+    :mounted_as => :video,
+    :filename => "filename",
+    :version => :thumb
   }.freeze
 
   let(:uploader) { DirectUploader.new }
   let(:mounted_model) { mock(sample(:mounted_model_name)) }
   let(:mounted_uploader) { DirectUploader.new(mounted_model, sample(:mounted_as)) }
+  let(:direct_uploader) { DirectUploader.new }
 
   describe ".store_dir" do
     context "'NightOut', :pic" do
@@ -151,6 +155,8 @@ describe CarrierWaveDirect::Uploader do
       end
     end
   end
+
+  it_should_have_accessor(:success_action_redirect, :it => DirectUploader.new)
 
   describe "#extension_white_list" do
     it "should return the result from .allowed_file_types" do
@@ -446,11 +452,9 @@ describe CarrierWaveDirect::Uploader do
     end
   end
 
-  # note that 'video' is hardcoded into the support file
+  # note that 'video' is hardcoded into the MountedClass support file
   # so changing the sample will cause the tests to fail
   context "a class has a '#{sample(:mounted_as)}' mounted" do
-    let(:direct_uploader) { DirectUploader.new }
-
     describe "'##{sample(:mounted_as)}'" do
       it "should be defined" do
         direct_uploader.should be_respond_to(sample(:mounted_as))
@@ -461,14 +465,27 @@ describe CarrierWaveDirect::Uploader do
       end
     end
   end
-end
+
+  context "with a '#{sample(:version)}' version" do
+    let(:video_uploader) { MountedClass.new.video }
+
+    before do
+      DirectUploader.version(sample(:version))
+      video_uploader.key(sample(:filename))
+      # Fix this...it should resolve before calling filename on the uploader
+      #video_uploader.filename
+    end
+
+    context "the store path filename" do
+      it "should be like '#{sample(:filename)}_#{sample(:version)}'" do
+        video_uploader.send(sample(:version)).store_path.should =~ /#{sample(:filename)}_#{sample(:version)}$/
+      end
+    end
 
 
-#  it_should_have_accessor(:success_action_redirect)
-#  it_should_have_accessor(:remote_net_url)
+  end
 
-
-#  context "the attachment has been stored" do
+  context "the attachment has been stored" do
 #    before do
 #      mounted_uploader.model.stub("remote_#{mounted_uploader.mounted_as}_url").and_return(sample(:file_url))
 #      mounted_uploader.store!(File.open(image_fixture_path))
@@ -481,6 +498,6 @@ end
 #        end
 #      end
 #    end
-#  end
-#end
+  end
+end
 

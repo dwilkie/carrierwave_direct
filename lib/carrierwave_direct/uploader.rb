@@ -5,7 +5,7 @@ module CarrierWaveDirect
     extend ActiveSupport::Concern
 
     included do
-      attr_accessor :success_action_redirect, :remote_net_url
+      attr_accessor :success_action_redirect
       attr_writer :key
 
       fog_credentials.keys.each do |key|
@@ -130,7 +130,6 @@ module CarrierWaveDirect
             "could not generate filename because the uploader has no key and the #{model.class} has no remote_#{mounted_as}_url"
           )
         end
-
 
         # Update the versions to use this key
         # This is imperiative otherwise a new guid will be generated for each version
