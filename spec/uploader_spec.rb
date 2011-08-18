@@ -7,7 +7,7 @@ describe CarrierWaveDirect::Uploader do
   SAMPLE_DATA = {
     :path => "upload_dir/bliind.exe",
     :key => "some key",
-    :s3_key => "store_dir/guid/filename",
+    :guid => "guid",
     :url => "http://example.com/some_url",
     :expiration => 60,
     :max_file_size => 10485760,
@@ -15,8 +15,24 @@ describe CarrierWaveDirect::Uploader do
     :mounted_model_name => "Porno",
     :mounted_as => :video,
     :filename => "filename",
+    :extension => ".jpg",
     :version => :thumb
-  }.freeze
+  }
+
+  SAMPLE_DATA.merge!(
+    :stored_filename_base => "#{sample(:guid)}/#{sample(:filename)}"
+  )
+
+  SAMPLE_DATA.merge!(
+    :stored_filename => "#{sample(:stored_filename_base)}#{sample(:extension)}",
+    :version_filename => "#{sample(:stored_filename_base)}_#{sample(:version)}#{sample(:extension)}"
+  )
+
+  SAMPLE_DATA.merge!(
+    :s3_key => "store_dir/#{sample(:stored_filename)}"
+  )
+
+  SAMPLE_DATA.freeze
 
   let(:uploader) { DirectUploader.new }
   let(:mounted_model) { mock(sample(:mounted_model_name)) }
@@ -265,12 +281,8 @@ describe CarrierWaveDirect::Uploader do
     context "key is set to '#{sample(:s3_key)}'" do
       before { mounted_uploader.key = sample(:s3_key) }
 
-      filename = sample(:s3_key).split("/")
-      filename.shift
-      filename = filename.join("/")
-
-      it "should return '#{filename}'" do
-        mounted_uploader.filename.should == filename
+      it "should return '#{sample(:stored_filename)}'" do
+        mounted_uploader.filename.should == sample(:stored_filename)
       end
     end
 
@@ -391,7 +403,6 @@ describe CarrierWaveDirect::Uploader do
       end
 
       context "should include" do
-
         # Rails form builder conditions
         it "'utf8'" do
           conditions.should have_condition(:utf8)
@@ -455,34 +466,39 @@ describe CarrierWaveDirect::Uploader do
   # note that 'video' is hardcoded into the MountedClass support file
   # so changing the sample will cause the tests to fail
   context "a class has a '#{sample(:mounted_as)}' mounted" do
-    describe "'##{sample(:mounted_as)}'" do
-      it "should be defined" do
-        direct_uploader.should be_respond_to(sample(:mounted_as))
+    describe "#{sample(:mounted_as).capitalize}Uploader" do
+      describe "##{sample(:mounted_as)}" do
+        it "should be defined" do
+          direct_uploader.should be_respond_to(sample(:mounted_as))
+        end
+
+        it "should return itself" do
+          direct_uploader.send(sample(:mounted_as)).should == direct_uploader
+        end
       end
 
-      it "should return itself" do
-        direct_uploader.send(sample(:mounted_as)).should == direct_uploader
+      context "has a '#{sample(:version)}' version" do
+        let(:video_uploader) { MountedClass.new.video }
+
+        before do
+          DirectUploader.version(sample(:version))
+        end
+
+        context "and the key is '#{sample(:s3_key)}'" do
+          before do
+            video_uploader.key = sample(:s3_key)
+          end
+          # Fix this...it should resolve before calling filename on the uploader
+          #video_uploader.filename
+
+          context "the store path filename" do
+            it "should be '#{sample(:version_filename)}'" do
+              video_uploader.send(sample(:version)).store_path.should == sample(:version_filename)
+            end
+          end
+        end
       end
     end
-  end
-
-  context "with a '#{sample(:version)}' version" do
-    let(:video_uploader) { MountedClass.new.video }
-
-    before do
-      DirectUploader.version(sample(:version))
-      video_uploader.key(sample(:filename))
-      # Fix this...it should resolve before calling filename on the uploader
-      #video_uploader.filename
-    end
-
-    context "the store path filename" do
-      it "should be like '#{sample(:filename)}_#{sample(:version)}'" do
-        video_uploader.send(sample(:version)).store_path.should =~ /#{sample(:filename)}_#{sample(:version)}$/
-      end
-    end
-
-
   end
 
   context "the attachment has been stored" do
