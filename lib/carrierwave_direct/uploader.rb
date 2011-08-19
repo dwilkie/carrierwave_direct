@@ -6,7 +6,6 @@ module CarrierWaveDirect
 
     included do
       attr_accessor :success_action_redirect
-      attr_writer :key
 
       fog_credentials.keys.each do |key|
         define_method(key) do
@@ -58,10 +57,9 @@ module CarrierWaveDirect
         end
         key_path
       end
-    end
+    end # ClassMethods
 
     module InstanceMethods
-
       def direct_fog_url(options = {})
         fog_uri = CarrierWave::Storage::Fog::File.new(self, nil, nil).public_url
         if options[:with_path]
@@ -73,8 +71,13 @@ module CarrierWaveDirect
         fog_uri
       end
 
-      def key(fname = nil)
-        @key ||= self.class.key(:store_dir => store_dir, :filename => fname)
+      def key=(k)
+        @key = k
+        update_version_keys(:with => @key)
+      end
+
+      def key
+        @key ||= self.class.key(:store_dir => store_dir)
       end
 
       def has_key?
@@ -125,16 +128,10 @@ module CarrierWaveDirect
         unless has_key?
           # Use the attached models remote url to generate a new key otherwise raise an error
           remote_url = model.send("remote_#{mounted_as}_url")
-          remote_url ? key(remote_url.split("/").pop) : raise(
+          remote_url ? key_from_file(remote_url.split("/").pop) : raise(
             ArgumentError,
             "could not generate filename because the uploader has no key and the #{model.class} has no remote_#{mounted_as}_url"
           )
-        end
-
-        # Update the versions to use this key
-        # This is imperiative otherwise a new guid will be generated for each version
-        versions.each do |name, uploader|
-          uploader.key = key
         end
 
         key_path = key.split("/")
@@ -145,10 +142,31 @@ module CarrierWaveDirect
       end
 
       # Add a white list of extensions which are allowed to be uploaded.
-      # For images you might use something like this:
       def extension_white_list
         self.class.allowed_file_types
       end
+
+      private
+
+      def key_from_file(fname)
+        self.key = self.class.key(:store_dir => store_dir, :filename => fname)
+      end
+
+      # Update the versions to use this key
+      def update_version_keys(options)
+        versions.each do |name, uploader|
+          uploader.key = options[:with]
+        end
+      end
+    end # InstanceMethods
+
+    private
+
+    # Put the version name at the end of the filename since the guid is also stored
+    # e.g. guid/filename_thumb.jpg instead of CarrierWave's default: thumb_guid/filename.jpg
+    def full_filename(for_file)
+      extname = File.extname(for_file)
+      [for_file.chomp(extname), version_name].compact.join('_') << extname
     end
   end
 end

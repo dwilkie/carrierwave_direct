@@ -8,6 +8,7 @@ describe CarrierWaveDirect::Uploader do
     :path => "upload_dir/bliind.exe",
     :key => "some key",
     :guid => "guid",
+    :store_dir => "store_dir",
     :url => "http://example.com/some_url",
     :expiration => 60,
     :max_file_size => 10485760,
@@ -25,11 +26,11 @@ describe CarrierWaveDirect::Uploader do
 
   SAMPLE_DATA.merge!(
     :stored_filename => "#{sample(:stored_filename_base)}#{sample(:extension)}",
-    :version_filename => "#{sample(:stored_filename_base)}_#{sample(:version)}#{sample(:extension)}"
+    :stored_version_filename => "#{sample(:stored_filename_base)}_#{sample(:version)}#{sample(:extension)}"
   )
 
   SAMPLE_DATA.merge!(
-    :s3_key => "store_dir/#{sample(:stored_filename)}"
+    :s3_key => "#{sample(:store_dir)}/#{sample(:stored_filename)}"
   )
 
   SAMPLE_DATA.freeze
@@ -181,8 +182,20 @@ describe CarrierWaveDirect::Uploader do
     end
   end
 
-  it "should respond to #key=" do
-    uploader.should be_respond_to("key=")
+  describe "#key=" do
+    before { uploader.key = sample(:key) }
+
+    it "should set the key" do
+      uploader.key.should == sample(:key)
+    end
+
+    context "the versions keys" do
+      it "should == this uploader's key" do
+        uploader.versions.each do |name, version_uploader|
+          version_uploader.key.should == uploader.key
+        end
+      end
+    end
   end
 
   describe "#key" do
@@ -192,26 +205,17 @@ describe CarrierWaveDirect::Uploader do
         mounted_uploader.stub(:store_dir).and_return("store_dir")
       end
 
-      context "passing no args" do
-        it "should return the result of .key :store_dir => store_dir, :filename => nil" do
-          mounted_uploader.class.stub(:key).with(:store_dir => "store_dir", :filename => nil).and_return(sample(:key))
-          mounted_uploader.key.should == sample(:key)
-        end
-      end
-
-      context "passing 'some_file.jpg'" do
-        it "should return the result of .key :store_dir => store_dir, :filename => 'some_file.jpg'" do
-          mounted_uploader.class.stub(:key).with(:store_dir => "store_dir", :filename => "some_file.jpg").and_return(sample(:key))
-          mounted_uploader.key("some_file.jpg").should == sample(:key)
-        end
+      it "should return the result of .key :store_dir => store_dir" do
+        mounted_uploader.class.stub(:key).with(:store_dir => "store_dir").and_return(sample(:key))
+        mounted_uploader.key.should == sample(:key)
       end
     end
 
     context "where the key is set to '#{sample(:key)}'" do
-      before { mounted_uploader.key = sample(:key) }
+      before { uploader.key = sample(:key) }
 
       it "should return '#{sample(:key)}'" do
-        mounted_uploader.key.should == sample(:key)
+        uploader.key.should == sample(:key)
       end
     end
   end
@@ -266,18 +270,6 @@ describe CarrierWaveDirect::Uploader do
   end
 
   describe "#filename" do
-    shared_examples_for "updating the version uploader keys" do
-      context "where the version uploader keys" do
-        before { mounted_uploader.filename }
-
-        it "should == this uploader's key" do
-          mounted_uploader.versions.each do |name, version_uploader|
-            version_uploader.key.should == mounted_uploader.key
-          end
-        end
-      end
-    end
-
     context "key is set to '#{sample(:s3_key)}'" do
       before { mounted_uploader.key = sample(:s3_key) }
 
@@ -301,10 +293,16 @@ describe CarrierWaveDirect::Uploader do
         end
 
         it "should return a filename based off the key and remote url" do
-          mounted_uploader.key.should =~ /#{Regexp.escape(mounted_uploader.filename)}$/
+          filename = mounted_uploader.filename
+          mounted_uploader.key.should =~ /#{Regexp.escape(filename)}$/
         end
 
-        it_should_behave_like "updating the version uploader keys"
+        # this ensures that the version uploader keys are updated
+        # see spec for key= for more details
+        it "should set the key explicitly" do
+          mounted_uploader.should_receive(:key=)
+          mounted_uploader.filename
+        end
       end
 
       context "and the model's remote #{sample(:mounted_as)} url is blank" do
@@ -488,32 +486,21 @@ describe CarrierWaveDirect::Uploader do
           before do
             video_uploader.key = sample(:s3_key)
           end
-          # Fix this...it should resolve before calling filename on the uploader
-          #video_uploader.filename
 
-          context "the store path filename" do
-            it "should be '#{sample(:version_filename)}'" do
-              video_uploader.send(sample(:version)).store_path.should == sample(:version_filename)
+          context "the store path" do
+            let(:store_path) { video_uploader.send(sample(:version)).store_path }
+
+            it "should be like '#{sample(:stored_version_filename)}'" do
+              store_path.should =~ /#{sample(:stored_version_filename)}$/
+            end
+
+            it "should not be like '#{sample(:version)}_#{sample(:stored_filename_base)}'" do
+              store_path.should_not =~ /#{sample(:version)}_#{sample(:stored_filename_base)}/
             end
           end
         end
       end
     end
-  end
-
-  context "the attachment has been stored" do
-#    before do
-#      mounted_uploader.model.stub("remote_#{mounted_uploader.mounted_as}_url").and_return(sample(:file_url))
-#      mounted_uploader.store!(File.open(image_fixture_path))
-#    end
-
-#    context "url returns '#{sample(:file_url)}'" do
-#      context "the thumb version's url" do
-#        it "should be like '/filename_thumb.jpg'" do
-#          mounted_uploader.thumb.url.should =~ /filename_thumb.jpg$/
-#        end
-#      end
-#    end
   end
 end
 
