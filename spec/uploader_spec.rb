@@ -198,7 +198,7 @@ describe CarrierWaveDirect::Uploader do
 
   DirectUploader.fog_credentials.keys.each do |key|
     describe "##{key}" do
-      it "should return the #{key.to_s.titleize}" do
+      it "should return the #{key.to_s.capitalize}" do
         uploader.send(key).should == DirectUploader.fog_credentials[key]
       end
 

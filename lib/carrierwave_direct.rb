@@ -3,11 +3,6 @@ require "carrierwave_direct/version"
 
 require "carrierwave"
 require "fog"
-
-# TODO: remove active_model dependency...
-require "active_model/conversion"
-require "active_model/naming"
-
 require "uuid"
 
 module CarrierWaveDirect

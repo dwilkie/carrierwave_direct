@@ -24,7 +24,7 @@ module ModelHelpers
     end
 
     def it_should_delegate(name, options = {})
-      sample_data = "Sample #{name.to_s.humanize}"
+      sample_data = "sample_#{name.to_s}"
       delegation_object, delegation_method = options[:to].split("#")
 
       describe "##{name} = '#{sample_data}'" do
@@ -50,7 +50,7 @@ module ModelHelpers
         sample_data = name[key]
         name = key
       else
-        sample_data = "Sample #{name.to_s.humanize}"
+        sample_data = "sample_#{name.to_s}"
       end
 
       it "should respond to ##{name}=" do

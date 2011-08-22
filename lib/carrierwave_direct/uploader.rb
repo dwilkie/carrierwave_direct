@@ -2,10 +2,19 @@
 
 module CarrierWaveDirect
   module Uploader
+    S3_FILENAME_WILDCARD = "${filename}"
+
     extend ActiveSupport::Concern
 
     included do
+      storage :fog
+
       attr_accessor :success_action_redirect
+
+      if defined?(ActiveModel)
+        include ActiveModel::Conversion
+        extend ActiveModel::Naming
+      end
 
       fog_credentials.keys.each do |key|
         define_method(key) do
@@ -14,12 +23,7 @@ module CarrierWaveDirect
       end
     end
 
-    S3_FILENAME_WILDCARD = "${filename}"
-
     module ClassMethods
-      include ActiveModel::Conversion
-      extend ActiveModel::Naming
-
       def upload_expiration
         36000
       end
@@ -34,7 +38,16 @@ module CarrierWaveDirect
 
       def store_dir(options = {})
         dir = "uploads"
-        dir << "/#{options[:model_class].to_s.underscore}" if options[:model_class]
+        # I stole it! from Rails
+        if options[:model_class]
+          model_class = options[:model_class].to_s.
+          gsub(/::/, '/').
+          gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2').
+          gsub(/([a-z\d])([A-Z])/,'\1_\2').
+          tr("-", "_").
+          downcase
+          dir << "/#{model_class}"
+        end
         dir << "/#{options[:mounted_as]}" if options[:mounted_as]
         dir
       end
