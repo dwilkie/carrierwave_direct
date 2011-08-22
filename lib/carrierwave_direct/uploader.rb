@@ -28,23 +28,29 @@ module CarrierWaveDirect
         5242880
       end
 
-      def store_dir(model_class, mounted_as)
-        "uploads/#{model_class.to_s.underscore}/#{mounted_as}"
+      def extension_white_list
+        []
+      end
+
+      def store_dir(options = {})
+        dir = "uploads"
+        dir << "/#{options[:model_class].to_s.underscore}" if options[:model_class]
+        dir << "/#{options[:mounted_as]}" if options[:mounted_as]
+        dir
       end
 
       def allowed_file_types(options = {})
-        file_types = %w(jpg jpeg gif png)
-        if options[:as] == :sentence
-          file_types.to_sentence
-        elsif options[:as] == :regexp_string
-          "\\.(#{file_types.join("|")})"
+        file_types = extension_white_list
+        if options[:as] == :regexp_string
+          extension_regexp = file_types.empty? ? "\\w+" : "(#{file_types.join("|")})"
+          "\\.#{extension_regexp}"
         else
           file_types
         end
       end
 
       def key(options = {})
-        options[:store_dir] ||= store_dir(options[:model_class], options[:mounted_as])
+        options[:store_dir] ||= store_dir(options)
         options[:guid] ||= UUID.generate
         options[:filename] ||= S3_FILENAME_WILDCARD
         key_path = "#{options[:store_dir]}/#{options[:guid]}/#{options[:filename]}"
@@ -121,7 +127,7 @@ module CarrierWaveDirect
       end
 
       def store_dir
-        self.class.store_dir(model.class, mounted_as)
+        self.class.store_dir(:model_class => model.class, :mounted_as => mounted_as)
       end
 
       def filename

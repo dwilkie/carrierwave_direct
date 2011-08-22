@@ -13,6 +13,10 @@ require "uuid"
 module CarrierWaveDirect
   autoload :Uploader, "carrierwave_direct/uploader"
   autoload :Mount, "carrierwave_direct/mount"
+
+  module Test
+    autoload :Helpers, 'carrierwave_direct/test/helpers'
+  end
 end
 
 if defined?(Rails)

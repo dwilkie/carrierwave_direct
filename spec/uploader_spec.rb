@@ -12,11 +12,11 @@ describe CarrierWaveDirect::Uploader do
     :url => "http://example.com/some_url",
     :expiration => 60,
     :max_file_size => 10485760,
-    :file_url => "http://anyurl.com/any_path/image_dir/filename.jpg",
+    :file_url => "http://anyurl.com/any_path/video_dir/filename.jpg",
     :mounted_model_name => "Porno",
     :mounted_as => :video,
     :filename => "filename",
-    :extension => ".jpg",
+    :extension => ".avi",
     :version => :thumb
   }
 
@@ -41,23 +41,58 @@ describe CarrierWaveDirect::Uploader do
   let(:direct_uploader) { DirectUploader.new }
 
   describe ".store_dir" do
-    context "'NightOut', :pic" do
+    context "passing no args" do
+      it "should return 'uploads'" do
+        uploader.class.store_dir.should == "uploads"
+      end
+    end
+    context ":model_class => 'NightOut', :mounted_as => :pic" do
       it "should return 'uploads/night_out/pic'" do
-        uploader.class.store_dir("NightOut", :pic).should == "uploads/night_out/pic"
+        uploader.class.store_dir(:model_class => "NightOut", :mounted_as => :pic).should == "uploads/night_out/pic"
       end
     end
   end
 
+  describe ".extension_white_list" do
+    it "should return an empty array" do
+      uploader.class.extension_white_list.should == []
+    end
+  end
+
   describe ".allowed_file_types" do
-    context "passing no args" do
-      it "should return ['jpg', 'jpeg', 'gif', 'png']" do
-        uploader.class.allowed_file_types.should == %w(jpg jpeg gif png)
+    context "with no extension whitelist" do
+      before do
+        uploader.class.stub(:extension_white_list).and_return([])
+      end
+
+      context "passing no args" do
+        it "should return and empty array" do
+          uploader.class.allowed_file_types.should == []
+        end
+      end
+
+      context ":as => :regexp_string" do
+        it "should return '\\.\\w+'" do
+          uploader.class.allowed_file_types(:as => :regexp_string).should == "\\.\\w+"
+        end
       end
     end
 
-    context ":as => :regexp_string" do
-      it "should return '\\.(jpg|jpeg|gif|png)'" do
-        uploader.class.allowed_file_types(:as => :regexp_string).should == "\\.(jpg|jpeg|gif|png)"
+    context "where the extension whitelist is ['jpg', 'jpeg', 'gif', 'png']" do
+      before do
+        uploader.class.stub(:extension_white_list).and_return(%w(jpg jpeg gif png))
+      end
+
+      context "passing no args" do
+        it "should return ['jpg', 'jpeg', 'gif', 'png']" do
+          uploader.class.allowed_file_types.should == %w(jpg jpeg gif png)
+        end
+      end
+
+      context ":as => :regexp_string" do
+        it "should return '\\.(jpg|jpeg|gif|png)'" do
+          uploader.class.allowed_file_types(:as => :regexp_string).should == "\\.(jpg|jpeg|gif|png)"
+        end
       end
     end
   end
@@ -323,10 +358,13 @@ describe CarrierWaveDirect::Uploader do
   end
 
   describe "#store_dir" do
-    context "for a '#{sample(:mounted_model_name)}' mounted as an '#{sample(:mounted_as)}'" do
+    context "for a '#{sample(:mounted_model_name)}' mounted as a '#{sample(:mounted_as)}'" do
 
-      it "should return the result from .store_dir #{sample(:mounted_model_name)}, :#{sample(:mounted_as)}" do
-        uploader.class.stub(:store_dir).with(mounted_model.class, mounted_uploader.mounted_as).and_return("store_dir")
+      it "should return the result from .store_dir :model_class => #{sample(:mounted_model_name)}, :mounted_as => :#{sample(:mounted_as)}" do
+        uploader.class.stub(:store_dir).with(
+          :model_class => mounted_model.class,
+          :mounted_as => mounted_uploader.mounted_as
+        ).and_return("store_dir")
         mounted_uploader.store_dir.should == "store_dir"
       end
     end
