@@ -145,18 +145,16 @@ module CarrierWaveDirect
 
       def filename
         unless has_key?
-          # Use the attached models remote url to generate a new key otherwise raise an error
+          # Use the attached models remote url to generate a new key otherwise return nil
           remote_url = model.send("remote_#{mounted_as}_url")
-          remote_url ? key_from_file(remote_url.split("/").pop) : raise(
-            ArgumentError,
-            "could not generate filename because the uploader has no key and the #{model.class} has no remote_#{mounted_as}_url"
-          )
+          remote_url ? key_from_file(remote_url.split("/").pop) : return
         end
 
         key_path = key.split("/")
         filename_parts = []
         filename_parts.unshift(key_path.pop)
-        filename_parts.unshift(key_path.pop)
+        unique_key = key_path.pop
+        filename_parts.unshift(unique_key) if unique_key
         File.join(filename_parts)
       end
 

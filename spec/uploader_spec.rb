@@ -313,6 +313,14 @@ describe CarrierWaveDirect::Uploader do
       end
     end
 
+    context "key is set to '#{sample(:key)}'" do
+      before { uploader.key = sample(:key) }
+
+      it "should return '#{sample(:key)}'" do
+        uploader.filename.should == sample(:key)
+      end
+    end
+
     context "key is not set" do
       context "but the model's remote #{sample(:mounted_as)} url is: '#{sample(:file_url)}'" do
 
@@ -347,11 +355,8 @@ describe CarrierWaveDirect::Uploader do
           ).and_return nil
         end
 
-        it "should raise an error" do
-          expect{ mounted_uploader.filename }.to raise_error(
-            ArgumentError,
-            "could not generate filename because the uploader has no key and the #{mounted_uploader.model.class} has no remote_#{mounted_uploader.mounted_as}_url"
-          )
+        it "should return nil" do
+          mounted_uploader.filename.should be_nil
         end
       end
     end
