@@ -19,14 +19,17 @@ module CarrierWaveDirect
         end
       end
 
-#      class ProcessingValidator < ::ActiveModel::EachValidator
-
-#        def validate_each(record, attribute, value)
-#          if record.send("#{attribute}_processing_error")
-#            record.errors.add(attribute, :carrierwave_processing_error)
-#          end
-#        end
-#      end
+      class FilenameFormatValidator < ::ActiveModel::EachValidator
+        def validate_each(record, attribute, value)
+          if record.new_record? && (record.key !~ record.send(attribute).key_regexp)
+            record.errors.add(
+              attribute,
+              :carrierwave_direct_filename_invalid,
+              :extension_white_list => record.send(attribute).extension_white_list
+            )
+          end
+        end
+      end
 
       module HelperMethods
 
@@ -46,6 +49,11 @@ module CarrierWaveDirect
         def validates_filename_uniqueness_of(*attr_names)
           validates_with UniqueFilenameValidator, _merge_attributes(attr_names)
         end
+
+        def validates_filename_format_of(*attr_names)
+          validates_with FilenameFormatValidator, _merge_attributes(attr_names)
+        end
+
       end
 
       included do
@@ -56,5 +64,5 @@ module CarrierWaveDirect
   end
 end
 
-I18n.load_path << File.join(File.dirname(__FILE__), "..", "locale", 'en.yml')
+Dir[File.dirname(__FILE__) << "/../locale/*.*"].each {|file| I18n.load_path << file }
 

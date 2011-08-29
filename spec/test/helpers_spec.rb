@@ -4,35 +4,65 @@ describe CarrierWaveDirect::Test::Helpers do
   include CarrierWaveDirect::Test::Helpers
 
   describe "#sample_key" do
-    context "passing DirectUploader" do
-      context "where DirectUploader's extension white list is" do
+    context "passing an instance of DirectUploader mounted as a video" do
+      let(:direct_uploader) { MountedClass.new.video }
+
+      context "where its extension white list returns" do
+
+        shared_examples_for "returning the default extension" do
+          it "should return '*/guid/filename.extension'" do
+            sample_key(direct_uploader).should =~ /#{GUID_REGEXP}\/filename\.extension$/
+          end
+        end
+
         context "['exe']" do
           before do
-            DirectUploader.stub(:extension_white_list).and_return(%w{exe})
+            direct_uploader.stub(:extension_white_list).and_return(%w{exe})
           end
-          it "should return 'uploads/guid/filename.exe'" do
-            sample_key(DirectUploader).should =~ /^uploads\/[a-f\d\-]+\/filename\.exe$/
+
+          it "should return '*/guid/filename.exe'" do
+            sample_key(direct_uploader).should =~ /#{GUID_REGEXP}\/filename\.exe$/
           end
         end
+
         context "[]" do
           before do
-            DirectUploader.stub(:extension_white_list).and_return([])
+            direct_uploader.stub(:extension_white_list).and_return([])
           end
-          it "should return 'uploads/guid/filename.extension'" do
-            sample_key(DirectUploader).should =~ /^uploads\/[a-f\d\-]+\/filename\.extension$/
+
+          it_should_behave_like "returning the default extension"
+        end
+
+        context "nil" do
+          before do
+            direct_uploader.stub(:extension_white_list).and_return(nil)
           end
+
+          it_should_behave_like "returning the default extension"
+        end
+
+      end
+
+      context "with no options" do
+        it "should return '*/guid/filename.extension'" do
+          sample_key(
+            direct_uploader,
+          ).should =~ /#{GUID_REGEXP}\/filename\.extension$/
         end
       end
+
       context "with options" do
         shared_examples_for "an invalid key" do
-          it "should return 'uploads/filename.extension'" do
-            sample_key(DirectUploader, options).should =~ /^uploads\/filename\.extension$/
+          it "should return 'filename.extension'" do
+            key_parts = sample_key(direct_uploader, options).split("/")
+            key_parts.pop
+            key_parts.last.should_not =~ /^#{GUID_REGEXP}$/
           end
         end
 
         shared_examples_for "a custom filename" do
-          it "should return 'uploads/guid/some_file.reg'" do
-            sample_key(DirectUploader, options).should =~ /^uploads\/[a-f\d\-]+\/some_file\.reg$/
+          it "should return '*/guid/some_file.reg'" do
+            sample_key(direct_uploader, options).should =~ /#{GUID_REGEXP}\/some_file\.reg$/
           end
         end
 
@@ -41,15 +71,17 @@ describe CarrierWaveDirect::Test::Helpers do
             let(:options) { { :invalid => true } }
           end
         end
+
         context ":valid => false" do
           it_should_behave_like "an invalid key" do
             let(:options) { { :valid => false } }
           end
         end
+
         context ":base => 'upload_dir/porno/movie/${filename}'" do
           it "should return 'upload_dir/porno/movie/guid/filename.extension'" do
             sample_key(
-              DirectUploader,
+              direct_uploader,
               :base => "upload_dir/porno/movie/${filename}"
             ).should == "upload_dir/porno/movie/filename.extension"
           end
@@ -62,16 +94,6 @@ describe CarrierWaveDirect::Test::Helpers do
         context ":filename => 'some_file', :extension => 'reg'" do
           it_should_behave_like "a custom filename" do
             let(:options) { { :filename => "some_file", :extension => "reg" } }
-          end
-        end
-
-        context ":model_class => 'SoftPorn', :mounted_as => :movie" do
-          it "should return 'uploads/soft_porn/movie/guid/filename.extension'" do
-            sample_key(
-              DirectUploader,
-              :model_class => "SoftPorn",
-              :mounted_as => "movie"
-            ).should =~ /^uploads\/soft_porn\/movie\/[a-f\d\-]+\/filename\.extension$/
           end
         end
       end

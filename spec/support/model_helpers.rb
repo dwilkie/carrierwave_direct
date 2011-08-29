@@ -6,14 +6,20 @@ module ModelHelpers
   module ClassMethods
     def it_should_be_accessible(name, sample_data, options = {})
       describe "when initialized with .new(:#{name} => '#{sample_data}')" do
-        let(:it) { options[:it] || subject }
-        let(:accessor_value) {
-          it.class.send(:new, { name => sample_data }).send(name)
-        }
+
+        let(:accessor_value) do
+          subject.class.send(:new, { name => sample_data }).send(name)
+        end
 
         if options[:accessible]
-          it "should == '#{sample_data}'" do
-            accessor_value.should == sample_data
+          if options[:accessible] == true
+            it "should == '#{sample_data}'" do
+              accessor_value.should == sample_data
+            end
+          else
+            it "##{options[:accessible].keys.first} should be #{options[:accessible].values.first}" do
+              subject.send(options[:accessible].keys.first).should == options[:accessible].values.first
+            end
           end
         else
           it "should be nil" do
@@ -54,17 +60,15 @@ module ModelHelpers
       end
 
       it "should respond to ##{name}=" do
-        options[:it] ||= subject
-        options[:it].should respond_to("#{name}=")
+        subject.should respond_to("#{name}=")
       end
 
       describe "##{name}" do
         context "where the #{name} is set to '#{sample_data}'" do
-          let(:it) { options[:it] || subject }
-          before { it.send("#{name}=", sample_data) }
+          before { subject.send("#{name}=", sample_data) }
 
           it "should == '#{sample_data}'" do
-            it.send(name).should == sample_data
+            subject.send(name).should == sample_data
           end
         end
 

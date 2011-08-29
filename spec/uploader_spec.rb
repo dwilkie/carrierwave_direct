@@ -35,199 +35,48 @@ describe CarrierWaveDirect::Uploader do
 
   SAMPLE_DATA.freeze
 
-  let(:uploader) { DirectUploader.new }
+  let(:subject) { DirectUploader.new }
   let(:mounted_model) { mock(sample(:mounted_model_name)) }
-  let(:mounted_uploader) { DirectUploader.new(mounted_model, sample(:mounted_as)) }
-  let(:direct_uploader) { DirectUploader.new }
-
-  describe ".store_dir" do
-    context "passing no args" do
-      it "should return 'uploads'" do
-        uploader.class.store_dir.should == "uploads"
-      end
-    end
-    context ":model_class => 'NightOut', :mounted_as => :pic" do
-      it "should return 'uploads/night_out/pic'" do
-        uploader.class.store_dir(:model_class => "NightOut", :mounted_as => :pic).should == "uploads/night_out/pic"
-      end
-    end
-  end
-
-  describe ".extension_white_list" do
-    it "should return an empty array" do
-      uploader.class.extension_white_list.should == []
-    end
-  end
-
-  describe ".allowed_file_types" do
-    context "with no extension whitelist" do
-      before do
-        uploader.class.stub(:extension_white_list).and_return([])
-      end
-
-      context "passing no args" do
-        it "should return and empty array" do
-          uploader.class.allowed_file_types.should == []
-        end
-      end
-
-      context ":as => :regexp_string" do
-        it "should return '\\.\\w+'" do
-          uploader.class.allowed_file_types(:as => :regexp_string).should == "\\.\\w+"
-        end
-      end
-    end
-
-    context "where the extension whitelist is ['jpg', 'jpeg', 'gif', 'png']" do
-      before do
-        uploader.class.stub(:extension_white_list).and_return(%w(jpg jpeg gif png))
-      end
-
-      context "passing no args" do
-        it "should return ['jpg', 'jpeg', 'gif', 'png']" do
-          uploader.class.allowed_file_types.should == %w(jpg jpeg gif png)
-        end
-      end
-
-      context ":as => :regexp_string" do
-        it "should return '\\.(jpg|jpeg|gif|png)'" do
-          uploader.class.allowed_file_types(:as => :regexp_string).should == "\\.(jpg|jpeg|gif|png)"
-        end
-      end
-    end
-  end
-
-  describe ".key" do
-    context ":store_dir => 'uploads/night_out/pic'" do
-      let(:options) { {:store_dir => 'uploads/night_out/pic' } }
-
-      it "should == uploads/night_out/pic/{guid}/${filename}'" do
-        uploader.class.key(
-          options
-        ).should =~ /^uploads\/night_out\/pic\/[\d\a-f\-]+\/\$\{filename\}$/
-      end
-    end
-
-    context ":filename => 'some_file.jpg'" do
-      let(:options) { {:filename => 'some_file.jpg' } }
-
-      it "should end with 'some_file.jpg'" do
-        uploader.class.key(
-          options
-        ).should =~ /some_file\.jpg$/
-      end
-    end
-
-    context ":model_class =>'NightOut', :mounted_as => :pic" do
-      let(:options) { {:model_class =>'NightOut', :mounted_as => :pic} }
-
-      before { uploader.class.stub(:store_dir).and_return("store_dir") }
-
-      it 'should == #{store_dir(NightOut, :pic)}/{guid}/${filename}' do
-        uploader.class.key(
-          options
-        ).should =~ /^store_dir\/[\d\a-f\-]+\/\$\{filename\}$/
-      end
-
-      context ":as => :regexp" do
-
-        before {options.merge!(:as => :regexp)}
-
-        it "should return a regexp" do
-          uploader.class.key(options).should be_a(Regexp)
-        end
-
-        context "a valid key" do
-          let(:key) {
-            sample_key(:uploader => "NightOut", :mounted_as => :pic, :extension => "jpg")
-          }
-
-          def sample_extension_regexp(ext)
-            "\\.(#{ext})"
-          end
-
-          context "with a valid extension" do
-            before do
-              uploader.class.stub(:allowed_file_types).with(
-                :as => :regexp_string
-              ).and_return(sample_extension_regexp("jpg"))
-            end
-
-            it "should be matched by the returned regexp" do
-              key.should =~ uploader.class.key(options)
-            end
-          end
-
-          context "with an invalid extension" do
-            before do
-              uploader.class.stub(:allowed_file_types).with(
-                :as => :regexp_string
-              ).and_return(sample_extension_regexp("exe"))
-            end
-
-            it "should not be matched by the returned regexp" do
-              key.should_not =~ uploader.class.key(options)
-            end
-          end
-        end
-
-        context "an invalid key" do
-          let(:key) {
-            sample_key(:invalid => true, :uploader => "NightOut", :mounted_as => :pic)
-          }
-
-          it "should not be matched by the returned regexp" do
-            key.should_not =~ uploader.class.key(options)
-          end
-        end
-      end
-    end
-  end
+  let(:mounted_subject) { DirectUploader.new(mounted_model, sample(:mounted_as)) }
+  let(:direct_subject) { DirectUploader.new }
 
   describe ".upload_expiration" do
     it "should be 10 hours" do
-      uploader.class.upload_expiration.should == 36000
+      subject.class.upload_expiration.should == 36000
     end
   end
 
   describe ".max_file_size" do
     it "should be 5 MB" do
-      uploader.class.max_file_size.should == 5242880
+      subject.class.max_file_size.should == 5242880
     end
   end
 
   DirectUploader.fog_credentials.keys.each do |key|
     describe "##{key}" do
       it "should return the #{key.to_s.capitalize}" do
-        uploader.send(key).should == DirectUploader.fog_credentials[key]
+        subject.send(key).should == DirectUploader.fog_credentials[key]
       end
 
       it "should not be nil" do
-        uploader.send(key).should_not be_nil
+        subject.send(key).should_not be_nil
       end
     end
   end
 
-  it_should_have_accessor(:success_action_redirect, :it => DirectUploader.new)
-
-  describe "#extension_white_list" do
-    it "should return the result from .allowed_file_types" do
-      uploader.class.stub(:allowed_file_types).and_return("allowed file types")
-      uploader.extension_white_list.should == "allowed file types"
-    end
-  end
+  it_should_have_accessor(:success_action_redirect)
 
   describe "#key=" do
-    before { uploader.key = sample(:key) }
+    before { subject.key = sample(:key) }
 
     it "should set the key" do
-      uploader.key.should == sample(:key)
+      subject.key.should == sample(:key)
     end
 
     context "the versions keys" do
-      it "should == this uploader's key" do
-        uploader.versions.each do |name, version_uploader|
-          version_uploader.key.should == uploader.key
+      it "should == this subject's key" do
+        subject.versions.each do |name, version_subject|
+          version_subject.key.should == subject.key
         end
       end
     end
@@ -236,21 +85,29 @@ describe CarrierWaveDirect::Uploader do
   describe "#key" do
     context "where the key is not set" do
       before do
-        mounted_uploader.key = nil
-        mounted_uploader.stub(:store_dir).and_return("store_dir")
+        mounted_subject.key = nil
       end
 
-      it "should return the result of .key :store_dir => store_dir" do
-        mounted_uploader.class.stub(:key).with(:store_dir => "store_dir").and_return(sample(:key))
-        mounted_uploader.key.should == sample(:key)
+      it "should return '*/\#\{guid\}/${filename}'" do
+        mounted_subject.key.should =~ /#{GUID_REGEXP}\/\$\{filename\}$/
+      end
+
+      context "and #store_dir returns '#{sample(:store_dir)}'" do
+        before do
+          mounted_subject.stub(:store_dir).and_return(sample(:store_dir))
+        end
+
+        it "should return '#{sample(:store_dir)}/\#\{guid\}/${filename}'" do
+          mounted_subject.key.should =~ /^#{sample(:store_dir)}\/#{GUID_REGEXP}\/\$\{filename\}$/
+        end
       end
     end
 
     context "where the key is set to '#{sample(:key)}'" do
-      before { uploader.key = sample(:key) }
+      before { subject.key = sample(:key) }
 
       it "should return '#{sample(:key)}'" do
-        uploader.key.should == sample(:key)
+        subject.key.should == sample(:key)
       end
     end
   end
@@ -259,40 +116,40 @@ describe CarrierWaveDirect::Uploader do
     context "a key has not been set" do
 
       it "should return false" do
-        uploader.should_not have_key
+        subject.should_not have_key
       end
     end
 
     context "the key has been autogenerated" do
-      before { uploader.key }
+      before { subject.key }
 
       it "should return false" do
-        uploader.should_not have_key
+        subject.should_not have_key
       end
     end
 
     context "the key has been set" do
-      before { uploader.key = sample_key(:mounted_as => :pic, :uploader => "NightOut") }
+      before { subject.key = sample_key }
 
       it "should return true" do
-        uploader.should have_key
+        subject.should have_key
       end
     end
   end
 
   describe "#direct_fog_url" do
     it "should return the result from CarrierWave::Storage::Fog::File#public_url" do
-      uploader.direct_fog_url.should == CarrierWave::Storage::Fog::File.new(
-        uploader, nil, nil
+      subject.direct_fog_url.should == CarrierWave::Storage::Fog::File.new(
+        subject, nil, nil
       ).public_url
     end
 
     context ":with_path => true" do
       context "#key is set to '#{sample(:path)}'" do
-        before { uploader.key = sample(:path) }
+        before { subject.key = sample(:path) }
 
         it "should return the full url with '/#{sample(:path)}' as the path" do
-          URI.parse(uploader.direct_fog_url(:with_path => true)).path.should == "/#{sample(:path)}"
+          URI.parse(subject.direct_fog_url(:with_path => true)).path.should == "/#{sample(:path)}"
         end
       end
     end
@@ -300,24 +157,24 @@ describe CarrierWaveDirect::Uploader do
 
   describe "#persisted?" do
     it "should return false" do
-      uploader.should_not be_persisted
+      subject.should_not be_persisted
     end
   end
 
   describe "#filename" do
     context "key is set to '#{sample(:s3_key)}'" do
-      before { mounted_uploader.key = sample(:s3_key) }
+      before { mounted_subject.key = sample(:s3_key) }
 
       it "should return '#{sample(:stored_filename)}'" do
-        mounted_uploader.filename.should == sample(:stored_filename)
+        mounted_subject.filename.should == sample(:stored_filename)
       end
     end
 
     context "key is set to '#{sample(:key)}'" do
-      before { uploader.key = sample(:key) }
+      before { subject.key = sample(:key) }
 
       it "should return '#{sample(:key)}'" do
-        uploader.filename.should == sample(:key)
+        subject.filename.should == sample(:key)
       end
     end
 
@@ -325,66 +182,53 @@ describe CarrierWaveDirect::Uploader do
       context "but the model's remote #{sample(:mounted_as)} url is: '#{sample(:file_url)}'" do
 
         before do
-          mounted_uploader.model.stub(
-            "remote_#{mounted_uploader.mounted_as}_url"
+          mounted_subject.model.stub(
+            "remote_#{mounted_subject.mounted_as}_url"
           ).and_return(sample(:file_url))
         end
 
         it "should set the key to contain '#{File.basename(sample(:file_url))}'" do
-          mounted_uploader.filename
-          mounted_uploader.key.should =~ /#{Regexp.escape(File.basename(sample(:file_url)))}$/
+          mounted_subject.filename
+          mounted_subject.key.should =~ /#{Regexp.escape(File.basename(sample(:file_url)))}$/
         end
 
         it "should return a filename based off the key and remote url" do
-          filename = mounted_uploader.filename
-          mounted_uploader.key.should =~ /#{Regexp.escape(filename)}$/
+          filename = mounted_subject.filename
+          mounted_subject.key.should =~ /#{Regexp.escape(filename)}$/
         end
 
-        # this ensures that the version uploader keys are updated
+        # this ensures that the version subject keys are updated
         # see spec for key= for more details
         it "should set the key explicitly" do
-          mounted_uploader.should_receive(:key=)
-          mounted_uploader.filename
+          mounted_subject.should_receive(:key=)
+          mounted_subject.filename
         end
       end
 
       context "and the model's remote #{sample(:mounted_as)} url is blank" do
         before do
           mounted_model.stub(
-            "remote_#{mounted_uploader.mounted_as}_url"
+            "remote_#{mounted_subject.mounted_as}_url"
           ).and_return nil
         end
 
         it "should return nil" do
-          mounted_uploader.filename.should be_nil
+          mounted_subject.filename.should be_nil
         end
-      end
-    end
-  end
-
-  describe "#store_dir" do
-    context "for a '#{sample(:mounted_model_name)}' mounted as a '#{sample(:mounted_as)}'" do
-
-      it "should return the result from .store_dir :model_class => #{sample(:mounted_model_name)}, :mounted_as => :#{sample(:mounted_as)}" do
-        uploader.class.stub(:store_dir).with(
-          :model_class => mounted_model.class,
-          :mounted_as => mounted_uploader.mounted_as
-        ).and_return("store_dir")
-        mounted_uploader.store_dir.should == "store_dir"
       end
     end
   end
 
   describe "#acl" do
     it "should return the sanitized s3 access policy" do
-      uploader.acl.should == uploader.s3_access_policy.to_s.gsub("_", "-")
+      subject.acl.should == subject.s3_access_policy.to_s.gsub("_", "-")
     end
   end
 
   # http://aws.amazon.com/articles/1434?_encoding=UTF8
   describe "#policy" do
     def decoded_policy(options = {})
-      instance = options.delete(:uploader) || uploader
+      instance = options.delete(:subject) || subject
       JSON.parse(Base64.decode64(instance.policy(options)))
     end
 
@@ -393,7 +237,7 @@ describe CarrierWaveDirect::Uploader do
     end
 
     it "should not contain any new lines" do
-      uploader.policy.should_not include("\n")
+      subject.policy.should_not include("\n")
     end
 
     context "expiration" do
@@ -451,23 +295,23 @@ describe CarrierWaveDirect::Uploader do
 
         # S3 conditions
         it "'key'" do
-          mounted_uploader.stub(:store_dir).and_return(sample(:s3_key))
-          mounted_uploader.key
+          mounted_subject.stub(:store_dir).and_return(sample(:s3_key))
+          mounted_subject.key
           conditions(
-            :uploader => mounted_uploader
+            :subject => mounted_subject
           ).should have_condition(:key, sample(:s3_key))
         end
 
         it "'bucket'" do
-          conditions.should have_condition("bucket" => uploader.fog_directory)
+          conditions.should have_condition("bucket" => subject.fog_directory)
         end
 
         it "'acl'" do
-          conditions.should have_condition("acl" => uploader.acl)
+          conditions.should have_condition("acl" => subject.acl)
         end
 
         it "'success_action_redirect'" do
-          uploader.success_action_redirect = "http://example.com/some_url"
+          subject.success_action_redirect = "http://example.com/some_url"
           conditions.should have_condition("success_action_redirect" => "http://example.com/some_url")
         end
 
@@ -493,13 +337,13 @@ describe CarrierWaveDirect::Uploader do
 
   describe "#signature" do
     it "should not contain any new lines" do
-      uploader.signature.should_not include("\n")
+      subject.signature.should_not include("\n")
     end
 
     it "should return a base64 encoded 'sha1' hash of the secret key and policy document" do
-      Base64.decode64(uploader.signature).should == OpenSSL::HMAC.digest(
+      Base64.decode64(subject.signature).should == OpenSSL::HMAC.digest(
         OpenSSL::Digest::Digest.new('sha1'),
-        uploader.aws_secret_access_key, uploader.policy
+        subject.aws_secret_access_key, subject.policy
       )
     end
   end
@@ -510,16 +354,16 @@ describe CarrierWaveDirect::Uploader do
     describe "#{sample(:mounted_as).capitalize}Uploader" do
       describe "##{sample(:mounted_as)}" do
         it "should be defined" do
-          direct_uploader.should be_respond_to(sample(:mounted_as))
+          direct_subject.should be_respond_to(sample(:mounted_as))
         end
 
         it "should return itself" do
-          direct_uploader.send(sample(:mounted_as)).should == direct_uploader
+          direct_subject.send(sample(:mounted_as)).should == direct_subject
         end
       end
 
       context "has a '#{sample(:version)}' version" do
-        let(:video_uploader) { MountedClass.new.video }
+        let(:video_subject) { MountedClass.new.video }
 
         before do
           DirectUploader.version(sample(:version))
@@ -527,11 +371,11 @@ describe CarrierWaveDirect::Uploader do
 
         context "and the key is '#{sample(:s3_key)}'" do
           before do
-            video_uploader.key = sample(:s3_key)
+            video_subject.key = sample(:s3_key)
           end
 
           context "the store path" do
-            let(:store_path) { video_uploader.send(sample(:version)).store_path }
+            let(:store_path) { video_subject.send(sample(:version)).store_path }
 
             it "should be like '#{sample(:stored_version_filename)}'" do
               store_path.should =~ /#{sample(:stored_version_filename)}$/

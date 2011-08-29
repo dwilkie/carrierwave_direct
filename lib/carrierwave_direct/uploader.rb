@@ -11,11 +11,6 @@ module CarrierWaveDirect
 
       attr_accessor :success_action_redirect
 
-      if defined?(ActiveModel)
-        include ActiveModel::Conversion
-        extend ActiveModel::Naming
-      end
-
       fog_credentials.keys.each do |key|
         define_method(key) do
           fog_credentials[key]
@@ -30,51 +25,6 @@ module CarrierWaveDirect
 
       def max_file_size
         5242880
-      end
-
-      def extension_white_list
-        []
-      end
-
-      def store_dir(options = {})
-        dir = "uploads"
-        # I stole it! from Rails
-        if options[:model_class]
-          model_class = options[:model_class].to_s.
-          gsub(/::/, '/').
-          gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2').
-          gsub(/([a-z\d])([A-Z])/,'\1_\2').
-          tr("-", "_").
-          downcase
-          dir << "/#{model_class}"
-        end
-        dir << "/#{options[:mounted_as]}" if options[:mounted_as]
-        dir
-      end
-
-      def allowed_file_types(options = {})
-        file_types = extension_white_list
-        if options[:as] == :regexp_string
-          extension_regexp = file_types.empty? ? "\\w+" : "(#{file_types.join("|")})"
-          "\\.#{extension_regexp}"
-        else
-          file_types
-        end
-      end
-
-      def key(options = {})
-        options[:store_dir] ||= store_dir(options)
-        options[:guid] ||= UUID.generate
-        options[:filename] ||= S3_FILENAME_WILDCARD
-        key_path = "#{options[:store_dir]}/#{options[:guid]}/#{options[:filename]}"
-        if options[:as] == :regexp
-          key_parts = key_path.split("/")
-          key_parts.pop
-          key_parts.pop
-          key_path = key_parts.join("/")
-          key_path = /\A#{key_path}\/[a-f\d\-]+\/.+#{allowed_file_types(:as => :regexp_string)}\z/
-        end
-        key_path
       end
     end # ClassMethods
 
@@ -95,8 +45,12 @@ module CarrierWaveDirect
         update_version_keys(:with => @key)
       end
 
+      def guid
+        UUID.generate
+      end
+
       def key
-        @key ||= self.class.key(:store_dir => store_dir)
+        @key ||= "#{store_dir}/#{guid}/#{S3_FILENAME_WILDCARD}"
       end
 
       def has_key?
@@ -139,10 +93,6 @@ module CarrierWaveDirect
         ).gsub("\n","")
       end
 
-      def store_dir
-        self.class.store_dir(:model_class => model.class, :mounted_as => mounted_as)
-      end
-
       def filename
         unless has_key?
           # Use the attached models remote url to generate a new key otherwise return nil
@@ -155,18 +105,24 @@ module CarrierWaveDirect
         filename_parts.unshift(key_path.pop)
         unique_key = key_path.pop
         filename_parts.unshift(unique_key) if unique_key
-        File.join(filename_parts)
+        filename_parts.join("/")
       end
 
-      # Add a white list of extensions which are allowed to be uploaded.
-      def extension_white_list
-        self.class.allowed_file_types
+      #TODO:
+      # Use the tests from the old .key method
+      def key_regexp
+        allowed_file_types = extension_white_list
+        extension_regexp = allowed_file_types.present? && allowed_file_types.any? ?  "(#{allowed_file_types.join("|")})" : "\\w+"
+        /\A#{store_dir}\/[a-f\d\-]+\/.+\.#{extension_regexp}\z/
       end
 
       private
 
       def key_from_file(fname)
-        self.key = self.class.key(:store_dir => store_dir, :filename => fname)
+        new_key_parts = key.split("/")
+        new_key_parts.pop
+        new_key_parts << fname
+        self.key = new_key_parts.join("/")
       end
 
       # Update the versions to use this key
