@@ -15,9 +15,9 @@ describe CarrierWaveDirect::Test::Helpers do
           end
         end
 
-        context "['exe']" do
+        context "['exe', 'bmp']" do
           before do
-            direct_uploader.stub(:extension_white_list).and_return(%w{exe})
+            direct_uploader.stub(:extension_white_list).and_return(%w{exe bmp})
           end
 
           it "should return '*/guid/filename.exe'" do

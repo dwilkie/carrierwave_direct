@@ -108,12 +108,17 @@ module CarrierWaveDirect
         filename_parts.join("/")
       end
 
-      #TODO:
-      # Use the tests from the old .key method
       def key_regexp
+        /\A#{store_dir}\/[a-f\d\-]+\/.+\.#{extension_regexp}\z/
+      end
+
+      def extension_regexp
         allowed_file_types = extension_white_list
         extension_regexp = allowed_file_types.present? && allowed_file_types.any? ?  "(#{allowed_file_types.join("|")})" : "\\w+"
-        /\A#{store_dir}\/[a-f\d\-]+\/.+\.#{extension_regexp}\z/
+      end
+
+      def url_scheme_white_list
+        nil
       end
 
       private

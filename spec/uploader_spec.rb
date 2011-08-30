@@ -9,6 +9,7 @@ describe CarrierWaveDirect::Uploader do
     :key => "some key",
     :guid => "guid",
     :store_dir => "store_dir",
+    :extension_regexp => "(avi)",
     :url => "http://example.com/some_url",
     :expiration => 60,
     :max_file_size => 10485760,
@@ -108,6 +109,73 @@ describe CarrierWaveDirect::Uploader do
 
       it "should return '#{sample(:key)}'" do
         subject.key.should == sample(:key)
+      end
+    end
+  end
+
+  describe "#url_scheme_white_list" do
+    it "should return nil" do
+      subject.url_scheme_white_list.should be_nil
+    end
+  end
+
+  describe "#key_regexp" do
+    it "should return a regexp" do
+      subject.key_regexp.should be_a(Regexp)
+    end
+
+    context "where #store_dir returns '#{sample(:store_dir)}'" do
+      before do
+        subject.stub(:store_dir).and_return(sample(:store_dir))
+      end
+
+      context "and #extension_regexp returns '#{sample(:extension_regexp)}'" do
+        before do
+          subject.stub(:extension_regexp).and_return(sample(:extension_regexp))
+        end
+
+        it "should return /\\A#{sample(:store_dir)}\\/#{GUID_REGEXP}\\/.+\\.#{sample(:extension_regexp)}\\z/" do
+          subject.key_regexp.should ==  /\A#{sample(:store_dir)}\/#{GUID_REGEXP}\/.+\.#{sample(:extension_regexp)}\z/
+        end
+      end
+    end
+  end
+
+  describe "#extension_regexp" do
+    shared_examples_for "a globally allowed file extension" do
+      it "should return '\\w+'" do
+        subject.extension_regexp.should == "\\w+"
+      end
+    end
+
+    it "should return a string" do
+      subject.extension_regexp.should be_a(String)
+    end
+
+    context "where #extension_white_list returns nil" do
+      before do
+        subject.stub(:extension_white_list).and_return(nil)
+      end
+
+      it_should_behave_like "a globally allowed file extension"
+    end
+
+    context "where #extension_white_list returns []" do
+      before do
+        subject.stub(:extension_white_list).and_return([])
+      end
+
+      it_should_behave_like "a globally allowed file extension"
+    end
+
+    context "where #extension_white_list returns ['exe', 'bmp']" do
+
+      before do
+        subject.stub(:extension_white_list).and_return(%w{exe bmp})
+      end
+
+      it "should return '(exe|bmp)'" do
+        subject.extension_regexp.should == "(exe|bmp)"
       end
     end
   end

@@ -31,6 +31,25 @@ module CarrierWaveDirect
         end
       end
 
+      class RemoteNetUrlFormatValidator < ::ActiveModel::EachValidator
+        def validate_each(record, attribute, value)
+
+          if record.new_record?
+            remote_net_url = record.send("remote_#{attribute}_net_url")
+            uploader = record.send(attribute)
+            url_scheme_white_list = uploader.url_scheme_white_list
+            if (remote_net_url !~ URI.regexp(url_scheme_white_list) || remote_net_url !~ /#{uploader.extension_regexp}\z/)
+              record.errors.add(
+                attribute,
+                :carrierwave_direct_remote_net_url_invalid,
+                :extension_white_list => uploader.extension_white_list,
+                :url_scheme_white_list => url_scheme_white_list
+              )
+            end
+          end
+        end
+      end
+
       module HelperMethods
 
         ##
@@ -54,6 +73,9 @@ module CarrierWaveDirect
           validates_with FilenameFormatValidator, _merge_attributes(attr_names)
         end
 
+        def validates_remote_net_url_format_of(*attr_names)
+          validates_with RemoteNetUrlFormatValidator, _merge_attributes(attr_names)
+        end
       end
 
       included do
