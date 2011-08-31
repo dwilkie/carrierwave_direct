@@ -157,7 +157,7 @@ describe CarrierWaveDirect::ActiveRecord do
     shared_examples_for "a remote net url i18n error message" do
       it "should use i18n for the error messages" do
         subject.valid?
-        subject.errors[:video].should == [I18n.t("errors.messages.carrierwave_direct_remote_net_url_invalid", i18n_options)]
+        subject.errors[:remote_video_net_url].should == [I18n.t("errors.messages.carrierwave_direct_remote_net_url_invalid", i18n_options)]
       end
     end
 
@@ -195,7 +195,7 @@ describe CarrierWaveDirect::ActiveRecord do
 
               it "should include the white listed extensions in the error message" do
                 subject.valid?
-                subject.errors[:video].first.should include("avi and mp4")
+                subject.errors[:remote_video_net_url].first.should include("avi and mp4")
               end
             end
           end
@@ -266,7 +266,7 @@ describe CarrierWaveDirect::ActiveRecord do
 
               it "should include the white listed url schemes in the error message" do
                 subject.valid?
-                subject.errors[:video].first.should include("http and https")
+                subject.errors[:remote_video_net_url].first.should include("http and https")
               end
             end
           end
@@ -295,9 +295,14 @@ describe CarrierWaveDirect::ActiveRecord do
         subject.should_not be_valid
       end
 
-      it "should use i18n for the error messages" do
+      it "should use i18n for the file upload error message" do
         subject.valid?
         subject.errors[:video].should == [I18n.t("errors.messages.carrierwave_direct_upload_missing")]
+      end
+
+      it "should use i18n for the remote net url error message" do
+        subject.valid?
+        subject.errors[:remote_video_net_url].should == [I18n.t("errors.messages.blank")]
       end
 
       it "should be valid on update" do

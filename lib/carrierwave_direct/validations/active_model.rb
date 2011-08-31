@@ -39,7 +39,7 @@ module CarrierWaveDirect
             url_scheme_white_list = uploader.url_scheme_white_list
             if (remote_net_url !~ URI.regexp(url_scheme_white_list) || remote_net_url !~ /#{uploader.extension_regexp}\z/)
               record.errors.add(
-                attribute,
+                :"remote_#{attribute}_net_url",
                 :carrierwave_direct_remote_net_url_invalid,
                 :extension_white_list => uploader.extension_white_list,
                 :url_scheme_white_list => url_scheme_white_list
@@ -56,6 +56,10 @@ module CarrierWaveDirect
               record.errors.add(
                 attribute,
                 :carrierwave_direct_upload_missing
+              )
+              record.errors.add(
+                :"remote_#{attribute}_net_url",
+                :blank
               )
             end
           end
