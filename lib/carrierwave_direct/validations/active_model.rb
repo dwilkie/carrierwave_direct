@@ -21,7 +21,7 @@ module CarrierWaveDirect
 
       class FilenameFormatValidator < ::ActiveModel::EachValidator
         def validate_each(record, attribute, value)
-          if record.new_record? && (record.key !~ record.send(attribute).key_regexp)
+          if record.new_record? && record.send("has_#{attribute}_upload?") && record.key !~ record.send(attribute).key_regexp
             record.errors.add(
               attribute,
               :carrierwave_direct_filename_invalid,
@@ -33,8 +33,7 @@ module CarrierWaveDirect
 
       class RemoteNetUrlFormatValidator < ::ActiveModel::EachValidator
         def validate_each(record, attribute, value)
-
-          if record.new_record?
+          if record.new_record? && record.send("has_remote_#{attribute}_net_url?")
             remote_net_url = record.send("remote_#{attribute}_net_url")
             uploader = record.send(attribute)
             url_scheme_white_list = uploader.url_scheme_white_list
@@ -46,6 +45,30 @@ module CarrierWaveDirect
                 :url_scheme_white_list => url_scheme_white_list
               )
             end
+          end
+        end
+      end
+
+      class IsUploadedValidator < ::ActiveModel::EachValidator
+        def validate_each(record, attribute, value)
+          if record.new_record?
+            unless (record.send("has_#{attribute}_upload?") || record.send("has_remote_#{attribute}_net_url?"))
+              record.errors.add(
+                attribute,
+                :carrierwave_direct_upload_missing
+              )
+            end
+          end
+        end
+      end
+
+      class IsAttachedValidator < ::ActiveModel::EachValidator
+        def validate_each(record, attribute, value)
+          if value.blank? && !record.skip_is_attached_validations
+            record.errors.add(
+              attribute,
+              :carrierwave_direct_attachment_missing
+            )
           end
         end
       end
@@ -76,6 +99,15 @@ module CarrierWaveDirect
         def validates_remote_net_url_format_of(*attr_names)
           validates_with RemoteNetUrlFormatValidator, _merge_attributes(attr_names)
         end
+
+        def validates_is_uploaded(*attr_names)
+          validates_with IsUploadedValidator, _merge_attributes(attr_names)
+        end
+
+        def validates_is_attached(*attr_names)
+          validates_with IsAttachedValidator, _merge_attributes(attr_names)
+        end
+
       end
 
       included do

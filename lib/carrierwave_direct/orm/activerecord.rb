@@ -18,6 +18,7 @@ module CarrierWaveDirect
       include CarrierWaveDirect::Validations::ActiveModel
 
       self.instance_eval <<-RUBY, __FILE__, __LINE__+1
+        attr_accessor   :skip_is_attached_validations
         attr_accessible :key, :remote_#{column}_net_url
       RUBY
 
@@ -26,7 +27,9 @@ module CarrierWaveDirect
       mod.class_eval <<-RUBY, __FILE__, __LINE__+1
         def filename_valid?
           if has_#{column}_upload?
+            self.skip_is_attached_validations = true
             valid?
+            self.skip_is_attached_validations = false
             column_errors = errors[:#{column}]
             errors.clear
             column_errors.each do |column_error|

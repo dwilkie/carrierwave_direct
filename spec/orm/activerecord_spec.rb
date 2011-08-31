@@ -36,6 +36,7 @@ describe CarrierWaveDirect::ActiveRecord do
   describe "class Party < ActiveRecord::Base; mount_uploader :video, DirectUploader; end" do
     $arclass = 0
     include UploaderHelpers
+    include ModelHelpers
 
     let(:party_class) { Class.new(Party) }
     let(:subject) { party_class.new }
@@ -73,36 +74,82 @@ describe CarrierWaveDirect::ActiveRecord do
       end
     end
 
+    shared_examples_for "an invalid filename" do
+      it "should not be valid on create" do
+        subject.should_not be_valid
+      end
+
+      it "should be valid on update" do
+        subject.save(:validate => false)
+        subject.should be_valid
+      end
+
+      it "should use i18n for the error messages" do
+        subject.valid?
+        subject.errors[:video].should == [
+          I18n.t("errors.messages.carrierwave_direct_filename_invalid", :extension_white_list => %w{avi mp4})
+        ]
+      end
+    end
+
     shared_examples_for "validating format of filenames" do
-      context "the video's key does not contain a guid" do
 
-        before do
-          subject.video.key = sample_key(:valid => false)
-        end
-
-        it "should not be valid on create" do
-          subject.should_not be_valid
-        end
-
-        it "should be valid on update" do
-          subject.save(:validate => false)
-          subject.should be_valid
-        end
-
-        it "should use I18n for the error messages" do
-          subject.valid?
-          subject.errors[:video].should == [I18n.t("errors.messages.carrierwave_direct_filename_invalid")]
-        end
-
-        context "the uploader has an extension white list" do
+      context "where the file upload is" do
+        context "nil" do
           before do
-            subject.video.stub(:extension_white_list).and_return(%w{exe bmp})
+            subject.key = nil
           end
+
+          it "should be valid" do
+            subject.should be_valid
+          end
+        end
+
+        context "blank" do
+          before do
+            subject.key = ""
+          end
+
+          it "should be valid" do
+            subject.should be_valid
+          end
+        end
+      end
+
+      context "where the uploader has an extension white list" do
+        before do
+          subject.video.stub(:extension_white_list).and_return(%w{avi mp4})
+        end
+
+        context "and the uploaded file's extension is included in the list" do
+          before do
+            subject.key = sample_key(:extension => "avi")
+          end
+
+          it "should be valid" do
+            subject.should be_valid
+          end
+        end
+
+        context "but uploaded file's extension is not included in the list" do
+          before do
+            subject.key = sample_key(:extension => "mp3")
+          end
+
+          it_should_behave_like "an invalid filename"
 
           it "should include the white listed extensions in the error message" do
             subject.valid?
-            subject.errors[:video].first.should include("exe and bmp")
+            subject.errors[:video].first.should include("avi and mp4")
           end
+        end
+
+        context "and the video's key does not contain a guid" do
+          before do
+            subject.video.key = sample_key(:valid => false)
+          end
+
+          it_should_behave_like "an invalid filename"
         end
       end
     end
@@ -167,6 +214,28 @@ describe CarrierWaveDirect::ActiveRecord do
             end
           end
 
+          context "where the url is" do
+            context "nil" do
+              before do
+                subject.remote_video_net_url = nil
+              end
+
+              it "should be valid" do
+                subject.should be_valid
+              end
+            end
+
+            context "blank" do
+              before do
+                subject.remote_video_net_url = ""
+              end
+
+              it "should be valid" do
+                subject.should be_valid
+              end
+            end
+          end
+
           context "where the uploader specifies valid url schemes" do
             before do
               subject.video.stub(:url_scheme_white_list).and_return(%w{http https})
@@ -212,6 +281,97 @@ describe CarrierWaveDirect::ActiveRecord do
             subject.save(:validate => false)
             subject.should be_valid
           end
+        end
+      end
+    end
+
+    shared_examples_for "without an upload" do
+      before do
+        subject.remote_video_net_url = remote_video_net_url
+        subject.key = upload_path
+      end
+
+      it "should not be valid on create" do
+        subject.should_not be_valid
+      end
+
+      it "should use i18n for the error messages" do
+        subject.valid?
+        subject.errors[:video].should == [I18n.t("errors.messages.carrierwave_direct_upload_missing")]
+      end
+
+      it "should be valid on update" do
+        subject.save(:validate => false)
+        subject.should be_valid
+      end
+    end
+
+    shared_examples_for "validating a file is uploaded" do
+      context "where there is no upload" do
+        it_should_behave_like "without an upload" do
+          let(:remote_video_net_url) { nil }
+          let(:upload_path) { nil }
+        end
+      end
+
+      context "where the remote net url is blank" do
+        it_should_behave_like "without an upload" do
+          let(:remote_video_net_url) { "" }
+          let(:upload_path) { nil }
+        end
+      end
+
+      context "with an upload by remote url" do
+        before do
+          subject.remote_video_net_url = "anything"
+        end
+
+        it "should be valid" do
+          subject.should be_valid
+        end
+      end
+
+      context "with an upload by file" do
+        before do
+          subject.key = sample_key
+        end
+
+        it "should be valid" do
+          subject.should be_valid
+        end
+      end
+    end
+
+    shared_examples_for "a blank or empty attachment" do
+      it "should not be valid" do
+        subject.should_not be_valid
+      end
+
+      context "on update" do
+        it "should not be valid" do
+          subject.save(:validate => false)
+          subject.should_not be_valid
+        end
+      end
+
+      it "should use i18n for the error messages" do
+        subject.valid?
+        subject.errors[:video].should == [I18n.t("errors.messages.carrierwave_direct_attachment_missing")]
+      end
+    end
+
+    shared_examples_for "validating attachment is present" do
+      context "where the attachment" do
+        context "is blank" do
+          it_should_behave_like "a blank or empty attachment"
+        end
+
+        context "is nil" do
+          before do
+            subject.video = nil
+          end
+
+          it_should_behave_like "a blank or empty attachment"
         end
       end
     end
@@ -264,6 +424,40 @@ describe CarrierWaveDirect::ActiveRecord do
       it_should_behave_like "validating format of remote net urls"
     end
 
+    describe ".validates_is_uploaded" do
+      before do
+        party_class.validates_is_uploaded :video
+      end
+
+      it_should_behave_like "validating a file is uploaded"
+    end
+
+    describe ".validate :video, :is_uploaded => true" do
+      before do
+        party_class.validates :video, :is_uploaded => true
+      end
+
+      it_should_behave_like "validating a file is uploaded"
+    end
+
+    describe ".validates_is_attached" do
+      before do
+        party_class.validates_is_attached :video
+      end
+
+      it_should_behave_like "validating attachment is present"
+    end
+
+    describe ".validate :video, :is_attached => true" do
+      before do
+        party_class.validates :video, :is_attached => true
+      end
+
+      it_should_behave_like "validating attachment is present"
+    end
+
+    it_should_have_accessor(:skip_is_attached_validations)
+
     describe "#key" do
       it "should be accessible" do
         party_class.new(:key => "some key").key.should == "some key"
@@ -278,7 +472,9 @@ describe CarrierWaveDirect::ActiveRecord do
 
     describe "#filename_valid?" do
       shared_examples_for "having empty errors" do
-        before { subject.filename_valid? }
+        before do
+          subject.filename_valid?
+        end
 
         context "where after the call, #errors" do
           it "should be empty" do
@@ -301,10 +497,15 @@ describe CarrierWaveDirect::ActiveRecord do
 
       context "with filename validations on" do
         before do
-          party_class.validates_filename_format_of :video
+          party_class.validates :video,
+                                :is_attached => true,
+                                :is_uploaded => true,
+                                :unique_filename => true,
+                                :filename_format => true,
+                                :remote_net_url_format => true
         end
 
-        context "does not have a video upload" do
+        context "does not have an upload" do
           it "should be true" do
             subject.filename_valid?.should be_true
           end
@@ -312,9 +513,11 @@ describe CarrierWaveDirect::ActiveRecord do
           it_should_behave_like "having empty errors"
         end
 
-        context "has a video upload" do
+        context "has an upload" do
           context "with a valid filename" do
-            before { subject.key = sample_key(:model_class => subject.class) }
+            before do
+              subject.key = sample_key(:model_class => subject.class)
+            end
 
             it "should be true" do
               subject.filename_valid?.should be_true
@@ -333,7 +536,7 @@ describe CarrierWaveDirect::ActiveRecord do
             context "after the call, #errors" do
               before { subject.filename_valid? }
 
-              it "should only contain 'video' errors" do
+              it "should only contain '\#\{column\}' errors" do
                 subject.errors.count.should == subject.errors[:video].count
               end
             end
