@@ -2,14 +2,17 @@
 
 module CarrierWaveDirect
   module Uploader
-    S3_FILENAME_WILDCARD = "${filename}"
 
     extend ActiveSupport::Concern
+
+    FILENAME_WILDCARD = "${filename}"
 
     included do
       storage :fog
 
       attr_accessor :success_action_redirect
+
+      include CarrierWaveDirect::Uploader::Configuration
 
       fog_credentials.keys.each do |key|
         define_method(key) do
@@ -40,25 +43,21 @@ module CarrierWaveDirect
         fog_uri
       end
 
+      def guid
+        UUID.generate
+      end
+
       def key=(k)
         @key = k
         update_version_keys(:with => @key)
       end
 
-      def guid
-        UUID.generate
-      end
-
       def key
-        @key ||= "#{store_dir}/#{guid}/#{S3_FILENAME_WILDCARD}"
+        @key ||= "#{store_dir}/#{guid}/#{FILENAME_WILDCARD}"
       end
 
       def has_key?
-        @key.present? && !(@key =~ /#{Regexp.escape(S3_FILENAME_WILDCARD)}\z/)
-      end
-
-      def persisted?
-        false
+        @key.present? && !(@key =~ /#{Regexp.escape(FILENAME_WILDCARD)}\z/)
       end
 
       def acl
@@ -91,6 +90,10 @@ module CarrierWaveDirect
             aws_secret_access_key, policy
           )
         ).gsub("\n","")
+      end
+
+      def persisted?
+        false
       end
 
       def filename

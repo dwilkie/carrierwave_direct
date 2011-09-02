@@ -17,6 +17,12 @@ module CarrierWaveDirect
 
       include CarrierWaveDirect::Validations::ActiveModel
 
+      validates_is_attached column if uploader_option(column.to_sym, :validate_is_attached)
+      validates_is_uploaded column if uploader_option(column.to_sym, :validate_is_uploaded)
+      validates_filename_uniqueness_of column if uploader_option(column.to_sym, :validate_unique_filename)
+      validates_filename_format_of column if uploader_option(column.to_sym, :validate_filename_format)
+      validates_remote_net_url_format_of column if uploader_option(column.to_sym, :validate_remote_net_url_format)
+
       self.instance_eval <<-RUBY, __FILE__, __LINE__+1
         attr_accessor   :skip_is_attached_validations
         attr_accessible :key, :remote_#{column}_net_url

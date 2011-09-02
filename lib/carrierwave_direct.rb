@@ -9,6 +9,10 @@ module CarrierWaveDirect
   autoload :Uploader, "carrierwave_direct/uploader"
   autoload :Mount, "carrierwave_direct/mount"
 
+  module Uploader
+    autoload :Configuration, 'carrierwave_direct/uploader/configuration'
+  end
+
   module Test
     autoload :Helpers, 'carrierwave_direct/test/helpers'
   end

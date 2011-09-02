@@ -38,40 +38,23 @@ describe CarrierWaveDirect::ActiveRecord do
     include UploaderHelpers
     include ModelHelpers
 
-    let(:party_class) { Class.new(Party) }
-    let(:subject) { party_class.new }
+    let(:party_class) do
+      Class.new(Party)
+    end
+
+    let(:subject) do
+      party = party_class.new
+    end
+
+    def mount_uploader
+      party_class.mount_uploader :video, DirectUploader
+    end
 
     before do
       # see https://github.com/jnicklas/carrierwave/blob/master/spec/orm/activerecord_spec.rb
       $arclass += 1
       Object.const_set("Party#{$arclass}", party_class)
       party_class.table_name = "parties"
-    end
-
-    shared_examples_for "validating uniqueness of filenames" do
-      context "a Party with a mounted video exists" do
-        before do
-          subject.video.key = "bliind"
-          subject.save
-        end
-
-        context "another Party with a duplicate video filename" do
-          let(:another_party) do
-            another_party = party_class.new
-            another_party.video.key = subject.video.key
-            another_party
-          end
-
-          it "should not be valid" do
-            another_party.should_not be_valid
-          end
-
-          it "should use I18n for the error messages" do
-            another_party.valid?
-            another_party.errors[:video].should == [I18n.t("errors.messages.carrierwave_direct_filename_taken")]
-          end
-        end
-      end
     end
 
     shared_examples_for "an invalid filename" do
@@ -92,7 +75,102 @@ describe CarrierWaveDirect::ActiveRecord do
       end
     end
 
-    shared_examples_for "validating format of filenames" do
+    shared_examples_for "a remote net url i18n error message" do
+      it "should use i18n for the error messages" do
+        subject.valid?
+        subject.errors[:remote_video_net_url].should == [I18n.t("errors.messages.carrierwave_direct_remote_net_url_invalid", i18n_options)]
+      end
+    end
+
+    shared_examples_for "without an upload" do
+      before do
+        subject.remote_video_net_url = remote_video_net_url
+        subject.key = upload_path
+      end
+
+      it "should not be valid on create" do
+        subject.should_not be_valid
+      end
+
+      it "should use i18n for the file upload error message" do
+        subject.valid?
+        subject.errors[:video].should == [I18n.t("errors.messages.carrierwave_direct_upload_missing")]
+      end
+
+      it "should use i18n for the remote net url error message" do
+        subject.valid?
+        subject.errors[:remote_video_net_url].should == [I18n.t("errors.messages.blank")]
+      end
+
+      it "should be valid on update" do
+        subject.save(:validate => false)
+        subject.should be_valid
+      end
+    end
+
+    shared_examples_for "a blank or empty attachment" do
+      it "should not be valid" do
+        subject.should_not be_valid
+      end
+
+      context "on update" do
+        it "should not be valid" do
+          subject.save(:validate => false)
+          subject.should_not be_valid
+        end
+      end
+
+      it "should use i18n for the error messages" do
+        subject.valid?
+        subject.errors[:video].should == [I18n.t("errors.messages.carrierwave_direct_attachment_missing")]
+      end
+    end
+
+    describe ".validates_filename_uniqueness_of" do
+      it "should be turned on by default" do
+        party_class.should_receive(:validates_filename_uniqueness_of).with(:video)
+        mount_uploader
+      end
+
+      context "another Party with a duplicate video filename" do
+        before do
+          subject.video.key = sample_key
+          subject.save
+        end
+
+        let(:another_party) do
+          another_party = party_class.new
+          another_party.video.key = subject.video.key
+          another_party
+        end
+
+        it "should not be valid" do
+          another_party.should_not be_valid
+        end
+
+        it "should use I18n for the error messages" do
+          another_party.valid?
+          another_party.errors[:video].should == [I18n.t("errors.messages.carrierwave_direct_filename_taken")]
+        end
+      end
+
+      context "is turned off in the configuration" do
+        before do
+          DirectUploader.validate_unique_filename = false
+        end
+
+        it "should not validate the filename uniqueness" do
+          party_class.should_not_receive(:validates_filename_uniqueness_of)
+          mount_uploader
+        end
+      end
+    end
+
+    describe ".validates_filename_format_of" do
+      it "should be turned on by default" do
+        party_class.should_receive(:validates_filename_format_of).with(:video)
+        mount_uploader
+      end
 
       context "where the file upload is" do
         context "nil" do
@@ -152,16 +230,25 @@ describe CarrierWaveDirect::ActiveRecord do
           it_should_behave_like "an invalid filename"
         end
       end
-    end
 
-    shared_examples_for "a remote net url i18n error message" do
-      it "should use i18n for the error messages" do
-        subject.valid?
-        subject.errors[:remote_video_net_url].should == [I18n.t("errors.messages.carrierwave_direct_remote_net_url_invalid", i18n_options)]
+      context "is turned off in the configuration" do
+        before do
+          DirectUploader.validate_filename_format = false
+        end
+
+        it "should not validate the filename format" do
+          party_class.should_not_receive(:validates_filename_format_of)
+          mount_uploader
+        end
       end
     end
 
-    shared_examples_for "validating format of remote net urls" do
+    describe ".validates_remote_net_url_format_of" do
+      it "should be turned on by default" do
+        party_class.should_receive(:validates_remote_net_url_format_of).with(:video)
+        mount_uploader
+      end
+
       context "with an invalid remote image net url" do
 
         context "on create" do
@@ -283,182 +370,113 @@ describe CarrierWaveDirect::ActiveRecord do
           end
         end
       end
-    end
 
-    shared_examples_for "without an upload" do
-      before do
-        subject.remote_video_net_url = remote_video_net_url
-        subject.key = upload_path
-      end
-
-      it "should not be valid on create" do
-        subject.should_not be_valid
-      end
-
-      it "should use i18n for the file upload error message" do
-        subject.valid?
-        subject.errors[:video].should == [I18n.t("errors.messages.carrierwave_direct_upload_missing")]
-      end
-
-      it "should use i18n for the remote net url error message" do
-        subject.valid?
-        subject.errors[:remote_video_net_url].should == [I18n.t("errors.messages.blank")]
-      end
-
-      it "should be valid on update" do
-        subject.save(:validate => false)
-        subject.should be_valid
-      end
-    end
-
-    shared_examples_for "validating a file is uploaded" do
-      context "where there is no upload" do
-        it_should_behave_like "without an upload" do
-          let(:remote_video_net_url) { nil }
-          let(:upload_path) { nil }
-        end
-      end
-
-      context "where the remote net url is blank" do
-        it_should_behave_like "without an upload" do
-          let(:remote_video_net_url) { "" }
-          let(:upload_path) { nil }
-        end
-      end
-
-      context "with an upload by remote url" do
+      context "is turned off in the configuration" do
         before do
-          subject.remote_video_net_url = "anything"
+          DirectUploader.validate_remote_net_url_format = false
         end
 
-        it "should be valid" do
-          subject.should be_valid
+        it "should not validate the format of the remote net url" do
+          party_class.should_not_receive(:validates_remote_net_url_format_of)
+          mount_uploader
         end
       end
-
-      context "with an upload by file" do
-        before do
-          subject.key = sample_key
-        end
-
-        it "should be valid" do
-          subject.should be_valid
-        end
-      end
-    end
-
-    shared_examples_for "a blank or empty attachment" do
-      it "should not be valid" do
-        subject.should_not be_valid
-      end
-
-      context "on update" do
-        it "should not be valid" do
-          subject.save(:validate => false)
-          subject.should_not be_valid
-        end
-      end
-
-      it "should use i18n for the error messages" do
-        subject.valid?
-        subject.errors[:video].should == [I18n.t("errors.messages.carrierwave_direct_attachment_missing")]
-      end
-    end
-
-    shared_examples_for "validating attachment is present" do
-      context "where the attachment" do
-        context "is blank" do
-          it_should_behave_like "a blank or empty attachment"
-        end
-
-        context "is nil" do
-          before do
-            subject.video = nil
-          end
-
-          it_should_behave_like "a blank or empty attachment"
-        end
-      end
-    end
-
-    describe ".validates_filename_uniqueness_of" do
-      before do
-        party_class.validates_filename_uniqueness_of :video
-      end
-
-      it_should_behave_like "validating uniqueness of filenames"
-    end
-
-    describe ".validate :video, :unique_filename => true" do
-      before do
-        party_class.validates :video, :unique_filename => true
-      end
-
-      it_should_behave_like "validating uniqueness of filenames"
-    end
-
-    describe ".validates_filename_format_of" do
-      before do
-        party_class.validates_filename_format_of :video
-      end
-
-      it_should_behave_like "validating format of filenames"
-    end
-
-    describe ".validate :video, :filename_format => true" do
-      before do
-        party_class.validates :video, :filename_format => true
-      end
-
-      it_should_behave_like "validating format of filenames"
-    end
-
-    describe ".validates_remote_net_url_format_of" do
-      before do
-        party_class.validates_remote_net_url_format_of :video
-      end
-
-      it_should_behave_like "validating format of remote net urls"
-    end
-
-    describe ".validate :video, :remote_net_url_format => true" do
-      before do
-        party_class.validates :video, :remote_net_url_format => true
-      end
-
-      it_should_behave_like "validating format of remote net urls"
     end
 
     describe ".validates_is_uploaded" do
-      before do
-        party_class.validates_is_uploaded :video
+      it "should be turned off by default" do
+        party_class.should_not_receive(:validates_is_uploaded)
+        mount_uploader
       end
 
-      it_should_behave_like "validating a file is uploaded"
-    end
+      context "is turned on in the configuration" do
+        before do
+          DirectUploader.validate_is_uploaded = true
+        end
 
-    describe ".validate :video, :is_uploaded => true" do
-      before do
-        party_class.validates :video, :is_uploaded => true
+        it "should validate that a file has been uploaded" do
+          party_class.should_receive(:validates_is_uploaded).with(:video)
+          mount_uploader
+        end
       end
 
-      it_should_behave_like "validating a file is uploaded"
+      context "is on" do
+        before do
+          party_class.validates_is_uploaded :video
+        end
+
+        context "where there is no upload" do
+          it_should_behave_like "without an upload" do
+            let(:remote_video_net_url) { nil }
+            let(:upload_path) { nil }
+          end
+        end
+
+        context "where the remote net url is blank" do
+          it_should_behave_like "without an upload" do
+            let(:remote_video_net_url) { "" }
+            let(:upload_path) { nil }
+          end
+        end
+
+        context "with an upload by remote url" do
+          before do
+            subject.remote_video_net_url = "http://example.com/some_url.anything"
+          end
+
+          it "should be valid" do
+            subject.should be_valid
+          end
+        end
+
+        context "with an upload by file" do
+          before do
+            subject.key = sample_key
+          end
+
+          it "should be valid" do
+            subject.should be_valid
+          end
+        end
+      end
     end
 
     describe ".validates_is_attached" do
-      before do
-        party_class.validates_is_attached :video
+      it "should be turned off by default" do
+        party_class.should_not_receive(:validates_is_attached)
+        mount_uploader
       end
 
-      it_should_behave_like "validating attachment is present"
-    end
+      context "is turned on in the configuration" do
+        before do
+          DirectUploader.validate_is_attached = true
+        end
 
-    describe ".validate :video, :is_attached => true" do
-      before do
-        party_class.validates :video, :is_attached => true
+        it "should validate that a file has been attached" do
+          party_class.should_receive(:validates_is_attached).with(:video)
+          mount_uploader
+        end
       end
 
-      it_should_behave_like "validating attachment is present"
+      context "is on" do
+        before do
+          party_class.validates_is_attached :video
+        end
+
+        context "where the attachment" do
+          context "is blank" do
+            it_should_behave_like "a blank or empty attachment"
+          end
+
+          context "is nil" do
+            before do
+              subject.video = nil
+            end
+
+            it_should_behave_like "a blank or empty attachment"
+          end
+        end
+      end
     end
 
     it_should_have_accessor(:skip_is_attached_validations)
@@ -488,29 +506,20 @@ describe CarrierWaveDirect::ActiveRecord do
         end
       end
 
-      context "with filename validations turned off" do
-        context "with an invalid key" do
-          before do
-            subject.key = sample_key(:model_class => subject.class, :valid => false)
-          end
-
-          it "should be true" do
-            subject.filename_valid?.should be_true
-          end
+      context "does not have an upload" do
+        it "should be true" do
+          subject.filename_valid?.should be_true
         end
+
+        it_should_behave_like "having empty errors"
       end
 
-      context "with filename validations on" do
-        before do
-          party_class.validates :video,
-                                :is_attached => true,
-                                :is_uploaded => true,
-                                :unique_filename => true,
-                                :filename_format => true,
-                                :remote_net_url_format => true
-        end
+      context "has an upload" do
+        context "with a valid filename" do
+          before do
+            subject.key = sample_key(:model_class => subject.class)
+          end
 
-        context "does not have an upload" do
           it "should be true" do
             subject.filename_valid?.should be_true
           end
@@ -518,32 +527,18 @@ describe CarrierWaveDirect::ActiveRecord do
           it_should_behave_like "having empty errors"
         end
 
-        context "has an upload" do
-          context "with a valid filename" do
-            before do
-              subject.key = sample_key(:model_class => subject.class)
-            end
+        context "with an invalid filename" do
+          before { subject.key = sample_key(:model_class => subject.class, :valid => false) }
 
-            it "should be true" do
-              subject.filename_valid?.should be_true
-            end
-
-            it_should_behave_like "having empty errors"
+          it "should be false" do
+            subject.filename_valid?.should be_false
           end
 
-          context "with an invalid filename" do
-            before { subject.key = sample_key(:model_class => subject.class, :valid => false) }
+          context "after the call, #errors" do
+            before { subject.filename_valid? }
 
-            it "should be false" do
-              subject.filename_valid?.should be_false
-            end
-
-            context "after the call, #errors" do
-              before { subject.filename_valid? }
-
-              it "should only contain '\#\{column\}' errors" do
-                subject.errors.count.should == subject.errors[:video].count
-              end
+            it "should only contain '\#\{column\}' errors" do
+              subject.errors.count.should == subject.errors[:video].count
             end
           end
         end
