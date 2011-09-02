@@ -12,8 +12,6 @@ module CarrierWaveDirect
 
       attr_accessor :success_action_redirect
 
-      include CarrierWaveDirect::Uploader::Configuration
-
       fog_credentials.keys.each do |key|
         define_method(key) do
           fog_credentials[key]

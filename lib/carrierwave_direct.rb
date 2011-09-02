@@ -6,11 +6,14 @@ require "fog"
 require "uuid"
 
 module CarrierWaveDirect
+
   autoload :Uploader, "carrierwave_direct/uploader"
   autoload :Mount, "carrierwave_direct/mount"
 
   module Uploader
     autoload :Configuration, 'carrierwave_direct/uploader/configuration'
+
+    CarrierWave::Uploader::Base.send(:include, Configuration)
   end
 
   module Test
