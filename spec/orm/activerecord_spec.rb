@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 require 'spec_helper'
 require 'carrierwave/orm/activerecord'
 require 'carrierwave_direct/orm/activerecord'
