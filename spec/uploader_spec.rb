@@ -13,7 +13,7 @@ describe CarrierWaveDirect::Uploader do
     :url => "http://example.com/some_url",
     :expiration => 60,
     :max_file_size => 10485760,
-    :file_url => "http://anyurl.com/any_path/video_dir/filename.jpg",
+    :file_url => "http://anyurl.com/any_path/video_dir/filename.avi",
     :mounted_model_name => "Porno",
     :mounted_as => :video,
     :filename => "filename",

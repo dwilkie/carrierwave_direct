@@ -18,6 +18,7 @@ module CarrierWaveDirect
 
   module Test
     autoload :Helpers, 'carrierwave_direct/test/helpers'
+    autoload :CapybaraHelpers, 'carrierwave_direct/test/capybara_helpers'
   end
 end
 
