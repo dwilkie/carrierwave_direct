@@ -14,7 +14,6 @@ Gem::Specification.new do |s|
   s.rubyforge_project = "carrierwave_direct"
 
   s.add_dependency "carrierwave"
-  s.add_dependency "activemodel"
   s.add_dependency "uuid"
   s.add_dependency "fog"
 
@@ -22,6 +21,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency "timecop"
   s.add_development_dependency "rails"
   s.add_development_dependency "sqlite3"
+  s.add_development_dependency "capybara"
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")

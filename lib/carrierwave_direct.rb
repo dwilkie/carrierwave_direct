@@ -30,6 +30,13 @@ if defined?(Rails)
           require 'carrierwave_direct/orm/activerecord'
         end
       end
+
+      initializer "carrierwave_direct.action_view" do
+        ActiveSupport.on_load :action_view do
+          require 'carrierwave_direct/form_builder'
+          require 'carrierwave_direct/action_view_extensions/form_helper'
+        end
+      end
     end
   end
 end
