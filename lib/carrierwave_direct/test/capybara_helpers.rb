@@ -28,7 +28,11 @@ module CarrierWaveDirect
           # form's success action redirect url
           redirect_url = URI.parse(page.find("input[@name='success_action_redirect']").value)
 
-          options[:redirect_key] ||= sample_key(uploader, :base => find_key, :filename => File.basename(find_upload_path))
+          unless options[:redirect_key]
+            sample_key_args = [{:base => find_key, :filename => File.basename(find_upload_path)}]
+            sample_key_args.unshift(uploader) if method(:sample_key).arity == -2
+            options[:redirect_key] = sample_key(*sample_key_args)
+          end
 
           redirect_url.query = Rack::Utils.build_nested_query({
             :bucket => uploader.fog_directory,
