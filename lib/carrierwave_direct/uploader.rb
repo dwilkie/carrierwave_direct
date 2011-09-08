@@ -19,16 +19,6 @@ module CarrierWaveDirect
       end
     end
 
-    module ClassMethods
-      def upload_expiration
-        36000
-      end
-
-      def max_file_size
-        5242880
-      end
-    end # ClassMethods
-
     module InstanceMethods
       def direct_fog_url(options = {})
         fog_uri = CarrierWave::Storage::Fog::File.new(self, nil, nil).public_url
