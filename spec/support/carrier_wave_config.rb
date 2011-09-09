@@ -1,4 +1,3 @@
-p CarrierWave::VERSION
 CarrierWave.configure do |config|
   config.fog_credentials = {
     :provider               => 'AWS',
