@@ -48,7 +48,7 @@ describe CarrierWaveDirect::Test::Helpers do
       context "with no options" do
         it "should return '*/guid/filename.extension'" do
           sample_key(
-            direct_uploader,
+            direct_uploader
           ).should =~ /#{GUID_REGEXP}\/filename\.extension$/
         end
       end

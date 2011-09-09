@@ -72,7 +72,7 @@ module ModelHelpers
           end
         end
 
-        it_should_be_accessible(name, sample_data, options)
+        it_should_be_accessible(name, sample_data, options) if options[:accessible].present?
       end
     end
   end

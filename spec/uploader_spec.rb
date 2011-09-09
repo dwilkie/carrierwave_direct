@@ -419,7 +419,7 @@ describe CarrierWaveDirect::Uploader do
   # note that 'video' is hardcoded into the MountedClass support file
   # so changing the sample will cause the tests to fail
   context "a class has a '#{sample(:mounted_as)}' mounted" do
-    describe "#{sample(:mounted_as).capitalize}Uploader" do
+    describe "#{sample(:mounted_as).to_s.capitalize}Uploader" do
       describe "##{sample(:mounted_as)}" do
         it "should be defined" do
           direct_subject.should be_respond_to(sample(:mounted_as))
