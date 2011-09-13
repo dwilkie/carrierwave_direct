@@ -313,19 +313,9 @@ describe CarrierWaveDirect::Uploader do
         decoded_policy(options)["expiration"]
       end
 
-      # Stolen from rails
-      def string_to_time(str)
-        d = ::Date._parse(str, false).values_at(
-          :year, :mon, :mday, :hour, :min, :sec, :sec_fraction, :offset
-        ).map { |arg| arg || 0 }
-        d[6] *= 1000000
-        Time.utc(*d[0..6]) - d[7]
-      end
-
-
       def have_expiration(expires_in = DirectUploader.upload_expiration)
         eql(
-          string_to_time(
+          Time.parse(
             JSON.parse({
               "expiry" => Time.now + expires_in
             }.to_json)["expiry"]
@@ -335,13 +325,17 @@ describe CarrierWaveDirect::Uploader do
 
       it "should be #{DirectUploader.upload_expiration / 3600} hours from now" do
         Timecop.freeze(Time.now) do
-          string_to_time(expiration).should have_expiration
+          Time.parse(expiration).should have_expiration
         end
+      end
+
+      it "should be encoded as a utc time" do
+        Time.parse(expiration).should be_utc
       end
 
       it "should be #{sample(:expiration) / 60 } minutes from now when passing {:expiration => #{sample(:expiration)}}" do
         Timecop.freeze(Time.now) do
-          string_to_time(expiration(:expiration => sample(:expiration))).should have_expiration(sample(:expiration))
+          Time.parse(expiration(:expiration => sample(:expiration))).should have_expiration(sample(:expiration))
         end
       end
     end
