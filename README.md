@@ -128,6 +128,10 @@ you can still use the form helper by including the ActiveModel modules your uplo
       extend ActiveModel::Naming
     end
 
+Note if you're using Rails 3.0.x you'll also need to disable forgery protection
+    # config/application.rb
+    config.action_controller.allow_forgery_protection = false
+
 Once you've uploaded your file directly to the cloud you'll probably need a way to reference it with an ORM and process it.
 
 ## Processing and referencing files in a background process
