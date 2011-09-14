@@ -129,6 +129,7 @@ you can still use the form helper by including the ActiveModel modules your uplo
     end
 
 Note if you're using Rails 3.0.x you'll also need to disable forgery protection
+
     # config/application.rb
     config.action_controller.allow_forgery_protection = false
 
