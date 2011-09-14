@@ -10,6 +10,8 @@
 
 Right now, CarrierWaveDirect works with [Amazon S3](http://aws.amazon.com/s3/). Adding support for [Google Storage for Developers](http://code.google.com/apis/storage/) should be fairly straight forward since the direct upload form is essentially the same. Please see the contributing section if you would like support for Google Storage for Developers or any other service that provides direct upload capabilities.
 
+Please be aware that this gem (and S3 in general) only support single file uploads. If you want to upload multiple files simultaneously you'll have to use a javascript or flash uploader.
+
 ## Information
 
 More information, and how-tos [available on the wiki](https://github.com/dwilkie/carrierwave_direct/wiki)
