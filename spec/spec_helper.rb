@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 require 'carrierwave_direct'
 require 'json'
 require 'timecop'

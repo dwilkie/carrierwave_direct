@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 CarrierWave.configure do |config|
   config.fog_credentials = {
     :provider               => 'AWS',

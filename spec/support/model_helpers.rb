@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 module ModelHelpers
   def self.included(base)
     base.extend ClassMethods

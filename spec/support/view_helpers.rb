@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 require 'capybara/rspec'
 
 module ViewHelpers
