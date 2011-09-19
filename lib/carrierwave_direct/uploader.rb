@@ -21,8 +21,6 @@ module CarrierWaveDirect
 
     module InstanceMethods
       def direct_fog_url(options = {})
-        p self.fog_credentials
-        p aws_secret_access_key
         fog_uri = CarrierWave::Storage::Fog::File.new(self, CarrierWave::Storage::Fog.new(self), nil).public_url
         if options[:with_path]
           uri = URI.parse(fog_uri)
