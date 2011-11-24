@@ -410,6 +410,13 @@ describe CarrierWaveDirect::Uploader do
         subject.aws_secret_access_key, subject.policy
       )
     end
+
+    it "should support custom options for the policy" do
+      Base64.decode64(subject.signature(:expiration => 365)).should == OpenSSL::HMAC.digest(
+        OpenSSL::Digest::Digest.new('sha1'),
+        subject.aws_secret_access_key, subject.policy(:expiration => 365)
+      )
+    end
   end
 
   # note that 'video' is hardcoded into the MountedClass support file

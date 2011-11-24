@@ -71,11 +71,11 @@ module CarrierWaveDirect
         ).gsub("\n","")
       end
 
-      def signature
+      def signature(options = {})
         Base64.encode64(
           OpenSSL::HMAC.digest(
             OpenSSL::Digest::Digest.new('sha1'),
-            aws_secret_access_key, policy
+            aws_secret_access_key, policy(options)
           )
         ).gsub("\n","")
       end
