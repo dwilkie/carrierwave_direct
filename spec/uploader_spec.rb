@@ -395,6 +395,12 @@ describe CarrierWaveDirect::Uploader do
             ).should have_content_length_range(sample(:max_file_size))
           end
         end
+
+        it "any customisable fields that S3 should ignore" do
+          conditions(
+            :ignore_fields => [:field_auto_added_by_framwork_x]
+          ).should have_condition(:field_auto_added_by_framwork_x)
+        end
       end
     end
   end
