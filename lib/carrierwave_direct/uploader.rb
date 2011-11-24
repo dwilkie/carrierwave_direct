@@ -55,27 +55,33 @@ module CarrierWaveDirect
       def policy(options = {})
         options[:expiration] ||= self.class.upload_expiration
         options[:max_file_size] ||= self.class.max_file_size
+        options[:ignore_fields] ||= [:utf8]
+
+        ignored_field_conditions = options[:ignore_fields].collect do |field_to_ignore|
+          ["starts-with", "$#{field_to_ignore}", ""]
+        end
+
+        conditions = ignored_field_conditions + [
+          ["starts-with", "$key", store_dir],
+          {"bucket" => fog_directory},
+          {"acl" => acl},
+          {"success_action_redirect" => success_action_redirect},
+          ["content-length-range", 1, options[:max_file_size]]
+        ]
 
         Base64.encode64(
           {
             'expiration' => Time.now.utc + options[:expiration],
-            'conditions' => [
-              ["starts-with", "$utf8", ""],
-              ["starts-with", "$key", store_dir],
-              {"bucket" => fog_directory},
-              {"acl" => acl},
-              {"success_action_redirect" => success_action_redirect},
-              ["content-length-range", 1, options[:max_file_size]]
-            ]
+            'conditions' => conditions
           }.to_json
         ).gsub("\n","")
       end
 
-      def signature
+      def signature(options = {})
         Base64.encode64(
           OpenSSL::HMAC.digest(
             OpenSSL::Digest::Digest.new('sha1'),
-            aws_secret_access_key, policy
+            aws_secret_access_key, policy(options)
           )
         ).gsub("\n","")
       end

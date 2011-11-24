@@ -395,6 +395,12 @@ describe CarrierWaveDirect::Uploader do
             ).should have_content_length_range(sample(:max_file_size))
           end
         end
+
+        it "any customisable fields that S3 should ignore" do
+          conditions(
+            :ignore_fields => [:field_auto_added_by_framwork_x]
+          ).should have_condition(:field_auto_added_by_framwork_x)
+        end
       end
     end
   end
@@ -408,6 +414,13 @@ describe CarrierWaveDirect::Uploader do
       Base64.decode64(subject.signature).should == OpenSSL::HMAC.digest(
         OpenSSL::Digest::Digest.new('sha1'),
         subject.aws_secret_access_key, subject.policy
+      )
+    end
+
+    it "should support custom options for the policy" do
+      Base64.decode64(subject.signature(:expiration => 365)).should == OpenSSL::HMAC.digest(
+        OpenSSL::Digest::Digest.new('sha1'),
+        subject.aws_secret_access_key, subject.policy(:expiration => 365)
       )
     end
   end
