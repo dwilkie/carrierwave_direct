@@ -27,7 +27,7 @@ module CarrierWaveDirect
           Rails.logger.debug(key)
           uri = URI.parse(fog_uri)
           path = "/#{key}"
-          uri.path = path
+          uri.path = URI.escape(path)
           fog_uri = uri.to_s
         end
         fog_uri
