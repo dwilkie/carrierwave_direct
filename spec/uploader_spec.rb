@@ -8,6 +8,7 @@ describe CarrierWaveDirect::Uploader do
 
   SAMPLE_DATA = {
     :path => "upload_dir/bliind.exe",
+    :path_with_special_chars => "upload_dir/some file & blah.exe",
     :key => "some key",
     :guid => "guid",
     :store_dir => "store_dir",
@@ -215,6 +216,15 @@ describe CarrierWaveDirect::Uploader do
     end
 
     context ":with_path => true" do
+
+      context "#key is set to '#{sample(:path_with_special_chars)}'" do
+        before { subject.key = sample(:path_with_special_chars) }
+
+        it "should return the full url with '/#{URI.escape(sample(:path_with_special_chars))}' as the path" do
+          URI.parse(subject.direct_fog_url(:with_path => true)).path.should == "/#{URI.escape(sample(:path_with_special_chars))}"
+        end
+      end
+
       context "#key is set to '#{sample(:path)}'" do
         before { subject.key = sample(:path) }
 
@@ -454,4 +464,3 @@ describe CarrierWaveDirect::Uploader do
     end
   end
 end
-
