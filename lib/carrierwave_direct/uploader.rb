@@ -23,6 +23,8 @@ module CarrierWaveDirect
       def direct_fog_url(options = {})
         fog_uri = CarrierWave::Storage::Fog::File.new(self, CarrierWave::Storage::Fog.new(self), nil).public_url
         if options[:with_path]
+          Rails.logger.debug(fog_uri.inspect)
+          Rails.logger.debug(key)
           uri = URI.parse(fog_uri)
           path = "/#{key}"
           uri.path = path
