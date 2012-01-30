@@ -3,6 +3,8 @@
 require 'action_view'
 require 'action_view/template'
 
+require File.join(File.dirname(__FILE__), 'view_helpers') 
+
 require 'carrierwave_direct/form_builder'
 require 'carrierwave_direct/action_view_extensions/form_helper'
 
@@ -12,7 +14,7 @@ module FormBuilderHelpers
   include ActionView::Context
   include ActionController::RecordIdentifier
 
-  include ViewHelpers
+  include ::ViewHelpers
 
   def direct_uploader
     defined?(super) ? super : @direct_uploader ||= MountedClass.new.video
