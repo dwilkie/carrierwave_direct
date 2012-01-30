@@ -22,7 +22,14 @@ describe CarrierWaveDirect::ActionViewExtensions::FormHelper do
           :action => "http://example.com", :method => "post", :enctype => "multipart/form-data"
         )
       end
+
+      it "should include any html options passed as through :html" do
+        form(:html => { :target => "_blank_iframe" }).should submit_to(
+          :action => "http://example.com", :method => "post", :enctype => "multipart/form-data", :target => "_blank_iframe"
+        )
+      end
     end
   end
+
 end
 
