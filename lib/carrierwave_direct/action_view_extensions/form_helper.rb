@@ -16,12 +16,17 @@ module CarrierWaveDirect
 
       def direct_upload_form_for(record, *args, &block)
         options = args.extract_options!
+
+        html_options = {
+          :multipart => true 
+        }.update(options[:html] || {})
+
         form_for(
           record,
           *(args << options.merge(
             :builder => CarrierWaveDirect::FormBuilder,
             :url => record.direct_fog_url,
-            :html => {:multipart => true},
+            :html => html_options,
             :authenticity_token => false,
             :include_id => false
           )),
