@@ -31,7 +31,7 @@ module CarrierWaveDirect
         fog_uri
       end
 
-      def guid
+      def guid #can be deprecated
         UUID.generate
       end
 
@@ -41,7 +41,7 @@ module CarrierWaveDirect
       end
 
       def key
-        @key ||= "#{store_dir}/#{guid}/#{FILENAME_WILDCARD}"
+        @key ||= "#{store_dir}/#{FILENAME_WILDCARD}"
       end
 
       def has_key?
