@@ -27,10 +27,9 @@ module FormBuilderHelpers
     false
   end
 
-  def form(&block)
+  def form(options = {}, &block)
     blk = block_given? ? block : Proc.new {|f|}
-    direct_upload_form_for(direct_uploader, &blk)
+    direct_upload_form_for(direct_uploader, options, &blk)
   end
-
 end
 
