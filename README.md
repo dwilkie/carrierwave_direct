@@ -69,7 +69,7 @@ Remove the line `storage :file` and replace it with `include CarrierWaveDirect::
 
 This adds the extra functionality for direct uploading.
 
-If you're *not* using Rails you can generate a direct upload form to S3 similar to this:
+If you're *not* using Rails you can generate a direct upload form to S3 similar to this (see also [http://doc.s3.amazonaws.com/proposals/post.html#A_Sample_Form](http://doc.s3.amazonaws.com/proposals/post.html#A_Sample_Form)):
 
     <form action="https://s3-bucket.s3.amazonaws.com/" method="post" enctype="multipart/form-data">
       <input type="hidden" name="key" value="uploads/${filename}">
@@ -362,4 +362,3 @@ Pull requests are very welcome. Before submitting a pull request, please make su
 You should now be able to run the tests
 
     bundle exec rake
-
