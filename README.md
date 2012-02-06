@@ -369,3 +369,8 @@ Pull requests are very welcome. Before submitting a pull request, please make su
 You should now be able to run the tests
 
     bundle exec rake
+
+## Contributors
+
+* cblunt (Chris Blunt) - Support for passing html options
+* robyurkowski (Rob Yurkowski) - Fix deprecation warnings for Rails 3.2
