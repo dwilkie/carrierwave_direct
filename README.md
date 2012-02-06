@@ -115,6 +115,13 @@ things just got a whole lot easier. You can generate a direct upload form like t
       <%= f.submit %>
     <% end %>
 
+You can also pass html options like this:
+
+    <%= direct_upload_form_for @uploader, :html => { :target => "_blank_iframe" } do |f| %>
+      <%= f.file_field :avatar %>
+      <%= f.submit %>
+    <% end %>
+
 Note if `User` is not an ActiveRecord object e.g.
 
     class User
