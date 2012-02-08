@@ -374,3 +374,4 @@ You should now be able to run the tests
 
 * cblunt (Chris Blunt) - Support for passing html options
 * robyurkowski (Rob Yurkowski) - Fix deprecation warnings for Rails 3.2
+* tylr (Tyler Love) - Bug fix
