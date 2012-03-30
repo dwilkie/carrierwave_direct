@@ -284,7 +284,20 @@ describe CarrierWaveDirect::Uploader do
           mounted_subject.filename
         end
       end
-
+      
+      context "and the model's remote #{sample(:mounted_as)} url has whitespace in it" do
+        before do
+          mounted_model.stub(
+            "remote_#{mounted_subject.mounted_as}_url"
+          ).and_return("http://anyurl.com/any_path/video_dir/filename 2.avi")
+        end
+        
+        it "should be sanitized (whitespace replaced with _)" do
+          mounted_subject.filename
+          mounted_subject.key.should =~ /filename_2.avi$/
+        end
+      end
+      
       context "and the model's remote #{sample(:mounted_as)} url is blank" do
         before do
           mounted_model.stub(
