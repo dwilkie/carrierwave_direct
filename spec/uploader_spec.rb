@@ -300,8 +300,8 @@ describe CarrierWaveDirect::Uploader do
   end
 
   describe "#acl" do
-    it "should return the sanitized s3 access policy" do
-      subject.acl.should == subject.s3_access_policy.to_s.gsub("_", "-")
+    it "should return the correct s3 access policy" do
+      subject.acl.should == (subject.fog_public ? 'public-read' : 'private')
     end
   end
 
