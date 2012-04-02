@@ -69,31 +69,50 @@ Remove the line `storage :file` and replace it with `include CarrierWaveDirect::
 
 This adds the extra functionality for direct uploading.
 
-If you're *not* using Rails you can generate a direct upload form to S3 similar to this (see also [http://doc.s3.amazonaws.com/proposals/post.html#A_Sample_Form](http://doc.s3.amazonaws.com/proposals/post.html#A_Sample_Form)):
+If you're *not* using Rails you can generate a direct upload form to S3 similar to [this example](http://doc.s3.amazonaws.com/proposals/post.html#A_Sample_Form)) by making use of the CarrierWaveDirect helper methods.
 
-    <form action="https://s3-bucket.s3.amazonaws.com/" method="post" enctype="multipart/form-data">
-      <input type="hidden" name="key" value="uploads/${filename}">
-      <input type="hidden" name="AWSAccessKeyId" value="YOUR_AWS_ACCESS_KEY">
-      <input type="hidden" name="acl" value="private">
-      <input type="hidden" name="success_action_redirect" value="http://localhost/">
-      <input type="hidden" name="policy" value="YOUR_POLICY_DOCUMENT_BASE64_ENCODED">
-      <input type="hidden" name="signature" value="YOUR_CALCULATED_SIGNATURE">
-      <input name="file" type="file">
-      <input type="submit" value="Upload to S3">
-    </form>
+### Sinatra
 
-by making use of the following methods in your uploader:
+Here is an example using Sinatra and Haml
 
-    uploader = AvatarUploader.new
+    # uploader_test.rb
 
-    uploader.direct_fog_url           # return the url to post to based off your bucket name
-    uploader.key                      # returns a key based off your store_dir
-    uploader.aws_access_key_id        # returns your aws_access_key_id from your fog configuration
-    uploader.acl                      # returns your acl from your fog configuration
-    uploader.success_action_redirect= # sets the success action redirect url
-    uploader.success_action_redirect  # gets the success action redirect url
-    uploader.policy                   # a base 64 encoded policy document
-    uploader.signature                # your signature
+    CarrierWave.configure do |config|
+      config.fog_credentials = {
+        :provider               => 'AWS',
+        :aws_access_key_id      => ENV['AWS_ACCESS_KEY_ID'],
+        :aws_secret_access_key  => ENV['AWS_SECRET_ACCESS_KEY']
+      }
+      config.fog_directory  = ENV['AWS_FOG_DIRECTORY'] # bucket name
+    end
+
+    class ImageUploader < CarrierWave::Uploader::Base
+      #include CarrierWave::RMagick
+      include CarrierWaveDirect::Uploader
+    end
+
+    class UploaderTest < Sinatra::Base
+      get "/" do
+        @uploader = ImageUploader.new
+        @uploader.success_action_redirect = request.url
+        haml :index
+      end
+    end
+
+    # index.haml
+
+    %form{:action => @uploader.direct_fog_url, :method => "post", :enctype => "multipart/form-data"}
+      %input{:name => "utf8", :type => "hidden"}
+      %input{:type => "hidden", :name => "key", :value => @uploader.key}
+      %input{:type => "hidden", :name => "AWSAccessKeyId", :value => @uploader.aws_access_key_id}
+      %input{:type => "hidden", :name => "acl", :value => @uploader.acl}
+      %input{:type => "hidden", :name => "success_action_redirect", :value => @uploader.success_action_redirect}
+      %input{:type => "hidden", :name => "policy", :value => @uploader.policy}
+      %input{:type => "hidden", :name => "signature", :value => @uploader.signature}
+      %input{:name => "file", :type => "file"}
+      %input{:type => "submit", :value => "Upload to S3"}
+
+### Rails
 
 If you *are* using Rails and you've mounted your uploader like this:
 
