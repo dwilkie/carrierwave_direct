@@ -359,6 +359,10 @@ The Active Record validations use the Rails i18n framework. Add these keys to yo
           carrierwave_direct_filename_invalid: is invalid. Allowed file types are ${extension_white_list}
           carrierwave_direct_remote_net_url_invalid: is invalid. Allowed file types are ${extension_white_list}. Allowed url schemes are ${url_scheme_white_list}
 
+## Caveats
+
+Don't name your string column `file`. It will result in a stack level too deep exception. See [this issue](https://github.com/dwilkie/carrierwave_direct/issues/10) for more info
+
 ## Contributing to CarrierWaveDirect
 
 Pull requests are very welcome. Before submitting a pull request, please make sure that your changes are well tested.
