@@ -48,7 +48,7 @@ module CarrierWaveDirect
     end
 
     def acl
-      s3_access_policy.to_s.gsub('_', '-')
+      fog_public ? 'public-read' : 'private'
     end
 
     def policy(options = {})
