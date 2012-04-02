@@ -57,7 +57,7 @@ module CarrierWaveDirect
 
       Base64.encode64(
         {
-          'expiration' => Time.now.utc + options[:expiration],
+          'expiration' => (Time.now + options[:expiration]).utc.iso8601,
           'conditions' => [
             ["starts-with", "$utf8", ""],
             ["starts-with", "$key", store_dir],
