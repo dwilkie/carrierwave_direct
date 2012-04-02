@@ -372,6 +372,7 @@ You should now be able to run the tests
 
 ## Contributors
 
-* cblunt (Chris Blunt) - Support for passing html options
-* robyurkowski (Rob Yurkowski) - Fix deprecation warnings for Rails 3.2
-* tylr (Tyler Love) - Bug fix
+* [cblunt (Chris Blunt)](https://github.com/cblunt) - Support for passing html options
+* [robyurkowski (Rob Yurkowski)](https://github.com/robyurkowski) - Fix deprecation warnings for Rails 3.2
+* [tylr (Tyler Love)](https://github.com/tylr) - Bug fix
+* [vlado (Vlado Cingel)](https://github.com/vlado) - Properly sanitize filename
