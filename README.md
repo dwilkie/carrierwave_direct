@@ -380,3 +380,4 @@ You should now be able to run the tests
 * [robyurkowski (Rob Yurkowski)](https://github.com/robyurkowski) - Fix deprecation warnings for Rails 3.2
 * [tylr (Tyler Love)](https://github.com/tylr) - Bug fix
 * [vlado (Vlado Cingel)](https://github.com/vlado) - Properly sanitize filename
+* [travisp (Travis Pew)](https://github.com/travisp) - Compatibility for CarrierWave 0.6.0
