@@ -87,7 +87,6 @@ Here is an example using Sinatra and Haml
     end
 
     class ImageUploader < CarrierWave::Uploader::Base
-      #include CarrierWave::RMagick
       include CarrierWaveDirect::Uploader
     end
 
@@ -236,7 +235,7 @@ Your users may find it convenient to upload a file from a location on the Intern
 
     <%= form_for @user do |f| %>
       <%= f.hidden_field :key %>
-      <% unless @hangover.has_avatar_upload? %>
+      <% unless @user.has_avatar_upload? %>
         <%= f.label :remote_avatar_net_url %>
         <%= f.text_field :remote_avatar_net_url %>
       <%= f.submit %>
