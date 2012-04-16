@@ -374,8 +374,8 @@ The Active Record validations use the Rails i18n framework. Add these keys to yo
           carrierwave_direct_filename_taken: filename was already taken
           carrierwave_direct_upload_missing: upload is missing
           carrierwave_direct_attachment_missing: attachment is missing
-          carrierwave_direct_filename_invalid: is invalid. Allowed file types are ${extension_white_list}
-          carrierwave_direct_remote_net_url_invalid: is invalid. Allowed file types are ${extension_white_list}. Allowed url schemes are ${url_scheme_white_list}
+          carrierwave_direct_filename_invalid: is invalid. Allowed file types are %{extension_white_list}
+          carrierwave_direct_remote_net_url_invalid: is invalid. Allowed file types are %{extension_white_list}. Allowed url schemes are %{url_scheme_white_list}
 
 ## Caveats
 
