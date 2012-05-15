@@ -69,6 +69,8 @@ Remove the line `storage :file` and replace it with `include CarrierWaveDirect::
 
 This adds the extra functionality for direct uploading.
 
+Finally, remove the `store_dir` method in order to default CarrierWaveDirect to its own storage directory.
+
 If you're *not* using Rails you can generate a direct upload form to S3 similar to [this example](http://doc.s3.amazonaws.com/proposals/post.html#A_Sample_Form)) by making use of the CarrierWaveDirect helper methods.
 
 ### Sinatra
