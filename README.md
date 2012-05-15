@@ -401,3 +401,4 @@ You should now be able to run the tests
 * [tylr (Tyler Love)](https://github.com/tylr) - Bug fix
 * [vlado (Vlado Cingel)](https://github.com/vlado) - Properly sanitize filename
 * [travisp (Travis Pew)](https://github.com/travisp) - Compatibility for CarrierWave 0.6.0
+* [jgorset] (Johannes Gorset)](https://github.com/jgorset) - Doc tweaks
