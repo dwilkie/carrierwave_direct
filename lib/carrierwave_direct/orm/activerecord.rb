@@ -10,6 +10,8 @@ module CarrierWaveDirect
     def mount_uploader(column, uploader=nil, options={}, &block)
       super
 
+      return unless uploader.ancestors.include?(CarrierWaveDirect::Uploader)
+
       uploader.instance_eval <<-RUBY, __FILE__, __LINE__+1
         include ActiveModel::Conversion
         extend ActiveModel::Naming
