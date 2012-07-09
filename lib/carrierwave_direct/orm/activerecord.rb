@@ -1,5 +1,8 @@
 # encoding: utf-8
 
+# This file tests that a ActiveRecord class that uses a standard CarrierWave uploader
+# does not get CarrierWaveDirect validators.
+
 require 'active_record'
 require 'carrierwave_direct/validations/active_model'
 
@@ -9,6 +12,9 @@ module CarrierWaveDirect
 
     def mount_uploader(column, uploader=nil, options={}, &block)
       super
+
+      # Don't go further unless the class included CarrierWaveDirect::Uploader
+      return unless uploader.ancestors.include?(CarrierWaveDirect::Uploader)
 
       uploader.instance_eval <<-RUBY, __FILE__, __LINE__+1
         include ActiveModel::Conversion
