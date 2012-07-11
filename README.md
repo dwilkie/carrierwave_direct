@@ -328,13 +328,13 @@ To attach a file to the direct upload form you can use
 
 To simulate a successful upload and redirect to S3 you can use
 
-    upload_directly(AvatarUploader, "Upload to S3")
+    upload_directly(AvatarUploader.new, "Upload to S3")
 
 This will click the Upload to S3 button on the form and redirect you to the `success_action_redirect` url (in the form) with a sample response from S3
 
 To simulate an unsuccessful upload you can pass `:success => false` and you'll remain on the upload page e.g.
 
-    upload_directly(AvatarUploader, "Upload to S3", :success => false)
+    upload_directly(AvatarUploader.new, "Upload to S3", :success => false)
 
 You can also use `find_key` and `find_upload_path` to get the key and upload path from the form
 
