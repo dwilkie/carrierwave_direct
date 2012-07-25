@@ -6,6 +6,9 @@ module CarrierWaveDirect
     def mount_uploader(column, uploader=nil, options={}, &block)
       super
 
+      # Don't go further unless the class included CarrierWaveDirect::Uploader
+      return unless uploader.ancestors.include?(CarrierWaveDirect::Uploader)
+
       uploader.class_eval <<-RUBY, __FILE__, __LINE__+1
         def #{column}; self; end
       RUBY
