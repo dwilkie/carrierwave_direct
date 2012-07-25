@@ -62,6 +62,12 @@ describe CarrierWave::ActiveRecord do
 
         subject.class.ancestors.should_not include(CarrierWaveDirect::Validations::ActiveModel)
       end
+
+      it "does not modify the class with CarrierWaveDirect-specific methods" do
+        subject.class.mount_uploader :video, StandardUploader
+
+        subject.methods.should_not include(:has_video_upload?)
+      end
     end
   end
 end
