@@ -42,9 +42,8 @@ CarrierWaveDirect works with [fog](https://github.com/geemus/fog) so make sure y
         :region                 => 'eu-west-1'  # optional, defaults to 'us-east-1'
       }
       config.fog_directory  = 'name_of_directory'                     # required
-      config.fog_host       = 'https://assets.example.com'            # optional, defaults to nil
-      config.fog_public     = false                                   # optional, defaults to true
-      config.fog_attributes = {'Cache-Control'=>'max-age=315576000'}  # optional, defaults to {}
+      # see https://github.com/jnicklas/carrierwave#using-amazon-s3
+      # for more optional configuration
     end
 
 If you haven't already done so generate an uploader
