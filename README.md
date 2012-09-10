@@ -41,7 +41,7 @@ CarrierWaveDirect works with [fog](https://github.com/geemus/fog) so make sure y
         :aws_secret_access_key  => 'yyy',       # required
         :region                 => 'eu-west-1'  # optional, defaults to 'us-east-1'
       }
-      config.fog_directory  = 'name_of_directory'                     # required
+      config.fog_directory  = 'name_of_your_aws_bucket' # required
       # see https://github.com/jnicklas/carrierwave#using-amazon-s3
       # for more optional configuration
     end
