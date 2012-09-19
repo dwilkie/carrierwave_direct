@@ -32,7 +32,7 @@ Note that CarrierWaveDirect is not compatible with Rails 2.
 
 Please read the [CarrierWave readme](https://github.com/jnicklas/carrierwave) first
 
-CarrierWaveDirect works with [fog](https://github.com/geemus/fog) so make sure you have [CarrierWave](https://github.com/jnicklas/carrierwave) set up and initialized with your fog credentials, for example:
+CarrierWaveDirect works with [fog](https://github.com/fog/fog) so make sure you have [CarrierWave](https://github.com/jnicklas/carrierwave) set up and initialized with your fog credentials, for example:
 
     CarrierWave.configure do |config|
       config.fog_credentials = {
