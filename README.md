@@ -404,3 +404,4 @@ You should now be able to run the tests
 * [frahugo (Hugo Frappier)](https://github.com/frahugo) - Fix bug where CarrierWaveDirect Validations were being added to non CarrierWaveDirect ActiveRecord models
 * [bak (Benjamin Cullen-Kerney)](https://github.com/bak) - Fix bug where CarrierWaveDirect specific methods were being added to non CarrierWaveDirect ActiveRecord models
 * [rhalff (Rob Halff)](https://github.com/rhalff) - Doc fix
+* [nicknovitski (Nick Novitski)](https://github.com/nicknovitski) - Update old link in README
