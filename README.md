@@ -12,10 +12,6 @@ Right now, CarrierWaveDirect works with [Amazon S3](http://aws.amazon.com/s3/). 
 
 Please be aware that this gem (and S3 in general) only support single file uploads. If you want to upload multiple files simultaneously you'll have to use a javascript or flash uploader.
 
-## Information
-
-More information, and how-tos [available on the wiki](https://github.com/dwilkie/carrierwave_direct/wiki)
-
 ## Installation
 
 Install the latest release:
