@@ -6,6 +6,10 @@
 
 [CarrierWaveDirect](https://github.com/dwilkie/carrierwave_direct) works on top of [CarrierWave](https://github.com/jnicklas/carrierwave) and provides a simple way to achieve this.
 
+## Example Application
+
+For a concrete example on how to use [CarrierWaveDirect](https://github.com/dwilkie/carrierwave_direct) in a Rails application check out the [Example Application](https://github.com/dwilkie/carrierwave_direct_example).
+
 ## Compatibility
 
 Right now, CarrierWaveDirect works with [Amazon S3](http://aws.amazon.com/s3/). Adding support for [Google Storage for Developers](http://code.google.com/apis/storage/) should be fairly straight forward since the direct upload form is essentially the same. Please see the contributing section if you would like support for Google Storage for Developers or any other service that provides direct upload capabilities.
