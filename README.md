@@ -380,7 +380,9 @@ The Active Record validations use the Rails i18n framework. Add these keys to yo
 
 ## Caveats
 
-Don't name your string column `file`. It will result in a stack level too deep exception. See [this issue](https://github.com/dwilkie/carrierwave_direct/issues/10) for more info
+Don't name your string column `file`. It will result in a stack level too deep exception. See [this issue](https://github.com/dwilkie/carrierwave_direct/issues/10) for more info.
+
+If you're Rails app was newly generated *after* version 3.2.3 and your testing this in development you may run into an issue where an `ActiveModel::MassAssignmentSecurity::Error` is raised when being redirected from S3. You can fix this by setting `config.active_record.mass_assignment_sanitizer = :logger` in your `config/environments/development.rb` file.
 
 ## Contributing to CarrierWaveDirect
 
