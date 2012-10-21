@@ -21,7 +21,8 @@ describe CarrierWaveDirect::Uploader do
     :mounted_as => :video,
     :filename => "filename",
     :extension => ".avi",
-    :version => :thumb
+    :version => :thumb,
+    :s3_bucket_url => "https://s3-bucket.s3.amazonaws.com"
   }
 
   SAMPLE_DATA.merge!(
@@ -35,6 +36,10 @@ describe CarrierWaveDirect::Uploader do
 
   SAMPLE_DATA.merge!(
     :s3_key => "#{sample(:store_dir)}/#{sample(:stored_filename)}"
+  )
+
+  SAMPLE_DATA.merge!(
+    :s3_file_url => "#{sample(:s3_bucket_url)}/#{sample(:s3_key)}"
   )
 
   SAMPLE_DATA.freeze
@@ -103,6 +108,21 @@ describe CarrierWaveDirect::Uploader do
 
         it "should return '#{sample(:store_dir)}/\#\{guid\}/${filename}'" do
           mounted_subject.key.should =~ /^#{sample(:store_dir)}\/#{GUID_REGEXP}\/\$\{filename\}$/
+        end
+      end
+
+      context "but the uploaders url is '#{sample(:s3_file_url)}'" do
+        before do
+          mounted_subject.stub(:url).and_return(sample(:s3_file_url))
+        end
+
+        it "should return '/#{sample(:s3_key)}'" do
+          mounted_subject.key.should == "/#{sample(:s3_key)}"
+        end
+
+        it "should set the key explicitly in order to update the version keys" do
+          mounted_subject.should_receive("key=").with("/#{sample(:s3_key)}")
+          mounted_subject.key
         end
       end
     end
@@ -284,20 +304,20 @@ describe CarrierWaveDirect::Uploader do
           mounted_subject.filename
         end
       end
-      
+
       context "and the model's remote #{sample(:mounted_as)} url has whitespace in it" do
         before do
           mounted_model.stub(
             "remote_#{mounted_subject.mounted_as}_url"
           ).and_return("http://anyurl.com/any_path/video_dir/filename 2.avi")
         end
-        
+
         it "should be sanitized (whitespace replaced with _)" do
           mounted_subject.filename
           mounted_subject.key.should =~ /filename_2.avi$/
         end
       end
-      
+
       context "and the model's remote #{sample(:mounted_as)} url is blank" do
         before do
           mounted_model.stub(

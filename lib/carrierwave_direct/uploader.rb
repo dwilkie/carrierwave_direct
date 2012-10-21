@@ -40,11 +40,17 @@ module CarrierWaveDirect
     end
 
     def key
-      @key ||= "#{store_dir}/#{guid}/#{FILENAME_WILDCARD}"
+      return @key if @key.present?
+      if url.present?
+        self.key = URI.parse(url).path # explicitly set key
+      else
+        @key = "#{store_dir}/#{guid}/#{FILENAME_WILDCARD}"
+      end
+      @key
     end
 
     def has_key?
-      @key.present? && !(@key =~ /#{Regexp.escape(FILENAME_WILDCARD)}\z/)
+      key !~ /#{Regexp.escape(FILENAME_WILDCARD)}\z/
     end
 
     def acl
