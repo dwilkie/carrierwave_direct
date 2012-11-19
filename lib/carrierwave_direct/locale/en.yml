@@ -7,5 +7,3 @@ en:
       carrierwave_direct_filename_invalid: "is invalid. "
       carrierwave_direct_allowed_extensions: Allowed file types are %{extensions}
       carrierwave_direct_allowed_schemes: Allowed schemes are %{schemes}
-      
-

@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 require 'active_model/validator'
 require 'active_support/concern'
 
@@ -38,7 +40,7 @@ module CarrierWaveDirect
             remote_net_url = record.send("remote_#{attribute}_net_url")
             uploader = record.send(attribute)
             url_scheme_white_list = uploader.url_scheme_white_list
-            
+
             if (remote_net_url !~ URI.regexp(url_scheme_white_list) || remote_net_url !~ /#{uploader.extension_regexp}\z/)
               extensions = uploader.extension_white_list
 
@@ -132,4 +134,3 @@ module CarrierWaveDirect
 end
 
 Dir[File.dirname(__FILE__) << "/../locale/*.*"].each {|file| I18n.load_path << file }
-

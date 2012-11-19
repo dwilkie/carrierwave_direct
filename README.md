@@ -375,8 +375,9 @@ The Active Record validations use the Rails i18n framework. Add these keys to yo
           carrierwave_direct_filename_taken: filename was already taken
           carrierwave_direct_upload_missing: upload is missing
           carrierwave_direct_attachment_missing: attachment is missing
-          carrierwave_direct_filename_invalid: is invalid. Allowed file types are %{extension_white_list}
-          carrierwave_direct_remote_net_url_invalid: is invalid. Allowed file types are %{extension_white_list}. Allowed url schemes are %{url_scheme_white_list}
+          carrierwave_direct_filename_invalid: "is invalid. "
+          carrierwave_direct_allowed_extensions: Allowed file types are %{extensions}
+          carrierwave_direct_allowed_schemes: Allowed schemes are %{schemes}
 
 ## Caveats
 
@@ -407,3 +408,4 @@ You should now be able to run the tests
 * [bak (Benjamin Cullen-Kerney)](https://github.com/bak) - Fix bug where CarrierWaveDirect specific methods were being added to non CarrierWaveDirect ActiveRecord models
 * [rhalff (Rob Halff)](https://github.com/rhalff) - Doc fix
 * [nicknovitski (Nick Novitski)](https://github.com/nicknovitski) - Update old link in README
+* [gabrielengel (Gabriel Engel)](https://github.com/gabrielengel) - Refactor I18n not to use procs
