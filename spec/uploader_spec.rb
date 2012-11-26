@@ -158,7 +158,7 @@ describe CarrierWaveDirect::Uploader do
         end
 
         it "should return /\\A#{sample(:store_dir)}\\/#{GUID_REGEXP}\\/.+\\.#{sample(:extension_regexp)}\\z/" do
-          subject.key_regexp.should ==  /\A#{sample(:store_dir)}\/#{GUID_REGEXP}\/.+\.#{sample(:extension_regexp)}\z/
+          subject.key_regexp.should ==  /\A#{sample(:store_dir)}\/#{GUID_REGEXP}\/.+\.(?i)#{sample(:extension_regexp)}(?-i)\z/
         end
       end
     end
