@@ -105,7 +105,7 @@ module CarrierWaveDirect
     end
 
     def key_regexp
-      /\A#{store_dir}\/[a-f\d\-]+\/.+\.#{extension_regexp}\z/
+      /\A#{store_dir}\/[a-f\d\-]+\/.+\.(?i)#{extension_regexp}(?-i)\z/
     end
 
     def extension_regexp
