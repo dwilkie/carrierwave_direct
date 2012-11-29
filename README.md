@@ -409,3 +409,4 @@ You should now be able to run the tests
 * [rhalff (Rob Halff)](https://github.com/rhalff) - Doc fix
 * [nicknovitski (Nick Novitski)](https://github.com/nicknovitski) - Update old link in README
 * [gabrielengel (Gabriel Engel)](https://github.com/gabrielengel) - Refactor I18n not to use procs
+* [evanlok](https://github.com/evanlok) - Don't be case sensitive with filename extension validation
