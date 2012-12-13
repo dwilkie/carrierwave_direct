@@ -163,6 +163,30 @@ Note if you're using Rails 3.0.x you'll also need to disable forgery protection
 
 Once you've uploaded your file directly to the cloud you'll probably need a way to reference it with an ORM and process it.
 
+## Content-Type / Mime
+
+The default amazon content-type is "binary/octet-stream" and for many cases this will work just fine.  But if you are trying to stream video or audio you will need to set the mime type manually as Amazon will not calculate it for you.  All mime types are supported: [http://en.wikipedia.org/wiki/Internet_media_type](http://en.wikipedia.org/wiki/Internet_media_type).
+
+Just add a content-type element to the form.
+
+    <%= direct_upload_form_for @uploader do |f| %>
+      <%= text_field_tag 'Content-Type', 'video/mpeg' %><br>
+      <%= f.file_field :avatar %>
+      <%= f.submit %>
+    <% end %>
+
+You could use a select as well.
+
+    <%= direct_upload_form_for @uploader do |f| %>
+      <%= select_tag 'Content-Type', options_for_select([
+        ['Video','video/mpeg'],
+        ['Audio','audio/mpeg'],
+        ['Image','image/jpeg']
+      ], 'video/mpeg') %><br>
+      <%= f.file_field :avatar %>
+      <%= f.submit %>
+    <% end %>
+
 ## Processing and referencing files in a background process
 
 Processing and saving file uploads are typically long running tasks and should be done in a background process. CarrierWaveDirect gives you a few methods to help you do this with your favorite background processor such as [DelayedJob](https://github.com/collectiveidea/delayed_job) or [Resque](https://github.com/defunkt/resque).
@@ -410,3 +434,4 @@ You should now be able to run the tests
 * [nicknovitski (Nick Novitski)](https://github.com/nicknovitski) - Update old link in README
 * [gabrielengel (Gabriel Engel)](https://github.com/gabrielengel) - Refactor I18n not to use procs
 * [evanlok](https://github.com/evanlok) - Don't be case sensitive with filename extension validation
+* [jkamenik (John Kamenik)](https://github.com/jkamenik) - Support for Content-Type
