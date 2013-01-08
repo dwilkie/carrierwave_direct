@@ -31,7 +31,9 @@ module CarrierWaveDirect
 
       self.instance_eval <<-RUBY, __FILE__, __LINE__+1
         attr_accessor   :skip_is_attached_validations
-        attr_accessible :key, :remote_#{column}_net_url
+        unless defined?(ActiveModel::ForbiddenAttributesProtection) && ancestors.include?(ActiveModel::ForbiddenAttributesProtection)
+          attr_accessible :key, :remote_#{column}_net_url
+        end
       RUBY
 
       mod = Module.new
