@@ -241,7 +241,10 @@ describe CarrierWaveDirect::Uploader do
         before { subject.key = sample(:path_with_special_chars) }
 
         it "should return the full url with '/#{URI.escape(sample(:path_with_special_chars))}' as the path" do
-          URI.parse(subject.direct_fog_url(:with_path => true)).path.should == "/#{URI.escape(sample(:path_with_special_chars))}"
+          direct_fog_url = CarrierWave::Storage::Fog::File.new(
+            subject, nil, nil
+          ).public_url
+          subject.direct_fog_url(:with_path => true).should == direct_fog_url + "#{URI.escape(sample(:path_with_special_chars))}"
         end
       end
 
@@ -249,7 +252,10 @@ describe CarrierWaveDirect::Uploader do
         before { subject.key = sample(:path) }
 
         it "should return the full url with '/#{sample(:path)}' as the path" do
-          URI.parse(subject.direct_fog_url(:with_path => true)).path.should == "/#{sample(:path)}"
+          direct_fog_url = CarrierWave::Storage::Fog::File.new(
+            subject, nil, nil
+          ).public_url
+          subject.direct_fog_url(:with_path => true).should == direct_fog_url + "#{sample(:path)}"
         end
       end
     end
