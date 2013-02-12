@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.version     = CarrierwaveDirect::VERSION
   s.authors     = ["David Wilkie"]
   s.email       = ["dwilkie@gmail.com"]
-  s.homepage    = ""
+  s.homepage    = "https://github.com/dwilkie/carrierwave_direct"
   s.summary     = %q{Upload direct to S3 using CarrierWave}
   s.description = %q{Process your uploads in the background by uploading directly to S3}
   s.required_ruby_version = ">= 1.9.0"
