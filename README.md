@@ -439,3 +439,4 @@ You should now be able to run the tests
 * [davesherratt (Dave Sherratt)](https://github.com/davesherratt) - Initial support for Rails 4 strong parameters
 * [kylecrum (Kyle Crum)](https://github.com/kylecrum) - Fix double url encoding bug
 * [rsniezynski](https://github.com/rsniezynski) - Add min file size configuration
+* [philipp-spiess (Philipp Spieß)](https://github.com/philipp-spiess) - Direct fog url bugfix
