@@ -436,3 +436,4 @@ You should now be able to run the tests
 * [evanlok](https://github.com/evanlok) - Don't be case sensitive with filename extension validation
 * [jkamenik (John Kamenik)](https://github.com/jkamenik) - Support for Content-Type
 * [davesherratt (Dave Sherratt)](https://github.com/davesherratt) - Initial support for Rails 4 strong parameters
+* [kylecrum (Kyle Crum)](https://github.com/kylecrum) - Fix double url encoding bug
