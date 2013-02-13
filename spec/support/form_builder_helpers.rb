@@ -3,7 +3,7 @@
 require 'action_view'
 require 'action_view/template'
 
-require File.join(File.dirname(__FILE__), 'view_helpers') 
+require File.join(File.dirname(__FILE__), 'view_helpers')
 
 require 'carrierwave_direct/form_builder'
 require 'carrierwave_direct/action_view_extensions/form_helper'
@@ -34,4 +34,3 @@ module FormBuilderHelpers
     direct_upload_form_for(direct_uploader, options, &blk)
   end
 end
-
