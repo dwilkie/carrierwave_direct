@@ -59,6 +59,7 @@ module CarrierWaveDirect
 
     def policy(options = {})
       options[:expiration] ||= self.class.upload_expiration
+      options[:min_file_size] ||= self.class.min_file_size
       options[:max_file_size] ||= self.class.max_file_size
 
       Base64.encode64(
@@ -71,7 +72,7 @@ module CarrierWaveDirect
             {"bucket" => fog_directory},
             {"acl" => acl},
             {"success_action_redirect" => success_action_redirect},
-            ["content-length-range", 1, options[:max_file_size]]
+            ["content-length-range", options[:min_file_size], options[:max_file_size]]
           ]
         }.to_json
       ).gsub("\n","")

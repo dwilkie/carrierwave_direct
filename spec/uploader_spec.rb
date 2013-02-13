@@ -15,6 +15,7 @@ describe CarrierWaveDirect::Uploader do
     :extension_regexp => "(avi)",
     :url => "http://example.com/some_url",
     :expiration => 60,
+    :min_file_size => 1024,
     :max_file_size => 10485760,
     :file_url => "http://anyurl.com/any_path/video_dir/filename.avi",
     :mounted_model_name => "Porno",
@@ -52,6 +53,12 @@ describe CarrierWaveDirect::Uploader do
   describe ".upload_expiration" do
     it "should be 10 hours" do
       subject.class.upload_expiration.should == 36000
+    end
+  end
+
+  describe ".min_file_size" do
+    it "should be 1 byte" do
+      subject.class.min_file_size.should == 1
     end
   end
 
@@ -428,18 +435,32 @@ describe CarrierWaveDirect::Uploader do
 
         context "'content-length-range of'" do
 
-          def have_content_length_range(max_file_size = DirectUploader.max_file_size)
-            include(["content-length-range", 1, max_file_size])
+          def have_content_length_range(options = {})
+            include([
+              "content-length-range",
+              options[:min_file_size] || DirectUploader.min_file_size,
+              options[:max_file_size] || DirectUploader.max_file_size,
+            ])
+          end
+
+          it "#{DirectUploader.min_file_size} bytes" do
+            conditions.should have_content_length_range
           end
 
           it "#{DirectUploader.max_file_size} bytes" do
             conditions.should have_content_length_range
           end
 
+          it "#{sample(:min_file_size)} bytes when passing {:min_file_size => #{sample(:min_file_size)}}" do
+            conditions(
+              :min_file_size => sample(:min_file_size)
+            ).should have_content_length_range(:min_file_size => sample(:min_file_size))
+          end
+
           it "#{sample(:max_file_size)} bytes when passing {:max_file_size => #{sample(:max_file_size)}}" do
             conditions(
               :max_file_size => sample(:max_file_size)
-            ).should have_content_length_range(sample(:max_file_size))
+            ).should have_content_length_range(:max_file_size => sample(:max_file_size))
           end
         end
       end
