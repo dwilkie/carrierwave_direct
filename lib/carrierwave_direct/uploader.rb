@@ -66,7 +66,6 @@ module CarrierWaveDirect
         {
           'expiration' => Time.now.utc + options[:expiration],
           'conditions' => [
-            ["starts-with", "$Content-Type", ""],
             ["starts-with", "$utf8", ""],
             ["starts-with", "$key", store_dir],
             {"bucket" => fog_directory},
