@@ -434,6 +434,10 @@ describe CarrierWaveDirect::Uploader do
           subject.success_action_redirect = "http://example.com/some_url"
           conditions.should have_condition("success_action_redirect" => "http://example.com/some_url")
         end
+        
+        it "'content-type' only if enabled" do
+          conditions.should have_condition('Content-Type') if subject.class.will_include_content_type
+        end
 
         context "'content-length-range of'" do
           def have_content_length_range(options = {})

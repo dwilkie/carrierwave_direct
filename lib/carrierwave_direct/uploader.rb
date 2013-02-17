@@ -61,13 +61,14 @@ module CarrierWaveDirect
       options[:expiration] ||= self.class.upload_expiration
       options[:min_file_size] ||= self.class.min_file_size
       options[:max_file_size] ||= self.class.max_file_size
+      
+      conditions = [ ["starts-with", "$utf8", ""], ["starts-with", "$key", store_dir] ]
+      conditions << ["starts-with", "$Content-Type", ""] if self.class.will_include_content_type
 
       Base64.encode64(
         {
           'expiration' => Time.now.utc + options[:expiration],
-          'conditions' => [
-            ["starts-with", "$utf8", ""],
-            ["starts-with", "$key", store_dir],
+          'conditions' => conditions + [
             {"bucket" => fog_directory},
             {"acl" => acl},
             {"success_action_redirect" => success_action_redirect},
