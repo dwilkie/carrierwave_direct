@@ -16,6 +16,7 @@ module CarrierWaveDirect
         add_config :min_file_size
         add_config :max_file_size
         add_config :upload_expiration
+        add_config :will_include_content_type
         reset_direct_config
       end
 
