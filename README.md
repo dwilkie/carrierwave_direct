@@ -422,7 +422,7 @@ If you're Rails app was newly generated *after* version 3.2.3 and your testing t
 
 ## Contributing to CarrierWaveDirect
 
-Pull requests are very welcome. Before submitting a pull request, please make sure that your changes are well tested.
+Pull requests are very welcome. Before submitting a pull request, please make sure that your changes are well tested. Pull requests without tests *will not* be accepted.
 
     gem install bundler
     bundle install
@@ -430,6 +430,10 @@ Pull requests are very welcome. Before submitting a pull request, please make su
 You should now be able to run the tests
 
     bundle exec rake
+
+### Using the Sample Application
+
+After you have fixed a bug or added a feature please also use the [CarrierWaveDirect Sample Application](https://github.com/dwilkie/carrierwave_direct_example) to ensure that the gem still works correctly.
 
 ## Contributors
 
