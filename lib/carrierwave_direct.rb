@@ -4,7 +4,8 @@ require "carrierwave_direct/version"
 
 require "carrierwave"
 require "fog"
-require "uuid"
+
+autoload :UUID, "uuid"
 
 module CarrierWaveDirect
 
