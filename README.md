@@ -454,3 +454,4 @@ After you have fixed a bug or added a feature please also use the [CarrierWaveDi
 * [rsniezynski](https://github.com/rsniezynski) - Add min file size configuration
 * [philipp-spiess (Philipp Spieß)](https://github.com/philipp-spiess) - Direct fog url bugfix
 * [colinyoung (Colin Young)](https://github.com/colinyoung) - Content-Type support
+* [filiptepper (Filip Tepper)](https://github.com/filiptepper) - Autoload UUID on heroku
