@@ -137,7 +137,7 @@ things just got a whole lot easier. You can generate a direct upload form like t
       <%= f.submit %>
     <% end %>
 
-After uploading to S3, you'll need to update the new object with the returned key in ``new_user_url``:
+After uploading to S3, You'll need to update the uploader object with the returned key in the controller action that corresponds to `new_user_url`:
 
     @uploader.update_attribute :key, params[:key]
 
