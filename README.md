@@ -68,7 +68,10 @@ Remove the line `storage :file` and replace it with `include CarrierWaveDirect::
 
 This adds the extra functionality for direct uploading.
 
-Finally, remove the `store_dir` method in order to default CarrierWaveDirect to its own storage directory.
+**Optional**: Remove the `store_dir` method in order to default CarrierWaveDirect to its own storage directory.
+
+    /uploads/<unique_guid>/foo.png
+
 
 If you're *not* using Rails you can generate a direct upload form to S3 similar to [this example](http://doc.s3.amazonaws.com/proposals/post.html#A_Sample_Form)) by making use of the CarrierWaveDirect helper methods.
 
@@ -133,6 +136,10 @@ things just got a whole lot easier. You can generate a direct upload form like t
       <%= f.file_field :avatar %>
       <%= f.submit %>
     <% end %>
+
+After uploading to S3, you'll need to update the new object with the returned key in ``new_user_url``:
+
+    @uploader.update_attribute :key, params[:key]
 
 You can also pass html options like this:
 
