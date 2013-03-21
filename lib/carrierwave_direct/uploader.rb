@@ -42,7 +42,7 @@ module CarrierWaveDirect
     def key
       return @key if @key.present?
       if url.present?
-        self.key = CGI.unescape(URI.parse(url).path) # explicitly set key
+        self.key = URI.parse(URI.encode(url)).path # explicitly set key
       else
         @key = "#{store_dir}/#{guid}/#{FILENAME_WILDCARD}"
       end
