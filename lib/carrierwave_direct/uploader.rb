@@ -31,7 +31,7 @@ module CarrierWaveDirect
     end
 
     def guid
-      UUID.generate
+      UUIDTools::UUID.random_create
     end
 
     def key=(k)
@@ -61,7 +61,7 @@ module CarrierWaveDirect
       options[:expiration] ||= self.class.upload_expiration
       options[:min_file_size] ||= self.class.min_file_size
       options[:max_file_size] ||= self.class.max_file_size
-      
+
       conditions = [ ["starts-with", "$utf8", ""], ["starts-with", "$key", store_dir] ]
       conditions << ["starts-with", "$Content-Type", ""] if self.class.will_include_content_type
 
