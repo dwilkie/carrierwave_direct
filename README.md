@@ -310,11 +310,11 @@ Validates that your mounted model has an avatar attached. This checks whether th
 
 Validates that the filename in the database is unique. Turned *on* by default
 
-      validates :avatar :filename_format => true
+      validates :avatar, :filename_format => true
 
 Validates that the uploaded filename is valid. As well as validating the extension against the `extension_white_list` it also validates that the `upload_dir` is correct. Turned *on* by default
 
-      validates :avatar :remote_net_url_format => true
+      validates :avatar, :remote_net_url_format => true
 
 Validates that the remote net url is valid. As well as validating the extension against the `extension_white_list` it also validates that url is valid and has only the schemes specified in the `url_scheme_whitelist`. Turned *on* by default
 
