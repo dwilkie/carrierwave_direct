@@ -15,6 +15,7 @@ describe CarrierWaveDirect::Uploader do
     :extension_regexp => "(avi)",
     :url => "http://example.com/some_url",
     :expiration => 60,
+    :min_file_size => 1024,
     :max_file_size => 10485760,
     :file_url => "http://anyurl.com/any_path/video_dir/filename.avi",
     :mounted_model_name => "Porno",
@@ -52,6 +53,12 @@ describe CarrierWaveDirect::Uploader do
   describe ".upload_expiration" do
     it "should be 10 hours" do
       subject.class.upload_expiration.should == 36000
+    end
+  end
+
+  describe ".min_file_size" do
+    it "should be 1 byte" do
+      subject.class.min_file_size.should == 1
     end
   end
 
@@ -241,7 +248,10 @@ describe CarrierWaveDirect::Uploader do
         before { subject.key = sample(:path_with_special_chars) }
 
         it "should return the full url with '/#{URI.escape(sample(:path_with_special_chars))}' as the path" do
-          URI.parse(subject.direct_fog_url(:with_path => true)).path.should == "/#{URI.escape(sample(:path_with_special_chars))}"
+          direct_fog_url = CarrierWave::Storage::Fog::File.new(
+            subject, nil, nil
+          ).public_url
+          subject.direct_fog_url(:with_path => true).should == direct_fog_url + "#{URI.escape(sample(:path_with_special_chars))}"
         end
       end
 
@@ -249,7 +259,10 @@ describe CarrierWaveDirect::Uploader do
         before { subject.key = sample(:path) }
 
         it "should return the full url with '/#{sample(:path)}' as the path" do
-          URI.parse(subject.direct_fog_url(:with_path => true)).path.should == "/#{sample(:path)}"
+          direct_fog_url = CarrierWave::Storage::Fog::File.new(
+            subject, nil, nil
+          ).public_url
+          subject.direct_fog_url(:with_path => true).should == direct_fog_url + "#{sample(:path)}"
         end
       end
     end
@@ -421,25 +434,38 @@ describe CarrierWaveDirect::Uploader do
           subject.success_action_redirect = "http://example.com/some_url"
           conditions.should have_condition("success_action_redirect" => "http://example.com/some_url")
         end
-
-        it "'content-type'" do
-          conditions.should have_condition('Content-Type')
+        
+        it "'content-type' only if enabled" do
+          conditions.should have_condition('Content-Type') if subject.class.will_include_content_type
         end
 
         context "'content-length-range of'" do
+          def have_content_length_range(options = {})
+            include([
+              "content-length-range",
+              options[:min_file_size] || DirectUploader.min_file_size,
+              options[:max_file_size] || DirectUploader.max_file_size,
+            ])
+          end
 
-          def have_content_length_range(max_file_size = DirectUploader.max_file_size)
-            include(["content-length-range", 1, max_file_size])
+          it "#{DirectUploader.min_file_size} bytes" do
+            conditions.should have_content_length_range
           end
 
           it "#{DirectUploader.max_file_size} bytes" do
             conditions.should have_content_length_range
           end
 
+          it "#{sample(:min_file_size)} bytes when passing {:min_file_size => #{sample(:min_file_size)}}" do
+            conditions(
+              :min_file_size => sample(:min_file_size)
+            ).should have_content_length_range(:min_file_size => sample(:min_file_size))
+          end
+
           it "#{sample(:max_file_size)} bytes when passing {:max_file_size => #{sample(:max_file_size)}}" do
             conditions(
               :max_file_size => sample(:max_file_size)
-            ).should have_content_length_range(sample(:max_file_size))
+            ).should have_content_length_range(:max_file_size => sample(:max_file_size))
           end
         end
       end

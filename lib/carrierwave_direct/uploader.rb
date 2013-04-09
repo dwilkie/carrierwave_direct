@@ -22,16 +22,16 @@ module CarrierWaveDirect
     def direct_fog_url(options = {})
       fog_uri = CarrierWave::Storage::Fog::File.new(self, CarrierWave::Storage::Fog.new(self), nil).public_url
       if options[:with_path]
-        uri = URI.parse(fog_uri)
+        uri = URI.parse(fog_uri.chomp('/'))
         path = "/#{key}"
-        uri.path = URI.escape(path)
+        uri.path += URI.escape(path)
         fog_uri = uri.to_s
       end
       fog_uri
     end
 
     def guid
-      UUID.generate
+      UUIDTools::UUID.random_create
     end
 
     def key=(k)
@@ -42,7 +42,7 @@ module CarrierWaveDirect
     def key
       return @key if @key.present?
       if url.present?
-        self.key = URI.parse(url).path # explicitly set key
+        self.key = URI.parse(URI.encode(url)).path # explicitly set key
       else
         @key = "#{store_dir}/#{guid}/#{FILENAME_WILDCARD}"
       end
@@ -59,19 +59,20 @@ module CarrierWaveDirect
 
     def policy(options = {})
       options[:expiration] ||= self.class.upload_expiration
+      options[:min_file_size] ||= self.class.min_file_size
       options[:max_file_size] ||= self.class.max_file_size
+
+      conditions = [ ["starts-with", "$utf8", ""], ["starts-with", "$key", store_dir] ]
+      conditions << ["starts-with", "$Content-Type", ""] if self.class.will_include_content_type
 
       Base64.encode64(
         {
           'expiration' => Time.now.utc + options[:expiration],
-          'conditions' => [
-            ["starts-with", "$Content-Type", ""],
-            ["starts-with", "$utf8", ""],
-            ["starts-with", "$key", store_dir],
+          'conditions' => conditions + [
             {"bucket" => fog_directory},
             {"acl" => acl},
             {"success_action_redirect" => success_action_redirect},
-            ["content-length-range", 1, options[:max_file_size]]
+            ["content-length-range", options[:min_file_size], options[:max_file_size]]
           ]
         }.to_json
       ).gsub("\n","")
