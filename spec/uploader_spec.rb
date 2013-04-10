@@ -123,12 +123,12 @@ describe CarrierWaveDirect::Uploader do
           mounted_subject.stub(:url).and_return(sample(:s3_file_url))
         end
 
-        it "should return '/#{sample(:s3_key)}'" do
-          mounted_subject.key.should == "/#{sample(:s3_key)}"
+        it "should return '#{sample(:s3_key)}'" do
+          mounted_subject.key.should == sample(:s3_key)
         end
 
         it "should set the key explicitly in order to update the version keys" do
-          mounted_subject.should_receive("key=").with("/#{sample(:s3_key)}")
+          mounted_subject.should_receive("key=").with(sample(:s3_key))
           mounted_subject.key
         end
       end
@@ -434,7 +434,7 @@ describe CarrierWaveDirect::Uploader do
           subject.success_action_redirect = "http://example.com/some_url"
           conditions.should have_condition("success_action_redirect" => "http://example.com/some_url")
         end
-        
+
         it "'content-type' only if enabled" do
           conditions.should have_condition('Content-Type') if subject.class.will_include_content_type
         end
