@@ -442,6 +442,10 @@ You should now be able to run the tests
 
 After you have fixed a bug or added a feature please also use the [CarrierWaveDirect Sample Application](https://github.com/dwilkie/carrierwave_direct_example) to ensure that the gem still works correctly.
 
+## Credits
+
+Thank you to everybody who has contributed to [CarrierWaveDirect](https://github.com/dwilkie/carrierwave_direct). A special thanks to [colinyoung (Colin Young)](https://github.com/colinyoung) who spends a great deal of his time maintaining the gem responding to pull requests and fixing bugs.
+
 ## Contributors
 
 * [cblunt (Chris Blunt)](https://github.com/cblunt) - Support for passing html options
