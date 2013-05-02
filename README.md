@@ -203,7 +203,7 @@ You could use a select as well.
 
 ## Processing and referencing files in a background process
 
-Processing and saving file uploads are typically long running tasks and should be done in a background process. CarrierWaveDirect gives you a few methods to help you do this with your favorite background processor such as [DelayedJob](https://github.com/collectiveidea/delayed_job) or [Resque](https://github.com/defunkt/resque).
+Processing and saving file uploads are typically long running tasks and should be done in a background process. CarrierWaveDirect gives you a few methods to help you do this with your favorite background processor such as [DelayedJob](https://github.com/collectiveidea/delayed_job) or [Resque](https://github.com/resque/resque).
 
 If your upload was successful then you will be redirected to the `success_action_redirect` url you specified in your uploader. S3 replies with a redirect like this: `http://example.com?bucket=your_fog_directory&key=uploads%2Fguid%2Ffile.ext&etag=%22d41d8cd98f00b204e9800998ecf8427%22`
 
@@ -244,7 +244,7 @@ then in your controller you can do something like this:
 
 ### Background processing
 
-Now that the basic building blocks are in place you can process and save your avatar in the background. This example uses [Resque](https://github.com/defunkt/resque) but the same logic could be applied to [DelayedJob](https://github.com/collectiveidea/delayed_job) or any other background processor.
+Now that the basic building blocks are in place you can process and save your avatar in the background. This example uses [Resque](https://github.com/resque/resque) but the same logic could be applied to [DelayedJob](https://github.com/collectiveidea/delayed_job) or any other background processor.
 
     class User < ActiveRecord::Base
       def save_and_process_avatar(options = {})
