@@ -118,9 +118,18 @@ describe CarrierWaveDirect::Uploader do
         end
       end
 
+      context "and the uploaders url is #default_url" do
+        it "should return '*/\#\{guid\}/${filename}'" do
+          mounted_subject.stub(:url).and_return(sample(:s3_file_url))
+          mounted_subject.stub(:present?).and_return(false)
+          mounted_subject.key.should =~ /#{GUID_REGEXP}\/\$\{filename\}$/
+        end
+      end
+
       context "but the uploaders url is '#{sample(:s3_file_url)}'" do
         before do
           mounted_subject.stub(:url).and_return(sample(:s3_file_url))
+          mounted_subject.stub(:present?).and_return(true)
         end
 
         it "should return '#{sample(:s3_key)}'" do
