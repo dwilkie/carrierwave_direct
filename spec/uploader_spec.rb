@@ -424,11 +424,16 @@ describe CarrierWaveDirect::Uploader do
 
         # S3 conditions
         it "'key'" do
-          mounted_subject.stub(:store_dir).and_return(sample(:s3_key))
-          mounted_subject.key
+          mounted_subject.stub(:key).and_return(sample(:s3_key))
           conditions(
             :subject => mounted_subject
           ).should have_condition(:key, sample(:s3_key))
+        end
+
+        it "'key' without FILENAME_WILDCARD" do
+          conditions(
+            :subject => mounted_subject
+          ).should have_condition(:key, mounted_subject.key.sub("${filename}", ""))
         end
 
         it "'bucket'" do
