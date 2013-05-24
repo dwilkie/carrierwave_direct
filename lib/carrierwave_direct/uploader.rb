@@ -41,7 +41,7 @@ module CarrierWaveDirect
 
     def key
       return @key if @key.present?
-      if url.present?
+      if present?
         self.key = URI.parse(URI.encode(url)).path[1 .. -1] # explicitly set key
       else
         @key = "#{store_dir}/#{guid}/#{FILENAME_WILDCARD}"
@@ -62,7 +62,10 @@ module CarrierWaveDirect
       options[:min_file_size] ||= self.class.min_file_size
       options[:max_file_size] ||= self.class.max_file_size
 
-      conditions = [ ["starts-with", "$utf8", ""], ["starts-with", "$key", store_dir] ]
+      conditions = [
+        ["starts-with", "$utf8", ""],
+        ["starts-with", "$key", key.sub(/#{Regexp.escape(FILENAME_WILDCARD)}\z/, "")]
+      ]
       conditions << ["starts-with", "$Content-Type", ""] if self.class.will_include_content_type
 
       Base64.encode64(
