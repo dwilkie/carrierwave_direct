@@ -6,6 +6,33 @@
 
 [CarrierWaveDirect](https://github.com/dwilkie/carrierwave_direct) works on top of [CarrierWave](https://github.com/jnicklas/carrierwave) and provides a simple way to achieve this.
 
+## Project Maintainer(s) Wanted
+
+Meh. [I just want to use it already.](https://github.com/dwilkie/carrierwave_direct#example-application)
+
+### Why can't you do it?
+
+I'm no longer involved in building apps which require file uploads. Therefore I no longer feel that I can do a good job maintaining this project. I just want the community to take it where it needs to go.
+
+### What's in it for me?
+
+* Everything
+* Job Applications
+* Not much
+* What you make of it
+
+### What do I need to do?
+
+You can help by simply accepting pull requests and bumping versions. Or if you want to be more involved you could help resolve outstanding issues or develop new features.
+
+### Who are you looking for?
+
+Anybody who has previously contributed to CarrierWaveDirect (with tests) and/or who anybody who really wants to.
+
+### How can I apply?
+
+This is not a job application. I you want to maintain it, you've basically got the job. Just comment on this issue: https://github.com/dwilkie/carrierwave_direct/issues/83 and link to a contribution you've made on this gem, or some other gem.
+
 ## Example Application
 
 For a concrete example on how to use [CarrierWaveDirect](https://github.com/dwilkie/carrierwave_direct) in a Rails application check out the [Example Application](https://github.com/dwilkie/carrierwave_direct_example).
