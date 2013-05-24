@@ -56,4 +56,3 @@ describe CarrierWaveDirect::FormBuilder do
     end
   end
 end
-
