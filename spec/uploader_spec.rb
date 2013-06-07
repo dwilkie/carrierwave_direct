@@ -434,9 +434,10 @@ describe CarrierWaveDirect::Uploader do
           subject.success_action_redirect = "http://example.com/some_url"
           conditions.should have_condition("success_action_redirect" => "http://example.com/some_url")
         end
-        
-        it "'content-type' only if enabled" do
-          conditions.should have_condition('Content-Type') if subject.class.will_include_content_type
+
+        it "'content-type'" do
+          subject.stub(:default_content_type).and_return 'foo'
+          conditions.should have_condition('Content-Type', 'foo')
         end
 
         context "'content-length-range of'" do
@@ -482,6 +483,20 @@ describe CarrierWaveDirect::Uploader do
         OpenSSL::Digest::Digest.new('sha1'),
         subject.aws_secret_access_key, subject.policy
       )
+    end
+  end
+
+  describe "#default_content_type" do
+    it "should default to binary/octet-stream" do
+      [nil,true,false].each do |value|
+        subject.class.stub(:will_include_content_type).and_return value
+        subject.default_content_type.should == 'binary/octet-stream'
+      end
+    end
+
+    it "should be the configured value" do
+      subject.class.stub(:will_include_content_type).and_return 'video/mp4'
+      subject.default_content_type.should == 'video/mp4'
     end
   end
 

@@ -57,13 +57,22 @@ module CarrierWaveDirect
       fog_public ? 'public-read' : 'private'
     end
 
+    def default_content_type
+      default = self.class.will_include_content_type
+
+      default.is_a?(String) ? default : 'binary/octet-stream'
+    end
+
     def policy(options = {})
       options[:expiration] ||= self.class.upload_expiration
       options[:min_file_size] ||= self.class.min_file_size
       options[:max_file_size] ||= self.class.max_file_size
 
-      conditions = [ ["starts-with", "$utf8", ""], ["starts-with", "$key", store_dir] ]
-      conditions << ["starts-with", "$Content-Type", ""] if self.class.will_include_content_type
+      conditions = [
+        ["starts-with", "$utf8", ""],
+        ["starts-with", "$key", store_dir],
+        ["starts-with", "$Content-Type",default_content_type]
+      ]
 
       Base64.encode64(
         {
