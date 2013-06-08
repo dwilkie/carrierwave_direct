@@ -57,7 +57,7 @@ module CarrierWaveDirect
       fog_public ? 'public-read' : 'private'
     end
 
-    def default_content_type
+    def content_type
       default = self.class.will_include_content_type
 
       default.is_a?(String) ? default : 'binary/octet-stream'
@@ -71,7 +71,7 @@ module CarrierWaveDirect
       conditions = [
         ["starts-with", "$utf8", ""],
         ["starts-with", "$key", store_dir],
-        ["starts-with", "$Content-Type",default_content_type]
+        ["starts-with", "$Content-Type",""]
       ]
 
       Base64.encode64(

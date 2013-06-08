@@ -436,8 +436,7 @@ describe CarrierWaveDirect::Uploader do
         end
 
         it "'content-type'" do
-          subject.stub(:default_content_type).and_return 'foo'
-          conditions.should have_condition('Content-Type', 'foo')
+          conditions.should have_condition('Content-Type')
         end
 
         context "'content-length-range of'" do
@@ -486,17 +485,17 @@ describe CarrierWaveDirect::Uploader do
     end
   end
 
-  describe "#default_content_type" do
+  describe "#content_type" do
     it "should default to binary/octet-stream" do
       [nil,true,false].each do |value|
         subject.class.stub(:will_include_content_type).and_return value
-        subject.default_content_type.should == 'binary/octet-stream'
+        subject.content_type.should == 'binary/octet-stream'
       end
     end
 
     it "should be the configured value" do
       subject.class.stub(:will_include_content_type).and_return 'video/mp4'
-      subject.default_content_type.should == 'video/mp4'
+      subject.content_type.should == 'video/mp4'
     end
   end
 
