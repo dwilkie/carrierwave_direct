@@ -174,12 +174,14 @@ Once you've uploaded your file directly to the cloud you'll probably need a way 
 
 The default amazon content-type is "binary/octet-stream" and for many cases this will work just fine.  But if you are trying to stream video or audio you will need to set the mime type manually as Amazon will not calculate it for you.  All mime types are supported: [http://en.wikipedia.org/wiki/Internet_media_type](http://en.wikipedia.org/wiki/Internet_media_type).
 
-First, tell CarrierWaveDirect that you will include your content type manually by adding to your initializer:
+First, tell CarrierWaveDirect what your default content type should be:
 
     CarrierWave.configure do |config|
       # ... fog configuration and other options ...
-      config.will_include_content_type = true
+      config.will_include_content_type = 'video/mp4'
     end
+
+Note: for backwards compatibility `will_include_content_type = true` just defaults to 'binary/octet-stream'
 
 Then, just add a content-type element to the form.
 
@@ -200,6 +202,17 @@ You could use a select as well.
       <%= f.file_field :avatar %>
       <%= f.submit %>
     <% end %>
+
+Or you can use the helper which shows all possible content types as a select.
+
+    <%= direct_upload_form_for @uploader do |f| %>
+      <%= f.content_type_label %><br>
+      <%= f.content_type_select %><br><br>
+
+      <%= f.file_field :avatar %><br>
+      <%= f.submit %>
+    <% end %>
+
 
 ## Processing and referencing files in a background process
 
@@ -329,12 +342,12 @@ As well as the built in validations CarrierWaveDirect provides, some validations
       config.validate_filename_format = false        # defaults to true
       config.validate_remote_net_url_format = false  # defaults to true
 
-      config.min_file_size     = 5.kilobytes         # defaults to 1.byte
-      config.max_file_size     = 10.megabytes        # defaults to 5.megabytes
-      config.upload_expiration = 1.hour              # defaults to 10.hours
-      config.will_include_content_type = true        # defaults to false; if true, content-type will be set
-                                                     # on s3, but you must include an input field named
-                                                     # Content-Type on every direct upload form
+      config.min_file_size             = 5.kilobytes  # defaults to 1.byte
+      config.max_file_size             = 10.megabytes # defaults to 5.megabytes
+      config.upload_expiration         = 1.hour       # defaults to 10.hours
+      config.will_include_content_type = 'video/mp4'  # defaults to false; if set it will be the default set content
+                                                      # type provided for amazon.  And the default selected value if
+                                                      # using the `content_type_select` helper.
     end
 
 ## Testing with CarrierWaveDirect
@@ -461,4 +474,5 @@ After you have fixed a bug or added a feature please also use the [CarrierWaveDi
 * [rsniezynski](https://github.com/rsniezynski) - Add min file size configuration
 * [philipp-spiess (Philipp Spieß)](https://github.com/philipp-spiess) - Direct fog url bugfix
 * [colinyoung (Colin Young)](https://github.com/colinyoung) - Content-Type support
+* [jkamenik (John Kamenik)](https://github.com/jkamenik) - Content-Type support
 * [filiptepper (Filip Tepper)](https://github.com/filiptepper) - Autoload UUID on heroku
