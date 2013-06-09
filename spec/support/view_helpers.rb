@@ -46,5 +46,12 @@ module ViewHelpers
     parent_selector << "input[#{to_xpath_attributes(options)}]"
     have_parent_selector selector_options
   end
+
+  def have_content_type(content_type,selected=nil)
+    options = {:value => content_type}
+    options[:selected] = 'selected' if selected
+
+    have_selector :xpath, ".//select[@name=\"Content-Type\"]/option[#{to_xpath_attributes(options)}]"
+  end
 end
 

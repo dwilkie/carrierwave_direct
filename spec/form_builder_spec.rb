@@ -2,6 +2,11 @@
 
 require 'spec_helper'
 
+class CarrierWaveDirect::FormBuilder
+  attr_reader :template
+  public :content_choices_options
+end
+
 shared_examples_for 'hidden values form' do
   hidden_fields = [
                     :key,
@@ -70,6 +75,22 @@ describe CarrierWaveDirect::FormBuilder do
       end
 
       it_should_behave_like 'hidden values form'
+
+      it 'should select the default content type' do
+        direct_uploader.stub(:content_type).and_return('video/mp4')
+        subject.should have_content_type 'video/mp4', true
+      end
+
+      it 'should select the passed in content type' do
+        dom = form {|f| f.content_type_select nil, 'video/mp4'}
+        dom.should have_content_type 'video/mp4', true
+      end
+
+      it 'should include most content types' do
+        %w(application/atom+xml application/ecmascript application/json application/javascript application/octet-stream application/ogg application/pdf application/postscript application/rss+xml application/font-woff application/xhtml+xml application/xml application/xml-dtd application/zip application/gzip audio/basic audio/mp4 audio/mpeg audio/ogg audio/vorbis audio/vnd.rn-realaudio audio/vnd.wave audio/webm image/gif image/jpeg image/pjpeg image/png image/svg+xml image/tiff text/cmd text/css text/csv text/html text/javascript text/plain text/vcard text/xml video/mpeg video/mp4 video/ogg video/quicktime video/webm video/x-matroska video/x-ms-wmv video/x-flv).each do |type|
+          subject.should have_content_type type
+        end
+      end
     end
   end
 
@@ -106,7 +127,6 @@ describe CarrierWaveDirect::FormBuilder do
     end
 
     it 'should include Content-Type twice' do
-      puts dom.inspect
       dom.should have_input(
                    :direct_uploader,
                    :content_type,
