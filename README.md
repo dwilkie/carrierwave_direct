@@ -108,7 +108,7 @@ This adds the extra functionality for direct uploading.
     /uploads/<unique_guid>/foo.png
 
 
-If you're *not* using Rails you can generate a direct upload form to S3 similar to [this example](http://doc.s3.amazonaws.com/proposals/post.html#A_Sample_Form)) by making use of the CarrierWaveDirect helper methods.
+If you're *not* using Rails you can generate a direct upload form to S3 similar to [this example](http://doc.s3.amazonaws.com/proposals/post.html#A_Sample_Form) by making use of the CarrierWaveDirect helper methods.
 
 ### Sinatra
 
