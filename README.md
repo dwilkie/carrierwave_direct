@@ -437,7 +437,7 @@ connection.directories.create(:key => fog_directory)
 
 ### Using Capybara
 
-If your using Capybara with Cucumber or RSpec, CarrierWaveDirect gives you a few useful helpers. To get the Capybara helpers, include the module into your test file or helper
+If you're using Capybara with Cucumber or RSpec, CarrierWaveDirect gives you a few useful helpers. To get the Capybara helpers, include the module into your test file or helper
 
 ```ruby
 describe AvatarUploadSpec
