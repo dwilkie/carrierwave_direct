@@ -14,7 +14,14 @@ module FormBuilderHelpers
   include ActionView::Helpers::FormHelper
   include CarrierWaveDirect::ActionViewExtensions::FormHelper
   include ActionView::Context
-  include ActionView::RecordIdentifier
+
+  # Try ActionView::RecrodIentifier for Rails 4
+  # else use ActionController::RecordIdentifier for Rails 3.2
+  begin
+    include ActionView::RecordIdentifier
+  rescue
+    include ActionController::RecordIdentifier
+  end
 
   include ::ViewHelpers
 
