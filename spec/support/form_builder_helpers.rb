@@ -2,6 +2,8 @@
 
 require 'action_view'
 require 'action_view/template'
+require 'action_controller'
+require 'active_model'
 
 require File.join(File.dirname(__FILE__), 'view_helpers')
 
@@ -12,7 +14,7 @@ module FormBuilderHelpers
   include ActionView::Helpers::FormHelper
   include CarrierWaveDirect::ActionViewExtensions::FormHelper
   include ActionView::Context
-  include ActionController::RecordIdentifier
+  include ActionView::RecordIdentifier
 
   include ::ViewHelpers
 
