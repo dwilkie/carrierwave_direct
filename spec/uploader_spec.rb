@@ -118,17 +118,26 @@ describe CarrierWaveDirect::Uploader do
         end
       end
 
+      context "and the uploaders url is #default_url" do
+        it "should return '*/\#\{guid\}/${filename}'" do
+          mounted_subject.stub(:url).and_return(sample(:s3_file_url))
+          mounted_subject.stub(:present?).and_return(false)
+          mounted_subject.key.should =~ /#{GUID_REGEXP}\/\$\{filename\}$/
+        end
+      end
+
       context "but the uploaders url is '#{sample(:s3_file_url)}'" do
         before do
           mounted_subject.stub(:url).and_return(sample(:s3_file_url))
+          mounted_subject.stub(:present?).and_return(true)
         end
 
-        it "should return '/#{sample(:s3_key)}'" do
-          mounted_subject.key.should == "/#{sample(:s3_key)}"
+        it "should return '#{sample(:s3_key)}'" do
+          mounted_subject.key.should == sample(:s3_key)
         end
 
         it "should set the key explicitly in order to update the version keys" do
-          mounted_subject.should_receive("key=").with("/#{sample(:s3_key)}")
+          mounted_subject.should_receive("key=").with(sample(:s3_key))
           mounted_subject.key
         end
       end
@@ -415,11 +424,16 @@ describe CarrierWaveDirect::Uploader do
 
         # S3 conditions
         it "'key'" do
-          mounted_subject.stub(:store_dir).and_return(sample(:s3_key))
-          mounted_subject.key
+          mounted_subject.stub(:key).and_return(sample(:s3_key))
           conditions(
             :subject => mounted_subject
           ).should have_condition(:key, sample(:s3_key))
+        end
+
+        it "'key' without FILENAME_WILDCARD" do
+          conditions(
+            :subject => mounted_subject
+          ).should have_condition(:key, mounted_subject.key.sub("${filename}", ""))
         end
 
         it "'bucket'" do
