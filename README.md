@@ -538,7 +538,7 @@ After you have fixed a bug or added a feature please also use the [CarrierWaveDi
 
 ## Credits
 
-Thank you to everybody who has contributed to [CarrierWaveDirect](https://github.com/dwilkie/carrierwave_direct). A special thanks to [colinyoung (Colin Young)](https://github.com/colinyoung) who spends a great deal of his time maintaining the gem responding to pull requests and fixing bugs.
+Thank you to everybody who has contributed to [CarrierWaveDirect](https://github.com/dwilkie/carrierwave_direct). A special thanks to [colinyoung (Colin Young)](https://github.com/colinyoung) and [nddeluca (Nicholas DeLuca)](https://github.com/nddeluca) who help maintain the gem.
 
 ## Contributors
 
