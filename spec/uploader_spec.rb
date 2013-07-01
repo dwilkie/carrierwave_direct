@@ -68,6 +68,12 @@ describe CarrierWaveDirect::Uploader do
     end
   end
 
+  describe ".use_action_status" do
+    it "should be false" do
+      subject.class.use_action_status.should be_false
+    end
+  end
+
   DirectUploader.fog_credentials.keys.each do |key|
     describe "##{key}" do
       it "should return the #{key.to_s.capitalize}" do
@@ -81,6 +87,7 @@ describe CarrierWaveDirect::Uploader do
   end
 
   it_should_have_accessor(:success_action_redirect)
+  it_should_have_accessor(:success_action_status)
 
   describe "#key=" do
     before { subject.key = sample(:key) }
@@ -451,6 +458,26 @@ describe CarrierWaveDirect::Uploader do
 
         it "'content-type' only if enabled" do
           conditions.should have_condition('Content-Type') if subject.class.will_include_content_type
+        end
+
+        context 'when use_action_status is true' do
+          before(:all) do
+            DirectUploader.use_action_status = true
+          end
+
+          after(:all) do
+            DirectUploader.use_action_status = false
+          end
+
+          it "'success_action_status'" do
+            subject.success_action_status = '200'
+            conditions.should have_condition("success_action_status" => "200")
+          end
+
+          it "does not have 'success_action_redirect'" do
+            subject.success_action_redirect = "http://example.com/some_url"
+            conditions.should_not have_condition("success_action_redirect" => "http://example.com/some_url")
+          end
         end
 
         context "'content-length-range of'" do
