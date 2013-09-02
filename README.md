@@ -232,26 +232,30 @@ First, tell CarrierWaveDirect what your default content type should be:
 ```ruby
 CarrierWave.configure do |config|
   # ... fog configuration and other options ...
-  config.will_include_content_type = 'video/mp4'
+  config.default_content_type = 'video/mp4'
 end
 ```
 
-Note: for backwards compatibility `will_include_content_type = true` just defaults to 'binary/octet-stream'
+Note: for backwards compatibility `will_include_content_type` is an alias for `default_content_type` and a value of true` just defaults to 'binary/octet-stream'
 
 Then, just add a content-type element to the form.
 
 ```erb
 <%= direct_upload_form_for @uploader do |f| %>
+  <%= f.hidden_fields %>
   <%= text_field_tag 'Content-Type', 'video/mpeg' %><br>
   <%= f.file_field :avatar %>
   <%= f.submit %>
 <% end %>
 ```
 
-You could use a select as well.
+*Note: if you do not use the helpers directly then you need to include the `hidden_fields` first.  Otherwise you values will be ignored.*
+
+You could use a manual select as well.
 
 ```erb
 <%= direct_upload_form_for @uploader do |f| %>
+  <%= f.hidden_fields %>
   <%= select_tag 'Content-Type', options_for_select([
     ['Video','video/mpeg'],
     ['Audio','audio/mpeg'],
