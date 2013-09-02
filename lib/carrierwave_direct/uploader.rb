@@ -11,6 +11,7 @@ module CarrierWaveDirect
       storage :fog
 
       attr_accessor :success_action_redirect
+      attr_accessor :success_action_status
 
       fog_credentials.keys.each do |key|
         define_method(key) do
@@ -73,16 +74,21 @@ module CarrierWaveDirect
         ["starts-with", "$key", key.sub(/#{Regexp.escape(FILENAME_WILDCARD)}\z/, "")],
         ["starts-with", "$Content-Type",""]
       ]
+      conditions << {"bucket" => fog_directory}
+      conditions << {"acl" => acl}
+
+      if self.class.use_action_status
+        conditions << {"success_action_status" => success_action_status}
+      else
+        conditions << {"success_action_redirect" => success_action_redirect}
+      end
+
+      conditions << ["content-length-range", options[:min_file_size], options[:max_file_size]]
 
       Base64.encode64(
         {
           'expiration' => Time.now.utc + options[:expiration],
-          'conditions' => conditions + [
-            {"bucket" => fog_directory},
-            {"acl" => acl},
-            {"success_action_redirect" => success_action_redirect},
-            ["content-length-range", options[:min_file_size], options[:max_file_size]]
-          ]
+          'conditions' => conditions
         }.to_json
       ).gsub("\n","")
     end
