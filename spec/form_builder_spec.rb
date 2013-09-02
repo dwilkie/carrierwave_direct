@@ -72,7 +72,7 @@ describe CarrierWaveDirect::FormBuilder do
 
     # http://aws.amazon.com/articles/1434?_encoding=UTF8
     context "form" do
-      let(:subject) {form_with_file_field}
+      let(:subject) {form_with_default_file_field}
       it_should_behave_like 'hidden values form'
 
       default_hidden_fields.each do |input|
