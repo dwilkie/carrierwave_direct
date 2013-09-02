@@ -236,7 +236,7 @@ CarrierWave.configure do |config|
 end
 ```
 
-Note: for backwards compatibility `will_include_content_type` is an alias for `default_content_type` and a value of true` just defaults to 'binary/octet-stream'
+*Note: for backwards compatibility `will_include_content_type` is an alias for `default_content_type` and a value of `true` just defaults to 'binary/octet-stream'*
 
 Then, just add a content-type element to the form.
 
