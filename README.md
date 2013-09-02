@@ -280,13 +280,15 @@ You could use a manual select as well.
 
 Or you can use the helper which shows all possible content types as a select, with the default content type selected.
 
-    <%= direct_upload_form_for @uploader do |f| %>
-      <%= f.content_type_label %><br>
-      <%= f.content_type_select %><br><br>
+```erb
+<%= direct_upload_form_for @uploader do |f| %>
+  <%= f.content_type_label %><br>
+  <%= f.content_type_select %><br><br>
 
-      <%= f.file_field :avatar %><br>
-      <%= f.submit %>
-    <% end %>
+  <%= f.file_field :avatar %><br>
+  <%= f.submit %>
+<% end %>
+```
 
 
 ## Processing and referencing files in a background process
