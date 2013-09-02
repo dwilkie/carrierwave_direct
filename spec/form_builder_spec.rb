@@ -142,6 +142,12 @@ describe CarrierWaveDirect::FormBuilder do
         subject.should have_content_type 'video/mp4', true
       end
 
+      it 'should include the default content types' do
+        direct_uploader.stub(:content_types).and_return(['text/foo','text/bar'])
+        subject.should have_content_type 'text/foo', false
+        subject.should have_content_type 'text/bar', false
+      end
+
       it 'should select the passed in content type' do
         dom = form {|f| f.content_type_select nil, 'video/mp4'}
         dom.should have_content_type 'video/mp4', true
