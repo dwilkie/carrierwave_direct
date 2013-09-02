@@ -232,7 +232,19 @@ First, tell CarrierWaveDirect what your default content type should be:
 ```ruby
 CarrierWave.configure do |config|
   # ... fog configuration and other options ...
-  config.default_content_type = 'video/mp4'
+  config.default_content_type = 'video/mpeg'
+  config.allowed_content_types = %w(video/mpeg video/mp4 video/ogg)
+end
+```
+
+or
+
+```ruby
+class VideoUploader < CarrierWave::Uploader::Base
+  include CarrierWaveDirect::Uploader
+
+  default_content_type  'video/mpeg'
+  allowed_content_types %w(video/mpeg video/mp4 video/ogg)
 end
 ```
 
@@ -266,7 +278,7 @@ You could use a manual select as well.
 <% end %>
 ```
 
-Or you can use the helper which shows all possible content types as a select.
+Or you can use the helper which shows all possible content types as a select, with the default content type selected.
 
     <%= direct_upload_form_for @uploader do |f| %>
       <%= f.content_type_label %><br>
