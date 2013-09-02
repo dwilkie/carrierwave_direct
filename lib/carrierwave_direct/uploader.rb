@@ -58,6 +58,29 @@ module CarrierWaveDirect
       fog_public ? 'public-read' : 'private'
     end
 
+    def content_type
+      default = self.class.default_content_type || self.class.will_include_content_type
+
+      default.is_a?(String) ? default : 'binary/octet-stream'
+    end
+
+    def content_types
+      types = self.class.allowed_content_types
+
+      return types if types.is_a? Array
+      %w(application/atom+xml application/ecmascript application/json
+         application/javascript application/octet-stream application/ogg
+         application/pdf application/postscript application/rss+xml
+         application/font-woff application/xhtml+xml application/xml
+         application/xml-dtd application/zip application/gzip audio/basic
+         audio/mp4 audio/mpeg audio/ogg audio/vorbis audio/vnd.rn-realaudio
+         audio/vnd.wave audio/webm image/gif image/jpeg image/pjpeg
+         image/png image/svg+xml image/tiff text/cmd text/css text/csv
+         text/html text/javascript text/plain text/vcard text/xml video/mpeg
+         video/mp4 video/ogg video/quicktime video/webm video/x-matroska
+         video/x-ms-wmv video/x-flv)
+    end
+
     def policy(options = {})
       options[:expiration] ||= self.class.upload_expiration
       options[:min_file_size] ||= self.class.min_file_size
@@ -65,9 +88,9 @@ module CarrierWaveDirect
 
       conditions = [
         ["starts-with", "$utf8", ""],
-        ["starts-with", "$key", key.sub(/#{Regexp.escape(FILENAME_WILDCARD)}\z/, "")]
+        ["starts-with", "$key", key.sub(/#{Regexp.escape(FILENAME_WILDCARD)}\z/, "")],
+        ["starts-with", "$Content-Type",""]
       ]
-      conditions << ["starts-with", "$Content-Type", ""] if self.class.will_include_content_type
       conditions << {"bucket" => fog_directory}
       conditions << {"acl" => acl}
 

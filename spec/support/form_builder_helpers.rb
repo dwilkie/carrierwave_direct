@@ -12,6 +12,7 @@ require 'carrierwave_direct/action_view_extensions/form_helper'
 
 module FormBuilderHelpers
   include ActionView::Helpers::FormHelper
+  include ActionView::Helpers::FormOptionsHelper
   include CarrierWaveDirect::ActionViewExtensions::FormHelper
   include ActionView::Context
 
