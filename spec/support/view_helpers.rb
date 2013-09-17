@@ -36,12 +36,22 @@ module ViewHelpers
   end
 
   def have_input(resource_name, input, options = {})
+    count = (options.delete :count).to_i
+    selector_options = count > 0 ? {:count => count} : {}
+
     options[:type] ||= input
     options[:id] ||= "#{resource_name}_#{input}"
     options[:name] ||= "#{resource_name}[#{input}]"
     options[:required] ||= "required" unless options[:required] == false
     parent_selector << "input[#{to_xpath_attributes(options)}]"
-    have_parent_selector
+    have_parent_selector selector_options
+  end
+
+  def have_content_type(content_type,selected=nil)
+    options = {:value => content_type}
+    options[:selected] = 'selected' if selected
+
+    have_selector :xpath, ".//select[@name=\"Content-Type\"]/option[#{to_xpath_attributes(options)}]"
   end
 end
 
