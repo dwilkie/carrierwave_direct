@@ -347,6 +347,18 @@ describe CarrierWaveDirect::Uploader do
         end
       end
 
+      context "and the model's remote url contains escape characters" do
+        before do 
+            subject.key = nil
+            subject.stub(:present?).and_return(:true)
+            subject.stub(:url).and_return("http://anyurl.com/any_path/video_dir/filename ()+[]2.avi")
+        end
+
+        it "should be escaped and replaced with non whitespace characters" do
+            subject.key.should =~ /filename%20%28%29%2B%5B%5D2.avi$/
+        end
+      end
+
       context "and the model's remote #{sample(:mounted_as)} url is blank" do
         before do
           mounted_model.stub(
