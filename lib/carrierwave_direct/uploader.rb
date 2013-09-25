@@ -4,6 +4,7 @@ module CarrierWaveDirect
   module Uploader
 
     extend ActiveSupport::Concern
+    include CarrierWave::Utilities::Uri
 
     FILENAME_WILDCARD = "${filename}"
 
@@ -21,7 +22,7 @@ module CarrierWaveDirect
     end
 
     def direct_fog_url(options = {})
-      fog_uri = CarrierWave::Storage::Fog::File.new(self, CarrierWave::Storage::Fog.new(self), nil).public_url
+      fog_uri = public_url_by_aws_configuration
       if options[:with_path]
         uri = URI.parse(fog_uri.chomp('/'))
         path = "/#{key}"
@@ -149,6 +150,23 @@ module CarrierWaveDirect
     def full_filename(for_file)
       extname = File.extname(for_file)
       [for_file.chomp(extname), version_name].compact.join('_') << extname
+    end
+
+    def public_url_by_aws_configuration
+      encoded_path = encode_path(path)
+      # check if some endpoint is set in fog_credentials
+      if self.fog_credentials.has_key?(:endpoint)
+        "#{self.fog_credentials[:endpoint]}/#{self.fog_directory}/#{encoded_path}"
+      else
+        protocol = self.fog_use_ssl_for_aws ? "https" : "http"
+        # if directory is a valid subdomain, use that style for access
+        if self.fog_directory.to_s =~ /^(?:[a-z]|\d(?!\d{0,2}(?:\d{1,3}){3}$))(?:[a-z0-9\.]|(?![\-])|\-(?![\.])){1,61}[a-z0-9]$/
+          "#{protocol}://#{self.fog_directory}.s3.amazonaws.com/#{encoded_path}"
+        else
+          # directory is not a valid subdomain, so use path style for access
+          "#{protocol}://s3.amazonaws.com/#{self.fog_directory}/#{encoded_path}"
+        end
+      end
     end
   end
 end
