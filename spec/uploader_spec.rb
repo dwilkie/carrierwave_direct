@@ -1,5 +1,4 @@
 # encoding: utf-8
-
 require 'spec_helper'
 
 describe CarrierWaveDirect::Uploader do
@@ -46,42 +45,36 @@ describe CarrierWaveDirect::Uploader do
   SAMPLE_DATA.freeze
 
   let(:subject) { DirectUploader.new }
-  let(:mounted_model) { mock(sample(:mounted_model_name)) }
+  let(:mounted_model) { double(sample(:mounted_model_name)) }
   let(:mounted_subject) { DirectUploader.new(mounted_model, sample(:mounted_as)) }
   let(:direct_subject) { DirectUploader.new }
 
-  describe ".upload_expiration" do
-    it "should be 10 hours" do
-      subject.class.upload_expiration.should == 36000
+  describe "default configuration" do
+    it "has upload_expiration of 10 hours" do
+      expect(subject.class.upload_expiration).to eq 36000
     end
-  end
 
-  describe ".min_file_size" do
-    it "should be 1 byte" do
-      subject.class.min_file_size.should == 1
+    it "has min_file_size of 1 byte" do
+      expect(subject.class.min_file_size).to eq 1
     end
-  end
 
-  describe ".max_file_size" do
-    it "should be 5 MB" do
-      subject.class.max_file_size.should == 5242880
+    it "has max_file_size of 5 MB" do
+      expect(subject.class.max_file_size).to eq 5242880
     end
-  end
 
-  describe ".use_action_status" do
-    it "should be false" do
-      subject.class.use_action_status.should be_false
+    it "returns false for use_action_status" do
+      expect(subject.class.use_action_status).to be_false
     end
   end
 
   DirectUploader.fog_credentials.keys.each do |key|
     describe "##{key}" do
       it "should return the #{key.to_s.capitalize}" do
-        subject.send(key).should == DirectUploader.fog_credentials[key]
+        expect(subject.send(key)).to eq subject.class.fog_credentials[key]
       end
 
       it "should not be nil" do
-        subject.send(key).should_not be_nil
+        expect(subject.send(key)).to_not be_nil
       end
     end
   end
@@ -93,13 +86,13 @@ describe CarrierWaveDirect::Uploader do
     before { subject.key = sample(:key) }
 
     it "should set the key" do
-      subject.key.should == sample(:key)
+      expect(subject.key).to eq sample(:key)
     end
 
     context "the versions keys" do
       it "should == this subject's key" do
         subject.versions.each do |name, version_subject|
-          version_subject.key.should == subject.key
+          expect(version_subject.key).to eq subject.key
         end
       end
     end
@@ -112,39 +105,39 @@ describe CarrierWaveDirect::Uploader do
       end
 
       it "should return '*/\#\{guid\}/${filename}'" do
-        mounted_subject.key.should =~ /#{GUID_REGEXP}\/\$\{filename\}$/
+        expect(mounted_subject.key).to match /#{GUID_REGEXP}\/\$\{filename\}$/
       end
 
       context "and #store_dir returns '#{sample(:store_dir)}'" do
         before do
-          mounted_subject.stub(:store_dir).and_return(sample(:store_dir))
+          allow(mounted_subject).to receive(:store_dir).and_return(sample(:store_dir))
         end
 
         it "should return '#{sample(:store_dir)}/\#\{guid\}/${filename}'" do
-          mounted_subject.key.should =~ /^#{sample(:store_dir)}\/#{GUID_REGEXP}\/\$\{filename\}$/
+          expect(mounted_subject.key).to match /^#{sample(:store_dir)}\/#{GUID_REGEXP}\/\$\{filename\}$/
         end
       end
 
       context "and the uploaders url is #default_url" do
         it "should return '*/\#\{guid\}/${filename}'" do
-          mounted_subject.stub(:url).and_return(sample(:s3_file_url))
-          mounted_subject.stub(:present?).and_return(false)
-          mounted_subject.key.should =~ /#{GUID_REGEXP}\/\$\{filename\}$/
+          allow(mounted_subject).to receive(:url).and_return(sample(:s3_file_url))
+          allow(mounted_subject).to receive(:present?).and_return(false)
+          expect(mounted_subject.key).to match /#{GUID_REGEXP}\/\$\{filename\}$/
         end
       end
 
       context "but the uploaders url is '#{sample(:s3_file_url)}'" do
         before do
-          mounted_subject.stub(:url).and_return(sample(:s3_file_url))
-          mounted_subject.stub(:present?).and_return(true)
+          allow(mounted_subject).to receive(:url).and_return(sample(:s3_file_url))
+          allow(mounted_subject).to receive(:present?).and_return(true)
         end
 
         it "should return '#{sample(:s3_key)}'" do
-          mounted_subject.key.should == sample(:s3_key)
+          expect(mounted_subject.key).to eq sample(:s3_key)
         end
 
         it "should set the key explicitly in order to update the version keys" do
-          mounted_subject.should_receive("key=").with(sample(:s3_key))
+          expect(mounted_subject).to receive("key=").with(sample(:s3_key))
           mounted_subject.key
         end
       end
@@ -154,34 +147,34 @@ describe CarrierWaveDirect::Uploader do
       before { subject.key = sample(:key) }
 
       it "should return '#{sample(:key)}'" do
-        subject.key.should == sample(:key)
+        expect(subject.key).to eq sample(:key)
       end
     end
   end
 
   describe "#url_scheme_white_list" do
     it "should return nil" do
-      subject.url_scheme_white_list.should be_nil
+      expect(subject.url_scheme_white_list).to be_nil
     end
   end
 
   describe "#key_regexp" do
     it "should return a regexp" do
-      subject.key_regexp.should be_a(Regexp)
+      expect(subject.key_regexp).to be_a(Regexp)
     end
 
     context "where #store_dir returns '#{sample(:store_dir)}'" do
       before do
-        subject.stub(:store_dir).and_return(sample(:store_dir))
+        allow(subject).to receive(:store_dir).and_return(sample(:store_dir))
       end
 
       context "and #extension_regexp returns '#{sample(:extension_regexp)}'" do
         before do
-          subject.stub(:extension_regexp).and_return(sample(:extension_regexp))
+          allow(subject).to receive(:extension_regexp).and_return(sample(:extension_regexp))
         end
 
         it "should return /\\A#{sample(:store_dir)}\\/#{GUID_REGEXP}\\/.+\\.#{sample(:extension_regexp)}\\z/" do
-          subject.key_regexp.should ==  /\A#{sample(:store_dir)}\/#{GUID_REGEXP}\/.+\.(?i)#{sample(:extension_regexp)}(?-i)\z/
+          expect(subject.key_regexp).to eq /\A#{sample(:store_dir)}\/#{GUID_REGEXP}\/.+\.(?i)#{sample(:extension_regexp)}(?-i)\z/
         end
       end
     end
