@@ -573,7 +573,7 @@ After you have fixed a bug or added a feature please also use the [CarrierWaveDi
 Thank you to everybody who has contributed to [CarrierWaveDirect](https://github.com/dwilkie/carrierwave_direct). A special thanks to [nddeluca (Nicholas DeLuca)](https://github.com/nddeluca) and [plentz (Diego Plentz)](https://github.com/plentz) who help maintain the gem.
 
 ## Contributors
-
+* [geeky-sh](https://github.com/geeky-sh) - Allow filenames with '()+[]' characters
 * [cblunt (Chris Blunt)](https://github.com/cblunt) - Support for passing html options
 * [robyurkowski (Rob Yurkowski)](https://github.com/robyurkowski) - Fix deprecation warnings for Rails 3.2
 * [tylr (Tyler Love)](https://github.com/tylr) - Bug fix
