@@ -1,6 +1,7 @@
 # encoding: utf-8
 
 require 'spec_helper'
+require 'erb'
 
 class CarrierWaveDirect::FormBuilder
   attr_reader :template
@@ -27,8 +28,8 @@ shared_examples_for 'hidden values form' do
     end
 
     it "should have a hidden field for '#{name}'" do
-      direct_uploader.stub(key).and_return(key.to_s)
-      subject.should have_input(
+      allow(direct_uploader).to receive(key).and_return(key.to_s)
+      expect(subject).to have_input(
         :direct_uploader,
         key,
         :type => :hidden,
@@ -84,8 +85,8 @@ describe CarrierWaveDirect::FormBuilder do
         end
 
         it "should have a hidden field for '#{name}'" do
-          direct_uploader.stub(key).and_return(key.to_s)
-          form_with_default_file_field.should have_input(
+          allow(direct_uploader).to receive(key).and_return(key.to_s)
+          expect(form_with_default_file_field).to have_input(
             :direct_uploader,
             key,
             :type => :hidden,
@@ -105,8 +106,8 @@ describe CarrierWaveDirect::FormBuilder do
         end
 
         it "should have a hidden field for '#{name}'" do
-          direct_uploader.stub(key).and_return(key.to_s)
-          form_with_file_field_and_no_redirect.should have_input(
+          allow(direct_uploader).to receive(key).and_return(key.to_s)
+          expect(form_with_file_field_and_no_redirect).to have_input(
             :direct_uploader,
             key,
             :type => :hidden,
@@ -118,7 +119,7 @@ describe CarrierWaveDirect::FormBuilder do
       end
 
       it "should have an input for a file to upload" do
-        form_with_default_file_field.should have_input(
+        expect(form_with_default_file_field).to have_input(
           :direct_uploader,
           :video,
           :type => :file,
@@ -132,30 +133,32 @@ describe CarrierWaveDirect::FormBuilder do
   describe "#content_type_select" do
     context "form" do
       let(:subject) do
-        form {|f| f.content_type_select }
+        form do |f|
+          f.content_type_select
+        end
       end
 
       it_should_behave_like 'hidden values form'
 
       it 'should select the default content type' do
-        direct_uploader.stub(:content_type).and_return('video/mp4')
-        subject.should have_content_type 'video/mp4', true
+        allow(direct_uploader).to receive(:content_type).and_return('video/mp4')
+        expect(subject).to have_content_type 'video/mp4', true
       end
 
       it 'should include the default content types' do
-        direct_uploader.stub(:content_types).and_return(['text/foo','text/bar'])
-        subject.should have_content_type 'text/foo', false
-        subject.should have_content_type 'text/bar', false
+        allow(direct_uploader).to receive(:content_types).and_return(['text/foo','text/bar'])
+        expect(subject).to have_content_type 'text/foo', false
+        expect(subject).to have_content_type 'text/bar', false
       end
 
       it 'should select the passed in content type' do
         dom = form {|f| f.content_type_select nil, 'video/mp4'}
-        dom.should have_content_type 'video/mp4', true
+        expect(dom).to have_content_type 'video/mp4', true
       end
 
       it 'should include most content types' do
         %w(application/atom+xml application/ecmascript application/json application/javascript application/octet-stream application/ogg application/pdf application/postscript application/rss+xml application/font-woff application/xhtml+xml application/xml application/xml-dtd application/zip application/gzip audio/basic audio/mp4 audio/mpeg audio/ogg audio/vorbis audio/vnd.rn-realaudio audio/vnd.wave audio/webm image/gif image/jpeg image/pjpeg image/png image/svg+xml image/tiff text/cmd text/css text/csv text/html text/javascript text/plain text/vcard text/xml video/mpeg video/mp4 video/ogg video/quicktime video/webm video/x-matroska video/x-ms-wmv video/x-flv).each do |type|
-          subject.should have_content_type type
+          expect(subject).to have_content_type type
         end
       end
     end
@@ -164,7 +167,9 @@ describe CarrierWaveDirect::FormBuilder do
   describe "#content_type_label" do
     context "form" do
       let(:subject) do
-        form {|f| f.content_type_label }
+        form do |f|
+          f.content_type_label
+        end
       end
 
       it_should_behave_like 'hidden values form'
@@ -182,7 +187,7 @@ describe CarrierWaveDirect::FormBuilder do
     end
 
     it 'should only include the hidden values once' do
-      dom.should have_input(
+      expect(dom).to have_input(
                    :direct_uploader,
                    'key',
                    :type => :hidden,
@@ -194,7 +199,7 @@ describe CarrierWaveDirect::FormBuilder do
     end
 
     it 'should include Content-Type twice' do
-      dom.should have_input(
+      expect(dom).to have_input(
                    :direct_uploader,
                    :content_type,
                    :type => :hidden,
@@ -204,7 +209,7 @@ describe CarrierWaveDirect::FormBuilder do
                    :count => 1
                  )
 
-      dom.should have_selector :xpath, './/select[@name="Content-Type"]', :count => 1
+      expect(dom).to have_selector :xpath, './/select[@name="Content-Type"]', :count => 1
     end
   end
 end

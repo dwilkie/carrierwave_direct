@@ -8,22 +8,22 @@ describe CarrierWaveDirect::Test::CapybaraHelpers do
   end
 
   let(:subject) { ExampleSpec.new }
-  let(:page) { mock("Page").as_null_object }
-  let(:selector) { mock("Selector") }
+  let(:page) { double("Page").as_null_object }
+  let(:selector) { double("Selector") }
 
   def stub_page
-    subject.stub(:page).and_return(page)
+    allow(subject).to receive(:page).and_return(page)
   end
 
   def find_element_value(css, value)
-    page.stub(:find).with(css).and_return(selector)
-    selector.stub(:value).and_return(value)
+    allow(page).to receive(:find).with(css).and_return(selector)
+    allow(selector).to receive(:value).and_return(value)
   end
 
   describe "#attach_file_for_direct_upload" do
     context "'path/to/file.ext'" do
       it "should attach a file with the locator => 'file'" do
-        subject.should_receive(:attach_file).with("file", "path/to/file.ext")
+        expect(subject).to receive(:attach_file).with("file", "path/to/file.ext")
         subject.attach_file_for_direct_upload "path/to/file.ext"
       end
     end
@@ -41,18 +41,18 @@ describe CarrierWaveDirect::Test::CapybaraHelpers do
     def stub_common
       stub_page
       find_element_value("input[@name='success_action_redirect']", "http://example.com")
-      subject.stub(:visit)
+      allow(subject).to receive(:visit)
     end
 
     before do
-      subject.stub(:click_button)
+      allow(subject).to receive(:click_button)
     end
 
     shared_examples_for "submitting the form" do
       let(:options) { {} }
 
       it "should submit the form" do
-        subject.should_receive(:click_button).with("Upload!")
+        expect(subject).to receive(:click_button).with("Upload!")
         upload_directly(options.merge(:button_locator => "Upload!"))
       end
     end
@@ -61,7 +61,7 @@ describe CarrierWaveDirect::Test::CapybaraHelpers do
       let(:options) { { :success => false } }
 
       it "should not redirect" do
-        subject.should_not_receive(:visit)
+        expect(subject).to_not receive(:visit)
         upload_directly(options)
       end
     end
@@ -69,30 +69,30 @@ describe CarrierWaveDirect::Test::CapybaraHelpers do
     context "passing no options" do
       before do
         stub_common
-        subject.stub(:find_key).and_return("upload_dir/guid/$filename")
-        subject.stub(:find_upload_path).and_return("path/to/file.ext")
+        allow(subject).to receive(:find_key).and_return("upload_dir/guid/$filename")
+        allow(subject).to receive(:find_upload_path).and_return("path/to/file.ext")
       end
 
       it_should_behave_like "submitting the form"
 
       it "should redirect to the page's success_action_redirect url" do
-        subject.should_receive(:visit).with(/^http:\/\/example.com/)
+        expect(subject).to receive(:visit).with(/^http:\/\/example.com/)
         upload_directly
       end
 
       context "the redirect url's params" do
         it "should include the bucket name" do
-          subject.should_receive(:visit).with(/bucket=/)
+          expect(subject).to receive(:visit).with(/bucket=/)
           upload_directly
         end
 
         it "should include an etag" do
-          subject.should_receive(:visit).with(/etag=/)
+          expect(subject).to receive(:visit).with(/etag=/)
           upload_directly
         end
 
         it "should include the key derived from the form" do
-          subject.should_receive(:visit).with(/key=upload_dir%2Fguid%2Ffile.ext/)
+          expect(subject).to receive(:visit).with(/key=upload_dir%2Fguid%2Ffile.ext/)
           upload_directly
         end
       end
@@ -106,7 +106,7 @@ describe CarrierWaveDirect::Test::CapybaraHelpers do
 
         context "the redirect url's params" do
           it "should include the key from the :redirect_key option" do
-            subject.should_receive(:visit).with(/key=some\+redirect\+key/)
+            expect(subject).to receive(:visit).with(/key=some\+redirect\+key/)
             upload_directly(:redirect_key => "some redirect key")
           end
         end
@@ -141,7 +141,7 @@ describe CarrierWaveDirect::Test::CapybaraHelpers do
     end
 
     it "should try to find the key on the page" do
-      subject.find_key.should == "key"
+      expect(subject.find_key).to eq "key"
     end
   end
 
@@ -152,9 +152,8 @@ describe CarrierWaveDirect::Test::CapybaraHelpers do
     end
 
     it "should try to find the upload path on the page" do
-      subject.find_upload_path.should == "upload path"
+      expect(subject.find_upload_path).to eq "upload path"
     end
   end
-
 end
 
