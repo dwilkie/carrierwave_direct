@@ -49,23 +49,6 @@ describe CarrierWaveDirect::Uploader do
   let(:mounted_subject) { DirectUploader.new(mounted_model, sample(:mounted_as)) }
   let(:direct_subject) { DirectUploader.new }
 
-  describe "default configuration" do
-    it "has upload_expiration of 10 hours" do
-      expect(subject.class.upload_expiration).to eq 36000
-    end
-
-    it "has min_file_size of 1 byte" do
-      expect(subject.class.min_file_size).to eq 1
-    end
-
-    it "has max_file_size of 5 MB" do
-      expect(subject.class.max_file_size).to eq 5242880
-    end
-
-    it "returns false for use_action_status" do
-      expect(subject.class.use_action_status).to be_false
-    end
-  end
 
   DirectUploader.fog_credentials.keys.each do |key|
     describe "##{key}" do
