@@ -61,17 +61,17 @@ describe CarrierWaveDirect::ActiveRecord do
 
     shared_examples_for "an invalid filename" do
       it "should not be valid on create" do
-        subject.should_not be_valid
+        expect(subject).to_not be_valid
       end
 
       it "should be valid on update" do
         subject.save(:validate => false)
-        subject.should be_valid
+        expect(subject).to be_valid
       end
 
       it "should use i18n for the error messages" do
         subject.valid?
-        subject.errors[:video].should == [
+        expect(subject.errors[:video]).to eq [
           I18n.t("errors.messages.carrierwave_direct_filename_invalid") +
           I18n.t("errors.messages.carrierwave_direct_allowed_extensions", :extensions => %w{avi mp4}.to_sentence)
         ]
@@ -96,7 +96,7 @@ describe CarrierWaveDirect::ActiveRecord do
           end
         end
 
-        subject.errors[:remote_video_net_url].should == [ messages ]
+        expect(subject.errors[:remote_video_net_url]).to eq [ messages ]
       end
     end
 

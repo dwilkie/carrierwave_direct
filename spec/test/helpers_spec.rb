@@ -13,23 +13,23 @@ describe CarrierWaveDirect::Test::Helpers do
 
         shared_examples_for "returning the default extension" do
           it "should return '*/guid/filename.extension'" do
-            sample_key(direct_uploader).should =~ /#{GUID_REGEXP}\/filename\.extension$/
+            expect(sample_key(direct_uploader)).to match /#{GUID_REGEXP}\/filename\.extension$/
           end
         end
 
         context "['exe', 'bmp']" do
           before do
-            direct_uploader.stub(:extension_white_list).and_return(%w{exe bmp})
+            allow(direct_uploader).to receive(:extension_white_list).and_return(%w{exe bmp})
           end
 
           it "should return '*/guid/filename.exe'" do
-            sample_key(direct_uploader).should =~ /#{GUID_REGEXP}\/filename\.exe$/
+            expect(sample_key(direct_uploader)).to match /#{GUID_REGEXP}\/filename\.exe$/
           end
         end
 
         context "[]" do
           before do
-            direct_uploader.stub(:extension_white_list).and_return([])
+            allow(direct_uploader).to receive(:extension_white_list).and_return([])
           end
 
           it_should_behave_like "returning the default extension"
@@ -37,7 +37,7 @@ describe CarrierWaveDirect::Test::Helpers do
 
         context "nil" do
           before do
-            direct_uploader.stub(:extension_white_list).and_return(nil)
+            allow(direct_uploader).to receive(:extension_white_list).and_return(nil)
           end
 
           it_should_behave_like "returning the default extension"
@@ -47,9 +47,7 @@ describe CarrierWaveDirect::Test::Helpers do
 
       context "with no options" do
         it "should return '*/guid/filename.extension'" do
-          sample_key(
-            direct_uploader
-          ).should =~ /#{GUID_REGEXP}\/filename\.extension$/
+          expect(sample_key(direct_uploader)).to match /#{GUID_REGEXP}\/filename\.extension$/
         end
       end
 
@@ -64,7 +62,7 @@ describe CarrierWaveDirect::Test::Helpers do
 
         shared_examples_for "a custom filename" do
           it "should return '*/guid/some_file.reg'" do
-            sample_key(direct_uploader, options).should =~ /#{GUID_REGEXP}\/some_file\.reg$/
+            expect(sample_key(direct_uploader, options)).to match /#{GUID_REGEXP}\/some_file\.reg$/
           end
         end
 
@@ -82,10 +80,10 @@ describe CarrierWaveDirect::Test::Helpers do
 
         context ":base => 'upload_dir/porno/movie/${filename}'" do
           it "should return 'upload_dir/porno/movie/guid/filename.extension'" do
-            sample_key(
+            expect(sample_key(
               direct_uploader,
               :base => "upload_dir/porno/movie/${filename}"
-            ).should == "upload_dir/porno/movie/filename.extension"
+            )).to eq "upload_dir/porno/movie/filename.extension"
           end
         end
         context ":filename => 'some_file.reg'" do
