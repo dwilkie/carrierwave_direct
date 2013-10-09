@@ -373,7 +373,13 @@ describe CarrierWaveDirect::Uploader do
           expect(conditions).to have_condition("success_action_redirect" => "http://example.com/some_url")
         end
 
-        it "'content-type'" do
+        it "does not have 'content-type' when will_include_content_type is false" do
+          allow(subject.class).to receive(:will_include_content_type).and_return(false)
+          expect(conditions).to_not have_condition('Content-Type')
+        end
+
+        it "has 'content-type' when will_include_content_type is true" do
+          allow(subject.class).to receive(:will_include_content_type).and_return(true)
           expect(conditions).to have_condition('Content-Type')
         end
 

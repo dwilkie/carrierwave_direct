@@ -6,23 +6,13 @@ describe CarrierWaveDirect::Uploader::ContentType do
   subject { DirectUploader.new }
 
   describe "#content_type" do
-    it "should default to binary/octet-stream" do
-      [nil,true,false].each do |value|
-        allow(subject.class).to receive(:will_include_content_type).and_return(value)
-        allow(subject.class).to receive(:default_content_type).and_return(value)
-        expect(subject.content_type).to eq 'binary/octet-stream'
-      end
+    it "defaults to binary/octet-stream when there is no default_content_type" do
+      allow(subject.class).to receive(:default_content_type).and_return(nil)
+      expect(subject.content_type).to eq 'binary/octet-stream'
     end
 
-    it "should be the configured value" do
-      allow(subject.class).to receive(:will_include_content_type).and_return(nil)
+    it "returns the default_content_type if set" do
       allow(subject.class).to receive(:default_content_type).and_return('video/mp4')
-      expect(subject.content_type).to eq 'video/mp4'
-    end
-
-    it "should use 'will_include_cnotent_types' value if availableb" do
-      subject.class.stub(:default_content_type).and_return nil
-      subject.class.stub(:will_include_content_type).and_return 'video/mp4'
       expect(subject.content_type).to eq 'video/mp4'
     end
   end
