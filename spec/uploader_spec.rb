@@ -1,48 +1,10 @@
 # encoding: utf-8
 require 'spec_helper'
+require 'data/sample_data'
 
 describe CarrierWaveDirect::Uploader do
   include UploaderHelpers
   include ModelHelpers
-
-  SAMPLE_DATA = {
-    :path => "upload_dir/bliind.exe",
-    :path_with_special_chars => "upload_dir/some file & blah.exe",
-    :key => "some key",
-    :guid => "guid",
-    :store_dir => "store_dir",
-    :extension_regexp => "(avi)",
-    :url => "http://example.com/some_url",
-    :expiration => 60,
-    :min_file_size => 1024,
-    :max_file_size => 10485760,
-    :file_url => "http://anyurl.com/any_path/video_dir/filename.avi",
-    :mounted_model_name => "Porno",
-    :mounted_as => :video,
-    :filename => "filename",
-    :extension => ".avi",
-    :version => :thumb,
-    :s3_bucket_url => "https://s3-bucket.s3.amazonaws.com"
-  }
-
-  SAMPLE_DATA.merge!(
-    :stored_filename_base => "#{sample(:guid)}/#{sample(:filename)}"
-  )
-
-  SAMPLE_DATA.merge!(
-    :stored_filename => "#{sample(:stored_filename_base)}#{sample(:extension)}",
-    :stored_version_filename => "#{sample(:stored_filename_base)}_#{sample(:version)}#{sample(:extension)}"
-  )
-
-  SAMPLE_DATA.merge!(
-    :s3_key => "#{sample(:store_dir)}/#{sample(:stored_filename)}"
-  )
-
-  SAMPLE_DATA.merge!(
-    :s3_file_url => "#{sample(:s3_bucket_url)}/#{sample(:s3_key)}"
-  )
-
-  SAMPLE_DATA.freeze
 
   let(:subject) { DirectUploader.new }
   let(:mounted_model) { double(sample(:mounted_model_name)) }
@@ -223,39 +185,6 @@ describe CarrierWaveDirect::Uploader do
 
       it "should return true" do
         subject.should have_key
-      end
-    end
-  end
-
-  describe "#direct_fog_url" do
-    it "should return the result from CarrierWave::Storage::Fog::File#public_url" do
-      subject.direct_fog_url.should == CarrierWave::Storage::Fog::File.new(
-        subject, nil, nil
-      ).public_url
-    end
-
-    context ":with_path => true" do
-
-      context "#key is set to '#{sample(:path_with_special_chars)}'" do
-        before { subject.key = sample(:path_with_special_chars) }
-
-        it "should return the full url with '/#{URI.escape(sample(:path_with_special_chars))}' as the path" do
-          direct_fog_url = CarrierWave::Storage::Fog::File.new(
-            subject, nil, nil
-          ).public_url
-          subject.direct_fog_url(:with_path => true).should == direct_fog_url + "#{URI.escape(sample(:path_with_special_chars))}"
-        end
-      end
-
-      context "#key is set to '#{sample(:path)}'" do
-        before { subject.key = sample(:path) }
-
-        it "should return the full url with '/#{sample(:path)}' as the path" do
-          direct_fog_url = CarrierWave::Storage::Fog::File.new(
-            subject, nil, nil
-          ).public_url
-          subject.direct_fog_url(:with_path => true).should == direct_fog_url + "#{sample(:path)}"
-        end
       end
     end
   end
@@ -514,38 +443,6 @@ describe CarrierWaveDirect::Uploader do
     end
   end
 
-  describe "#content_type" do
-    it "should default to binary/octet-stream" do
-      [nil,true,false].each do |value|
-        subject.class.stub(:will_include_content_type).and_return value
-        subject.class.stub(:default_content_type).and_return value
-        subject.content_type.should == 'binary/octet-stream'
-      end
-    end
-
-    it "should be the configured value" do
-      subject.class.stub(:will_include_content_type).and_return nil
-      subject.class.stub(:default_content_type).and_return 'video/mp4'
-      subject.content_type.should == 'video/mp4'
-    end
-
-    it "should use 'will_include_cnotent_types' value if availableb" do
-      subject.class.stub(:default_content_type).and_return nil
-      subject.class.stub(:will_include_content_type).and_return 'video/mp4'
-      subject.content_type.should == 'video/mp4'
-    end
-  end
-
-  describe "#content_types" do
-    it "should default to common media types" do
-      subject.content_types.should eq %w(application/atom+xml application/ecmascript application/json application/javascript application/octet-stream application/ogg application/pdf application/postscript application/rss+xml application/font-woff application/xhtml+xml application/xml application/xml-dtd application/zip application/gzip audio/basic audio/mp4 audio/mpeg audio/ogg audio/vorbis audio/vnd.rn-realaudio audio/vnd.wave audio/webm image/gif image/jpeg image/pjpeg image/png image/svg+xml image/tiff text/cmd text/css text/csv text/html text/javascript text/plain text/vcard text/xml video/mpeg video/mp4 video/ogg video/quicktime video/webm video/x-matroska video/x-ms-wmv video/x-flv)
-    end
-
-    it "should be the configured value" do
-      subject.class.stub(:allowed_content_types).and_return ['audio/ogg']
-      subject.content_types.should eq ['audio/ogg']
-    end
-  end
 
   # note that 'video' is hardcoded into the MountedClass support file
   # so changing the sample will cause the tests to fail

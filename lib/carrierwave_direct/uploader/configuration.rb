@@ -1,7 +1,6 @@
 # encoding: utf-8
 
 module CarrierWaveDirect
-
   module Uploader
     module Configuration
       extend ActiveSupport::Concern

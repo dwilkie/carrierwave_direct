@@ -6,6 +6,10 @@ describe CarrierWaveDirect::Uploader::Configuration do
 
   let(:subject) { DirectUploader }
 
+  before do
+    subject.reset_direct_config
+  end
+
   describe "default configuration" do
     it "returns false for validate_is_attached" do
       expect(subject.validate_is_attached).to be_false
