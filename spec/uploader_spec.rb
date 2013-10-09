@@ -128,17 +128,17 @@ describe CarrierWaveDirect::Uploader do
   describe "#extension_regexp" do
     shared_examples_for "a globally allowed file extension" do
       it "should return '\\w+'" do
-        subject.extension_regexp.should == "\\w+"
+        expect(subject.extension_regexp).to eq "\\w+"
       end
     end
 
     it "should return a string" do
-      subject.extension_regexp.should be_a(String)
+      expect(subject.extension_regexp).to be_a(String)
     end
 
     context "where #extension_white_list returns nil" do
       before do
-        subject.stub(:extension_white_list).and_return(nil)
+        allow(subject).to receive(:extension_white_list).and_return(nil)
       end
 
       it_should_behave_like "a globally allowed file extension"
@@ -146,7 +146,7 @@ describe CarrierWaveDirect::Uploader do
 
     context "where #extension_white_list returns []" do
       before do
-        subject.stub(:extension_white_list).and_return([])
+        allow(subject).to receive(:extension_white_list).and_return([])
       end
 
       it_should_behave_like "a globally allowed file extension"
@@ -155,11 +155,11 @@ describe CarrierWaveDirect::Uploader do
     context "where #extension_white_list returns ['exe', 'bmp']" do
 
       before do
-        subject.stub(:extension_white_list).and_return(%w{exe bmp})
+        allow(subject).to receive(:extension_white_list).and_return(%w{exe bmp})
       end
 
       it "should return '(exe|bmp)'" do
-        subject.extension_regexp.should == "(exe|bmp)"
+        expect(subject.extension_regexp).to eq "(exe|bmp)"
       end
     end
   end
@@ -168,7 +168,7 @@ describe CarrierWaveDirect::Uploader do
     context "a key has not been set" do
 
       it "should return false" do
-        subject.should_not have_key
+        expect(subject).to_not have_key
       end
     end
 
@@ -176,7 +176,7 @@ describe CarrierWaveDirect::Uploader do
       before { subject.key }
 
       it "should return false" do
-        subject.should_not have_key
+        expect(subject).to_not have_key
       end
     end
 
@@ -184,14 +184,14 @@ describe CarrierWaveDirect::Uploader do
       before { subject.key = sample_key }
 
       it "should return true" do
-        subject.should have_key
+        expect(subject).to have_key
       end
     end
   end
 
   describe "#persisted?" do
     it "should return false" do
-      subject.should_not be_persisted
+      expect(subject).to_not be_persisted
     end
   end
 
@@ -200,7 +200,7 @@ describe CarrierWaveDirect::Uploader do
       before { mounted_subject.key = sample(:s3_key) }
 
       it "should return '#{sample(:stored_filename)}'" do
-        mounted_subject.filename.should == sample(:stored_filename)
+        expect(mounted_subject.filename).to eq sample(:stored_filename)
       end
     end
 
@@ -208,7 +208,7 @@ describe CarrierWaveDirect::Uploader do
       before { subject.key = sample(:key) }
 
       it "should return '#{sample(:key)}'" do
-        subject.filename.should == sample(:key)
+        expect(subject.filename).to eq sample(:key)
       end
     end
 
@@ -216,63 +216,63 @@ describe CarrierWaveDirect::Uploader do
       context "but the model's remote #{sample(:mounted_as)} url is: '#{sample(:file_url)}'" do
 
         before do
-          mounted_subject.model.stub(
+          allow(mounted_subject.model).to receive(
             "remote_#{mounted_subject.mounted_as}_url"
           ).and_return(sample(:file_url))
         end
 
         it "should set the key to contain '#{File.basename(sample(:file_url))}'" do
           mounted_subject.filename
-          mounted_subject.key.should =~ /#{Regexp.escape(File.basename(sample(:file_url)))}$/
+          expect(mounted_subject.key).to match /#{Regexp.escape(File.basename(sample(:file_url)))}$/
         end
 
         it "should return a filename based off the key and remote url" do
           filename = mounted_subject.filename
-          mounted_subject.key.should =~ /#{Regexp.escape(filename)}$/
+          expect(mounted_subject.key).to match /#{Regexp.escape(filename)}$/
         end
 
         # this ensures that the version subject keys are updated
         # see spec for key= for more details
         it "should set the key explicitly" do
-          mounted_subject.should_receive(:key=)
+          expect(mounted_subject).to receive(:key=)
           mounted_subject.filename
         end
       end
 
       context "and the model's remote #{sample(:mounted_as)} url has whitespace in it" do
         before do
-          mounted_model.stub(
+          allow(mounted_model).to receive(
             "remote_#{mounted_subject.mounted_as}_url"
           ).and_return("http://anyurl.com/any_path/video_dir/filename 2.avi")
         end
 
         it "should be sanitized (whitespace replaced with _)" do
           mounted_subject.filename
-          mounted_subject.key.should =~ /filename_2.avi$/
+          expect(mounted_subject.key).to match /filename_2.avi$/
         end
       end
 
       context "and the model's remote url contains escape characters" do
         before do 
             subject.key = nil
-            subject.stub(:present?).and_return(:true)
-            subject.stub(:url).and_return("http://anyurl.com/any_path/video_dir/filename ()+[]2.avi")
+            allow(subject).to receive(:present?).and_return(:true)
+            allow(subject).to receive(:url).and_return("http://anyurl.com/any_path/video_dir/filename ()+[]2.avi")
         end
 
         it "should be escaped and replaced with non whitespace characters" do
-            subject.key.should =~ /filename%20%28%29%2B%5B%5D2.avi$/
+            expect(subject.key).to match /filename%20%28%29%2B%5B%5D2.avi$/
         end
       end
 
       context "and the model's remote #{sample(:mounted_as)} url is blank" do
         before do
-          mounted_model.stub(
+          allow(mounted_model).to receive(
             "remote_#{mounted_subject.mounted_as}_url"
           ).and_return nil
         end
 
         it "should return nil" do
-          mounted_subject.filename.should be_nil
+          expect(mounted_subject.filename).to be_nil
         end
       end
     end
@@ -280,7 +280,7 @@ describe CarrierWaveDirect::Uploader do
 
   describe "#acl" do
     it "should return the correct s3 access policy" do
-      subject.acl.should == (subject.fog_public ? 'public-read' : 'private')
+      expect(subject.acl).to eq (subject.fog_public ? 'public-read' : 'private')
     end
   end
 
@@ -292,11 +292,11 @@ describe CarrierWaveDirect::Uploader do
     end
 
     it "should return Base64-encoded JSON" do
-      decoded_policy.should be_a(Hash)
+      expect(decoded_policy).to be_a(Hash)
     end
 
     it "should not contain any new lines" do
-      subject.policy.should_not include("\n")
+      expect(subject.policy).to_not include("\n")
     end
 
     context "expiration" do
@@ -316,17 +316,17 @@ describe CarrierWaveDirect::Uploader do
 
       it "should be #{DirectUploader.upload_expiration / 3600} hours from now" do
         Timecop.freeze(Time.now) do
-          Time.parse(expiration).should have_expiration
+          expect(Time.parse(expiration)).to have_expiration
         end
       end
 
       it "should be encoded as a utc time" do
-        Time.parse(expiration).should be_utc
+        expect(Time.parse(expiration)).to be_utc
       end
 
       it "should be #{sample(:expiration) / 60 } minutes from now when passing {:expiration => #{sample(:expiration)}}" do
         Timecop.freeze(Time.now) do
-          Time.parse(expiration(:expiration => sample(:expiration))).should have_expiration(sample(:expiration))
+          expect(Time.parse(expiration(:expiration => sample(:expiration)))).to have_expiration(sample(:expiration))
         end
       end
     end
@@ -343,38 +343,38 @@ describe CarrierWaveDirect::Uploader do
       context "should include" do
         # Rails form builder conditions
         it "'utf8'" do
-          conditions.should have_condition(:utf8)
+          expect(conditions).to have_condition(:utf8)
         end
 
         # S3 conditions
         it "'key'" do
-          mounted_subject.stub(:key).and_return(sample(:s3_key))
-          conditions(
+          allow(mounted_subject).to receive(:key).and_return(sample(:s3_key))
+          expect(conditions(
             :subject => mounted_subject
-          ).should have_condition(:key, sample(:s3_key))
+          )).to have_condition(:key, sample(:s3_key))
         end
 
         it "'key' without FILENAME_WILDCARD" do
-          conditions(
+          expect(conditions(
             :subject => mounted_subject
-          ).should have_condition(:key, mounted_subject.key.sub("${filename}", ""))
+          )).to have_condition(:key, mounted_subject.key.sub("${filename}", ""))
         end
 
         it "'bucket'" do
-          conditions.should have_condition("bucket" => subject.fog_directory)
+          expect(conditions).to have_condition("bucket" => subject.fog_directory)
         end
 
         it "'acl'" do
-          conditions.should have_condition("acl" => subject.acl)
+          expect(conditions).to have_condition("acl" => subject.acl)
         end
 
         it "'success_action_redirect'" do
           subject.success_action_redirect = "http://example.com/some_url"
-          conditions.should have_condition("success_action_redirect" => "http://example.com/some_url")
+          expect(conditions).to have_condition("success_action_redirect" => "http://example.com/some_url")
         end
 
         it "'content-type'" do
-          conditions.should have_condition('Content-Type')
+          expect(conditions).to have_condition('Content-Type')
         end
 
         context 'when use_action_status is true' do
@@ -388,12 +388,12 @@ describe CarrierWaveDirect::Uploader do
 
           it "'success_action_status'" do
             subject.success_action_status = '200'
-            conditions.should have_condition("success_action_status" => "200")
+            expect(conditions).to have_condition("success_action_status" => "200")
           end
 
           it "does not have 'success_action_redirect'" do
             subject.success_action_redirect = "http://example.com/some_url"
-            conditions.should_not have_condition("success_action_redirect" => "http://example.com/some_url")
+            expect(conditions).to_not have_condition("success_action_redirect" => "http://example.com/some_url")
           end
         end
 
@@ -407,23 +407,23 @@ describe CarrierWaveDirect::Uploader do
           end
 
           it "#{DirectUploader.min_file_size} bytes" do
-            conditions.should have_content_length_range
+            expect(conditions).to have_content_length_range
           end
 
           it "#{DirectUploader.max_file_size} bytes" do
-            conditions.should have_content_length_range
+            expect(conditions).to have_content_length_range
           end
 
           it "#{sample(:min_file_size)} bytes when passing {:min_file_size => #{sample(:min_file_size)}}" do
-            conditions(
+            expect(conditions(
               :min_file_size => sample(:min_file_size)
-            ).should have_content_length_range(:min_file_size => sample(:min_file_size))
+            )).to have_content_length_range(:min_file_size => sample(:min_file_size))
           end
 
           it "#{sample(:max_file_size)} bytes when passing {:max_file_size => #{sample(:max_file_size)}}" do
-            conditions(
+            expect(conditions(
               :max_file_size => sample(:max_file_size)
-            ).should have_content_length_range(:max_file_size => sample(:max_file_size))
+            )).to have_content_length_range(:max_file_size => sample(:max_file_size))
           end
         end
       end
@@ -432,11 +432,11 @@ describe CarrierWaveDirect::Uploader do
 
   describe "#signature" do
     it "should not contain any new lines" do
-      subject.signature.should_not include("\n")
+      expect(subject.signature).to_not include("\n")
     end
 
     it "should return a base64 encoded 'sha1' hash of the secret key and policy document" do
-      Base64.decode64(subject.signature).should == OpenSSL::HMAC.digest(
+      expect(Base64.decode64(subject.signature)).to eq OpenSSL::HMAC.digest(
         OpenSSL::Digest::Digest.new('sha1'),
         subject.aws_secret_access_key, subject.policy
       )
@@ -450,11 +450,11 @@ describe CarrierWaveDirect::Uploader do
     describe "#{sample(:mounted_as).to_s.capitalize}Uploader" do
       describe "##{sample(:mounted_as)}" do
         it "should be defined" do
-          direct_subject.should be_respond_to(sample(:mounted_as))
+          expect(direct_subject).to be_respond_to(sample(:mounted_as))
         end
 
         it "should return itself" do
-          direct_subject.send(sample(:mounted_as)).should == direct_subject
+          expect(direct_subject.send(sample(:mounted_as))).to eq direct_subject
         end
       end
 
@@ -474,11 +474,11 @@ describe CarrierWaveDirect::Uploader do
             let(:store_path) { video_subject.send(sample(:version)).store_path }
 
             it "should be like '#{sample(:stored_version_filename)}'" do
-              store_path.should =~ /#{sample(:stored_version_filename)}$/
+              expect(store_path).to match /#{sample(:stored_version_filename)}$/
             end
 
             it "should not be like '#{sample(:version)}_#{sample(:stored_filename_base)}'" do
-              store_path.should_not =~ /#{sample(:version)}_#{sample(:stored_filename_base)}/
+              expect(store_path).to_not match /#{sample(:version)}_#{sample(:stored_filename_base)}/
             end
           end
         end

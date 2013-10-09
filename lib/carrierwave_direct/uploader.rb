@@ -76,25 +76,6 @@ module CarrierWaveDirect
       false
     end
 
-    def filename
-      unless has_key?
-        # Use the attached models remote url to generate a new key otherwise return nil
-        remote_url = model.send("remote_#{mounted_as}_url")
-        remote_url ? key_from_file(CarrierWave::SanitizedFile.new(remote_url).filename) : return
-      end
-
-      key_path = key.split("/")
-      filename_parts = []
-      filename_parts.unshift(key_path.pop)
-      unique_key = key_path.pop
-      filename_parts.unshift(unique_key) if unique_key
-      filename_parts.join("/")
-    end
-
-    def blank_key
-      "#{store_dir}/#{guid}/#{FILENAME_WILDCARD}"
-    end
-
     def key
       return @key if @key.present?
       if present?
@@ -125,6 +106,21 @@ module CarrierWaveDirect
     def extension_regexp
       allowed_file_types = extension_white_list
       extension_regexp = allowed_file_types.present? && allowed_file_types.any? ?  "(#{allowed_file_types.join("|")})" : "\\w+"
+    end
+
+    def filename
+      unless has_key?
+        # Use the attached models remote url to generate a new key otherwise return nil
+        remote_url = model.send("remote_#{mounted_as}_url")
+        remote_url ? key_from_file(CarrierWave::SanitizedFile.new(remote_url).filename) : return
+      end
+
+      key_path = key.split("/")
+      filename_parts = []
+      filename_parts.unshift(key_path.pop)
+      unique_key = key_path.pop
+      filename_parts.unshift(unique_key) if unique_key
+      filename_parts.join("/")
     end
 
     private
