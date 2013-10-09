@@ -1,18 +1,13 @@
 # encoding: utf-8
 
-require "carrierwave_direct/version"
-
 require "carrierwave"
 require "uuidtools"
 require "fog"
 
 module CarrierWaveDirect
 
-  autoload :Uploader, "carrierwave_direct/uploader"
-  autoload :Mount, "carrierwave_direct/mount"
-
   module Uploader
-    autoload :Configuration, 'carrierwave_direct/uploader/configuration'
+    require "carrierwave_direct/uploader/configuration"
 
     CarrierWave::Uploader::Base.send(:include, Configuration)
   end
@@ -42,4 +37,8 @@ if defined?(Rails)
     end
   end
 end
+
+require "carrierwave_direct/mount"
+require "carrierwave_direct/uploader"
+require "carrierwave_direct/version"
 

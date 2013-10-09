@@ -16,16 +16,16 @@ module ModelHelpers
         if options[:accessible]
           if options[:accessible] == true
             it "should == '#{sample_data}'" do
-              accessor_value.should == sample_data
+              expect(accessor_value).to eq sample_data
             end
           else
             it "##{options[:accessible].keys.first} should be #{options[:accessible].values.first}" do
-              subject.send(options[:accessible].keys.first).should == options[:accessible].values.first
+              expect(subject.send(options[:accessible].keys.first)).to eq options[:accessible].values.first
             end
           end
         else
           it "should be nil" do
-            accessor_value.should be_nil
+            expect(accessor_value).to be_nil
           end
         end
       end
@@ -38,14 +38,14 @@ module ModelHelpers
       describe "##{name} = '#{sample_data}'" do
         it "should set the #{delegation_object}'s #{delegation_method}" do
           subject.send("#{name}=", sample_data)
-          subject.send(delegation_object).send(delegation_method).should == sample_data
+          expect(subject.send(delegation_object).send(delegation_method)).to eq sample_data
         end
       end
 
       describe "##{name}" do
         it "should return the #{delegation_method} from the #{delegation_object}" do
           subject.send(delegation_object).send("#{delegation_method}=", sample_data)
-          subject.send(name).should == sample_data
+          expect(subject.send(name)).to eq sample_data
         end
 
         it_should_be_accessible(name, sample_data, options)
@@ -62,7 +62,7 @@ module ModelHelpers
       end
 
       it "should respond to ##{name}=" do
-        subject.should respond_to("#{name}=")
+        expect(subject).to respond_to("#{name}=")
       end
 
       describe "##{name}" do
@@ -70,7 +70,7 @@ module ModelHelpers
           before { subject.send("#{name}=", sample_data) }
 
           it "should == '#{sample_data}'" do
-            subject.send(name).should == sample_data
+            expect(subject.send(name)).to eq sample_data
           end
         end
 

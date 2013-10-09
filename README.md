@@ -232,6 +232,8 @@ First, tell CarrierWaveDirect what your default content type should be:
 ```ruby
 CarrierWave.configure do |config|
   # ... fog configuration and other options ...
+  config.will_include_content_type = true
+
   config.default_content_type = 'video/mpeg'
   config.allowed_content_types = %w(video/mpeg video/mp4 video/ogg)
 end
@@ -243,37 +245,36 @@ or
 class VideoUploader < CarrierWave::Uploader::Base
   include CarrierWaveDirect::Uploader
 
+  def will_include_content_type
+    true
+  end
+
   default_content_type  'video/mpeg'
   allowed_content_types %w(video/mpeg video/mp4 video/ogg)
 end
 ```
 
-*Note: for backwards compatibility `will_include_content_type` is an alias for `default_content_type` and a value of `true` just defaults to 'binary/octet-stream'*
+*Note: If `will_include_content_type` is `true` and `default_content_type` is nil, the content type will default to 'binary/octet-stream'.*
 
-Then, just add a content-type element to the form.
+For the forms, no change is required to use the default_content_type.
 
 ```erb
 <%= direct_upload_form_for @uploader do |f| %>
-  <%= f.hidden_fields %>
-  <%= text_field_tag 'Content-Type', 'video/mpeg' %><br>
-  <%= f.file_field :avatar %>
+  <%= f.file_field :avatar %> # Content-Type will automatically be set to the default
   <%= f.submit %>
 <% end %>
 ```
-
-*Note: if you do not use the helpers directly then you need to include the `hidden_fields` first.  Otherwise you values will be ignored.*
 
 You could use a manual select as well.
 
 ```erb
 <%= direct_upload_form_for @uploader do |f| %>
-  <%= f.hidden_fields %>
   <%= select_tag 'Content-Type', options_for_select([
     ['Video','video/mpeg'],
     ['Audio','audio/mpeg'],
     ['Image','image/jpeg']
   ], 'video/mpeg') %><br>
-  <%= f.file_field :avatar %>
+  <%= f.file_field :avatar, exclude_content_type: true %> # Must tell the file_field helper not to include content type
   <%= f.submit %>
 <% end %>
 ```
@@ -285,7 +286,7 @@ Or you can use the helper which shows all possible content types as a select, wi
   <%= f.content_type_label %><br>
   <%= f.content_type_select %><br><br>
 
-  <%= f.file_field :avatar %><br>
+  <%= f.file_field :avatar, exclude_content_type: true %><br> # Must tell the file_field helper not to include its own content type
   <%= f.submit %>
 <% end %>
 ```

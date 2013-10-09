@@ -4,7 +4,8 @@ require 'spec_helper'
 require 'erb'
 
 class CarrierWaveDirect::FormBuilder
-  attr_reader :template
+  attr_accessor :template, :object
+
   public :content_choices_options
 end
 
@@ -15,8 +16,7 @@ shared_examples_for 'hidden values form' do
                     :acl,
                     :success_action_redirect,
                     :policy,
-                    :signature,
-                    {:content_type => 'Content-Type'}
+                    :signature
                   ]
 
   hidden_fields.each do |input|
@@ -51,7 +51,11 @@ describe CarrierWaveDirect::FormBuilder do
     end
 
     def form_with_file_field_and_no_redirect
-      form {|f| f.file_field :video, use_action_status: true }
+      allow(@direct_uploader.class).to receive(:use_action_status).and_return(true)
+
+      form do |f|
+        f.file_field :video
+      end
     end
 
     default_hidden_fields = [
@@ -138,7 +142,9 @@ describe CarrierWaveDirect::FormBuilder do
         end
       end
 
-      it_should_behave_like 'hidden values form'
+      before do
+        allow(direct_uploader.class).to receive(:will_include_content_type).and_return(true)
+      end
 
       it 'should select the default content type' do
         allow(direct_uploader).to receive(:content_type).and_return('video/mp4')
@@ -172,18 +178,21 @@ describe CarrierWaveDirect::FormBuilder do
         end
       end
 
-      it_should_behave_like 'hidden values form'
     end
   end
 
   describe 'full form' do
-    before {direct_uploader.stub('key').and_return('foo')}
     let(:dom) do
       form do |f|
         f.content_type_label <<
         f.content_type_select <<
         f.file_field(:video)
       end
+    end
+
+    before do
+      allow(direct_uploader).to receive('key').and_return('foo')
+      allow(direct_uploader.class).to receive(:will_include_content_type).and_return(true)
     end
 
     it 'should only include the hidden values once' do
