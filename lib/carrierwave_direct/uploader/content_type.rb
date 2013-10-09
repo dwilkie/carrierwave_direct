@@ -3,11 +3,11 @@ module CarrierWaveDirect
     module ContentType
 
       def content_type
-        self.class.default_content_type ? self.class.default_content_type : 'binary/octet-stream'
+        default_content_type ? default_content_type : 'binary/octet-stream'
       end
 
       def content_types
-        types = self.class.allowed_content_types
+        types = allowed_content_types
 
         return types if types.is_a? Array
 

@@ -30,20 +30,20 @@ module CarrierWaveDirect
     end
 
     def policy(options = {})
-      options[:expiration] ||= self.class.upload_expiration
-      options[:min_file_size] ||= self.class.min_file_size
-      options[:max_file_size] ||= self.class.max_file_size
+      options[:expiration] ||= upload_expiration
+      options[:min_file_size] ||= min_file_size
+      options[:max_file_size] ||= max_file_size
 
       conditions = [
         ["starts-with", "$utf8", ""],
         ["starts-with", "$key", key.sub(/#{Regexp.escape(FILENAME_WILDCARD)}\z/, "")]
       ]
 
-      conditions << ["starts-with", "$Content-Type", ""] if self.class.will_include_content_type
+      conditions << ["starts-with", "$Content-Type", ""] if will_include_content_type
       conditions << {"bucket" => fog_directory}
       conditions << {"acl" => acl}
 
-      if self.class.use_action_status
+      if use_action_status
         conditions << {"success_action_status" => success_action_status}
       else
         conditions << {"success_action_redirect" => success_action_redirect}

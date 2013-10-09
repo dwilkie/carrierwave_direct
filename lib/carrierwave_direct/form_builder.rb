@@ -36,13 +36,13 @@ module CarrierWaveDirect
     end
 
     def content_type_field(options)
-      return ''.html_safe unless @object.class.will_include_content_type
+      return ''.html_safe unless @object.will_include_content_type
 
       hidden_field(:content_type, :name => 'Content-Type') unless options[:exclude_content_type]
     end
 
     def success_action_field(options)
-      if @object.class.use_action_status
+      if @object.use_action_status
         hidden_field(:success_action_status, :name => "success_action_status")
       else
         hidden_field(:success_action_redirect, :name => "success_action_redirect")
