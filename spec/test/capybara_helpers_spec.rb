@@ -40,7 +40,7 @@ describe CarrierWaveDirect::Test::CapybaraHelpers do
 
     def stub_common
       stub_page
-      find_element_value("input[@name='success_action_redirect']", "http://example.com")
+      find_element_value("input[name='success_action_redirect']", "http://example.com")
       allow(subject).to receive(:visit)
     end
 
@@ -137,7 +137,7 @@ describe CarrierWaveDirect::Test::CapybaraHelpers do
   describe "#find_key" do
     before do
       stub_page
-      find_element_value("input[@name='key']", "key")
+      find_element_value("input[name='key']", "key")
     end
 
     it "should try to find the key on the page" do
@@ -148,7 +148,7 @@ describe CarrierWaveDirect::Test::CapybaraHelpers do
   describe "#find_upload_path" do
     before do
       stub_page
-      find_element_value("input[@name='file']", "upload path")
+      find_element_value("input[name='file']", "upload path")
     end
 
     it "should try to find the upload path on the page" do
