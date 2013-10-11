@@ -15,7 +15,11 @@ module CarrierWaveDirect
       end
 
       def find_upload_path
-        page.find("input[@name='file']").value
+        # Standards compliant browsers report C:\fakepath as part of
+        # their value. We should strip this for our test helpers as
+        # it is not submitted to the upload
+        # http://davidwalsh.name/fakepath
+        page.find("input[@name='file']").value.sub("C:\\fakepath\\", "")
       end
 
       def upload_directly(uploader, button_locator, options = {})
