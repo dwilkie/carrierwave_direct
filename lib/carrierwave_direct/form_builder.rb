@@ -8,8 +8,6 @@ module CarrierWaveDirect
 
       if options[:use_action_status]
         fields << hidden_field(:success_action_status, :name => "success_action_status")
-      else
-        fields << hidden_field(:success_action_redirect, :name => "success_action_redirect")
       end
 
       fields << super
