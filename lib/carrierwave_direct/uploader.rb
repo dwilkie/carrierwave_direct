@@ -1,8 +1,10 @@
 # encoding: utf-8
 
+require "carrierwave_direct/uploader/content_type"
+require "carrierwave_direct/uploader/direct_url"
+
 module CarrierWaveDirect
   module Uploader
-
     extend ActiveSupport::Concern
 
     FILENAME_WILDCARD = "${filename}"
@@ -20,81 +22,28 @@ module CarrierWaveDirect
       end
     end
 
-    def direct_fog_url(options = {})
-      fog_uri = CarrierWave::Storage::Fog::File.new(self, CarrierWave::Storage::Fog.new(self), nil).public_url
-      if options[:with_path]
-        uri = URI.parse(fog_uri.chomp('/'))
-        path = "/#{key}"
-        uri.path += URI.escape(path)
-        fog_uri = uri.to_s
-      end
-      fog_uri
-    end
-
-    def guid
-      UUIDTools::UUID.random_create
-    end
-
-    def key=(k)
-      @key = k
-      update_version_keys(:with => @key)
-    end
-
-    def key
-      return @key if @key.present?
-      if present?
-        self.key = URI.parse(URI.encode(url, " []+()")).path[1 .. -1] # explicitly set key
-      else
-        @key = "#{store_dir}/#{guid}/#{FILENAME_WILDCARD}"
-      end
-      @key
-    end
-
-    def has_key?
-      key !~ /#{Regexp.escape(FILENAME_WILDCARD)}\z/
-    end
+    include CarrierWaveDirect::Uploader::ContentType
+    include CarrierWaveDirect::Uploader::DirectUrl
 
     def acl
       fog_public ? 'public-read' : 'private'
     end
 
-    def content_type
-      default = self.class.default_content_type || self.class.will_include_content_type
-
-      default.is_a?(String) ? default : 'binary/octet-stream'
-    end
-
-    def content_types
-      types = self.class.allowed_content_types
-
-      return types if types.is_a? Array
-      %w(application/atom+xml application/ecmascript application/json
-         application/javascript application/octet-stream application/ogg
-         application/pdf application/postscript application/rss+xml
-         application/font-woff application/xhtml+xml application/xml
-         application/xml-dtd application/zip application/gzip audio/basic
-         audio/mp4 audio/mpeg audio/ogg audio/vorbis audio/vnd.rn-realaudio
-         audio/vnd.wave audio/webm image/gif image/jpeg image/pjpeg
-         image/png image/svg+xml image/tiff text/cmd text/css text/csv
-         text/html text/javascript text/plain text/vcard text/xml video/mpeg
-         video/mp4 video/ogg video/quicktime video/webm video/x-matroska
-         video/x-ms-wmv video/x-flv)
-    end
-
     def policy(options = {})
-      options[:expiration] ||= self.class.upload_expiration
-      options[:min_file_size] ||= self.class.min_file_size
-      options[:max_file_size] ||= self.class.max_file_size
+      options[:expiration] ||= upload_expiration
+      options[:min_file_size] ||= min_file_size
+      options[:max_file_size] ||= max_file_size
 
       conditions = [
         ["starts-with", "$utf8", ""],
-        ["starts-with", "$key", key.sub(/#{Regexp.escape(FILENAME_WILDCARD)}\z/, "")],
-        ["starts-with", "$Content-Type",""]
+        ["starts-with", "$key", key.sub(/#{Regexp.escape(FILENAME_WILDCARD)}\z/, "")]
       ]
+
+      conditions << ["starts-with", "$Content-Type", ""] if will_include_content_type
       conditions << {"bucket" => fog_directory}
       conditions << {"acl" => acl}
 
-      if self.class.use_action_status
+      if use_action_status
         conditions << {"success_action_status" => success_action_status}
       else
         conditions << {"success_action_redirect" => success_action_redirect}
@@ -119,8 +68,44 @@ module CarrierWaveDirect
       ).gsub("\n","")
     end
 
+    def url_scheme_white_list
+      nil
+    end
+
     def persisted?
       false
+    end
+
+    def key
+      return @key if @key.present?
+      if present?
+        self.key = URI.parse(URI.encode(url, " []+()")).path[1 .. -1] # explicitly set key
+      else
+        @key = "#{store_dir}/#{guid}/#{FILENAME_WILDCARD}"
+      end
+      @key
+    end
+
+    def key=(k)
+      @key = k
+      update_version_keys(:with => @key)
+    end
+
+    def guid
+      UUIDTools::UUID.random_create
+    end
+
+    def has_key?
+      key !~ /#{Regexp.escape(FILENAME_WILDCARD)}\z/
+    end
+
+    def key_regexp
+      /\A#{store_dir}\/[a-f\d\-]+\/.+\.(?i)#{extension_regexp}(?-i)\z/
+    end
+
+    def extension_regexp
+      allowed_file_types = extension_white_list
+      extension_regexp = allowed_file_types.present? && allowed_file_types.any? ?  "(#{allowed_file_types.join("|")})" : "\\w+"
     end
 
     def filename
@@ -136,19 +121,6 @@ module CarrierWaveDirect
       unique_key = key_path.pop
       filename_parts.unshift(unique_key) if unique_key
       filename_parts.join("/")
-    end
-
-    def key_regexp
-      /\A#{store_dir}\/[a-f\d\-]+\/.+\.(?i)#{extension_regexp}(?-i)\z/
-    end
-
-    def extension_regexp
-      allowed_file_types = extension_white_list
-      extension_regexp = allowed_file_types.present? && allowed_file_types.any? ?  "(#{allowed_file_types.join("|")})" : "\\w+"
-    end
-
-    def url_scheme_white_list
-      nil
     end
 
     private
