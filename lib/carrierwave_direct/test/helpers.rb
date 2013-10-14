@@ -11,7 +11,7 @@ module CarrierWaveDirect
       def sample_key(uploader, options = {})
         options[:valid] = true unless options[:valid] == false
         options[:valid] &&= !options[:invalid]
-        options[:base] ||= uploader.key
+        options[:base] ||= uploader.blank_key
         if options[:filename]
           filename_parts = options[:filename].split(".")
           options[:extension] = filename_parts.pop if filename_parts.size > 1

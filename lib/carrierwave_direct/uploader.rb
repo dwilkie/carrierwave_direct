@@ -36,7 +36,7 @@ module CarrierWaveDirect
 
       conditions = [
         ["starts-with", "$utf8", ""],
-        ["starts-with", "$key", key.sub(/#{Regexp.escape(FILENAME_WILDCARD)}\z/, "")]
+        ["starts-with", "$key", blank_key.sub(/#{Regexp.escape(FILENAME_WILDCARD)}\z/, "")]
       ]
 
       conditions << ["starts-with", "$Content-Type", ""] if will_include_content_type
@@ -76,27 +76,58 @@ module CarrierWaveDirect
       false
     end
 
+    # We must cache the generated blank_key in order for the form data and
+    # generated policy to match
+    def blank_key
+      @blank_key ||= "#{store_dir}/#{generate_guid}/#{FILENAME_WILDCARD}"
+    end
+
+    # If the filename is not set, use the path for the key
+    # Note: Cacheing is not done here on purpose.  We let
+    # carrierwave worry about updating path and filename changes.
     def key
-      return @key if @key.present?
-      if present?
-        self.key = URI.parse(URI.encode(url, " []+()")).path[1 .. -1] # explicitly set key
-      else
-        @key = "#{store_dir}/#{guid}/#{FILENAME_WILDCARD}"
-      end
-      @key
+      filename ? "#{store_dir}/#{filename}" : path
     end
 
-    def key=(k)
-      @key = k
-      update_version_keys(:with => @key)
+    # Key is used to set the guid and filename explicitly.
+    # After these are we refresh the uploaders file reference
+    # in order to reflect the key change
+    #
+    # Note the store_dir must match between uploaders when setting
+    # the key.
+    def key=(new_key)
+      return if new_key.blank?
+
+      key_parts = new_key.split("/")
+
+      @filename = key_parts.pop
+      set_cached_guid(key_parts.pop)
+
+      refresh_fog_file
+
+      key
     end
 
+    # Generate a new guid if no file has been stored or if
+    # a new file has been cached; otherwise, use the stored
+    # identifier to get the guid
     def guid
-      UUIDTools::UUID.random_create
+      storage_identifier = model[mounted_as]
+
+      if storage_identifier.blank? || cached?
+        get_or_set_cached_guid(generate_guid)
+      else
+        get_or_set_cached_guid(storage_identifier.split("/").first)
+      end
+    end
+
+    # Make sure to store the guid with the filename in the database
+    def filename
+     "#{guid}/#{@filename}" if @filename
     end
 
     def has_key?
-      key !~ /#{Regexp.escape(FILENAME_WILDCARD)}\z/
+      !key.nil?
     end
 
     def key_regexp
@@ -108,35 +139,32 @@ module CarrierWaveDirect
       extension_regexp = allowed_file_types.present? && allowed_file_types.any? ?  "(#{allowed_file_types.join("|")})" : "\\w+"
     end
 
-    def filename
-      unless has_key?
-        # Use the attached models remote url to generate a new key otherwise return nil
-        remote_url = model.send("remote_#{mounted_as}_url")
-        remote_url ? key_from_file(CarrierWave::SanitizedFile.new(remote_url).filename) : return
-      end
-
-      key_path = key.split("/")
-      filename_parts = []
-      filename_parts.unshift(key_path.pop)
-      unique_key = key_path.pop
-      filename_parts.unshift(unique_key) if unique_key
-      filename_parts.join("/")
-    end
-
     private
 
-    def key_from_file(fname)
-      new_key_parts = key.split("/")
-      new_key_parts.pop
-      new_key_parts << fname
-      self.key = new_key_parts.join("/")
+    # Guid is cached as an instance variable in the model
+    # in order to make sure that all verions get the same guid.
+    def get_or_set_cached_guid(value)
+      get_cached_guid || set_cached_guid(value)
     end
 
-    # Update the versions to use this key
-    def update_version_keys(options)
-      versions.each do |name, uploader|
-        uploader.key = options[:with]
-      end
+    def set_cached_guid(value)
+      model.instance_variable_set(guid_instance_variable, value)
+    end
+
+    def get_cached_guid
+      model.instance_variable_get(guid_instance_variable)
+    end
+
+    def generate_guid
+      UUIDTools::UUID.random_create
+    end
+
+    def guid_instance_variable
+      :"@#{mounted_as}_guid"
+    end
+
+    def refresh_fog_file
+      @file = CarrierWave::Storage::Fog::File.new(self, storage, self.key)
     end
 
     # Put the version name at the end of the filename since the guid is also stored

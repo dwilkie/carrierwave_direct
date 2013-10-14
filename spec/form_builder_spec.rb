@@ -11,7 +11,7 @@ end
 
 shared_examples_for 'hidden values form' do
   hidden_fields = [
-                    :key,
+                    { :blank_key => "key" },
                     {:aws_access_key_id => "AWSAccessKeyId"},
                     :acl,
                     :success_action_redirect,
@@ -59,7 +59,7 @@ describe CarrierWaveDirect::FormBuilder do
     end
 
     default_hidden_fields = [
-                      :key,
+                      { :blank_key => "key" },
                       {:aws_access_key_id => "AWSAccessKeyId"},
                       :acl,
                       :success_action_redirect,
@@ -67,7 +67,7 @@ describe CarrierWaveDirect::FormBuilder do
                       :signature
                     ]
     status_hidden_fields = [
-                      :key,
+                      { :blank_key => "key" },
                       {:aws_access_key_id => "AWSAccessKeyId"},
                       :acl,
                       :success_action_status,
@@ -191,14 +191,14 @@ describe CarrierWaveDirect::FormBuilder do
     end
 
     before do
-      allow(direct_uploader).to receive('key').and_return('foo')
+      allow(direct_uploader).to receive('blank_key').and_return('foo')
       allow(direct_uploader.class).to receive(:will_include_content_type).and_return(true)
     end
 
     it 'should only include the hidden values once' do
       expect(dom).to have_input(
                    :direct_uploader,
-                   'key',
+                   'blank_key',
                    :type => :hidden,
                    :name => 'key',
                    :value => 'foo',
