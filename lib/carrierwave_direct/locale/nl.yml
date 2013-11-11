@@ -1,4 +1,4 @@
-en:
+nl:
   errors:
     messages:
       carrierwave_direct_filename_taken: bestandsnaam is reeds in gebruik
