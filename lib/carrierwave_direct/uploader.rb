@@ -79,7 +79,14 @@ module CarrierWaveDirect
     def key
       return @key if @key.present?
       if present?
-        self.key = URI.parse(URI.encode(url, " []+()")).path[1 .. -1] # explicitly set key
+        path = URI.parse(URI.encode(url, " []+()")).path
+
+        # explicitly set key
+        self.key = if self.fog_credentials.has_key?(:endpoint)
+          path.gsub(/\A\/.*?\//, "") # strip bucket name from path
+        else
+          path[1 .. -1] 
+        end
       else
         @key = "#{store_dir}/#{guid}/#{FILENAME_WILDCARD}"
       end
