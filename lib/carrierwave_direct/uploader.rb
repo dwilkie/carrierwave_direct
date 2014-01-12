@@ -79,7 +79,7 @@ module CarrierWaveDirect
     def key
       return @key if @key.present?
       if present?
-        self.key = URI.parse(URI.encode(url, " []+()")).path[1 .. -1] # explicitly set key
+        self.key = URI.decode(URI.parse(URI.encode(url, " []+()")).path[1 .. -1]) # explicitly set key
       else
         @key = "#{store_dir}/#{guid}/#{FILENAME_WILDCARD}"
       end
