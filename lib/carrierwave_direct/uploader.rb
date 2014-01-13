@@ -79,7 +79,7 @@ module CarrierWaveDirect
     def key
       return @key if @key.present?
       if present?
-        path = URI.parse(URI.decode(url)).path
+        path = URI.decode(URI.parse(url).path)
 
         # explicitly set key
         self.key = if self.fog_credentials.has_key?(:endpoint)
