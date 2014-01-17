@@ -17,7 +17,9 @@ describe CarrierWaveDirect::Uploader::DirectUrl do
     context ":with_path => true" do
 
       context "#key is set to '#{sample(:path_with_special_chars)}'" do
-        before { subject.key = sample(:path_with_special_chars) }
+        before do
+          allow(subject).to receive(:key).and_return(sample(:path_with_special_chars))
+        end
 
         it "should return the full url with '/#{URI.escape(sample(:path_with_special_chars))}' as the path" do
           direct_fog_url = CarrierWave::Storage::Fog::File.new(
@@ -28,7 +30,9 @@ describe CarrierWaveDirect::Uploader::DirectUrl do
       end
 
       context "#key is set to '#{sample(:path)}'" do
-        before { subject.key = sample(:path) }
+        before do
+          allow(subject).to receive(:key).and_return(sample(:path))
+        end
 
         it "should return the full url with '/#{sample(:path)}' as the path" do
           direct_fog_url = CarrierWave::Storage::Fog::File.new(

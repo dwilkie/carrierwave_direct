@@ -1,5 +1,4 @@
 # encoding: utf-8
-
 require 'spec_helper'
 require 'carrierwave/orm/activerecord'
 require 'carrierwave_direct/orm/activerecord'
@@ -107,46 +106,46 @@ describe CarrierWaveDirect::ActiveRecord do
       end
 
       it "should not be valid on create" do
-        subject.should_not be_valid
+        expect(subject).to_not be_valid
       end
 
       it "should use i18n for the file upload error message" do
         subject.valid?
-        subject.errors[:video].should == [I18n.t("errors.messages.carrierwave_direct_upload_missing")]
+        expect(subject.errors[:video]).to eq [I18n.t("errors.messages.carrierwave_direct_upload_missing")]
       end
 
       it "should use i18n for the remote net url error message" do
         subject.valid?
-        subject.errors[:remote_video_net_url].should == [I18n.t("errors.messages.blank")]
+        expect(subject.errors[:remote_video_net_url]).to eq [I18n.t("errors.messages.blank")]
       end
 
       it "should be valid on update" do
         subject.save(:validate => false)
-        subject.should be_valid
+        expect(subject).to be_valid
       end
     end
 
     shared_examples_for "a blank or empty attachment" do
       it "should not be valid" do
-        subject.should_not be_valid
+        expect(subject).to_not be_valid
       end
 
       context "on update" do
         it "should not be valid" do
           subject.save(:validate => false)
-          subject.should_not be_valid
+          expect(subject).to_not be_valid
         end
       end
 
       it "should use i18n for the error messages" do
         subject.valid?
-        subject.errors[:video].should == [I18n.t("errors.messages.carrierwave_direct_attachment_missing")]
+        expect(subject.errors[:video]).to eq [I18n.t("errors.messages.carrierwave_direct_attachment_missing")]
       end
     end
 
     describe ".validates_filename_uniqueness_of" do
       it "should be turned on by default" do
-        party_class.should_receive(:validates_filename_uniqueness_of).with(:video)
+        allow(party_class).to receive(:validates_filename_uniqueness_of).with(:video)
         mount_uploader
       end
 
@@ -163,12 +162,12 @@ describe CarrierWaveDirect::ActiveRecord do
         end
 
         it "should not be valid" do
-          another_party.should_not be_valid
+          expect(another_party).to_not be_valid
         end
 
         it "should use I18n for the error messages" do
           another_party.valid?
-          another_party.errors[:video].should == [I18n.t("errors.messages.carrierwave_direct_filename_taken")]
+          expect(another_party.errors[:video]).to eq [I18n.t("errors.messages.carrierwave_direct_filename_taken")]
         end
       end
 
@@ -178,7 +177,7 @@ describe CarrierWaveDirect::ActiveRecord do
         end
 
         it "should not validate the filename uniqueness" do
-          party_class.should_not_receive(:validates_filename_uniqueness_of)
+          expect(party_class).to_not receive(:validates_filename_uniqueness_of)
           mount_uploader
         end
       end
@@ -186,7 +185,7 @@ describe CarrierWaveDirect::ActiveRecord do
 
     describe ".validates_filename_format_of" do
       it "should be turned on by default" do
-        party_class.should_receive(:validates_filename_format_of).with(:video)
+        expect(party_class).to receive(:validates_filename_format_of).with(:video)
         mount_uploader
       end
 
@@ -197,7 +196,7 @@ describe CarrierWaveDirect::ActiveRecord do
           end
 
           it "should be valid" do
-            subject.should be_valid
+            expect(subject).to be_valid
           end
         end
 
@@ -207,14 +206,14 @@ describe CarrierWaveDirect::ActiveRecord do
           end
 
           it "should be valid" do
-            subject.should be_valid
+            expect(subject).to be_valid
           end
         end
       end
 
       context "where the uploader has an extension white list" do
         before do
-          subject.video.stub(:extension_white_list).and_return(%w{avi mp4})
+          allow(subject.video).to receive(:extension_white_list).and_return(%w{avi mp4})
         end
 
         context "and the uploaded file's extension is included in the list" do
@@ -223,7 +222,7 @@ describe CarrierWaveDirect::ActiveRecord do
           end
 
           it "should be valid" do
-            subject.should be_valid
+            expect(subject).to be_valid
           end
         end
 
@@ -236,7 +235,7 @@ describe CarrierWaveDirect::ActiveRecord do
 
           it "should include the white listed extensions in the error message" do
             subject.valid?
-            subject.errors[:video].first.should include("avi and mp4")
+            expect(subject.errors[:video].first).to include("avi and mp4")
           end
         end
 
@@ -255,7 +254,7 @@ describe CarrierWaveDirect::ActiveRecord do
         end
 
         it "should not validate the filename format" do
-          party_class.should_not_receive(:validates_filename_format_of)
+          expect(party_class).to_not receive(:validates_filename_format_of)
           mount_uploader
         end
       end
@@ -263,7 +262,7 @@ describe CarrierWaveDirect::ActiveRecord do
 
     describe ".validates_remote_net_url_format_of" do
       it "should be turned on by default" do
-        party_class.should_receive(:validates_remote_net_url_format_of).with(:video)
+        allow(party_class).to receive(:validates_remote_net_url_format_of).with(:video)
         mount_uploader
       end
 
@@ -272,7 +271,7 @@ describe CarrierWaveDirect::ActiveRecord do
         context "on create" do
           context "where the uploader has an extension white list" do
             before do
-              subject.video.stub(:extension_white_list).and_return(%w{avi mp4})
+              allow(subject.video).to receive(:extension_white_list).and_return(%w{avi mp4})
             end
 
             context "and the url's extension is included in the list" do
@@ -281,7 +280,7 @@ describe CarrierWaveDirect::ActiveRecord do
               end
 
               it "should be valid" do
-                subject.should be_valid
+                expect(subject).to be_valid
               end
             end
 
@@ -291,7 +290,7 @@ describe CarrierWaveDirect::ActiveRecord do
               end
 
               it "should not be valid" do
-                subject.should_not be_valid
+                expect(subject).to_not be_valid
               end
 
               it_should_behave_like "a remote net url i18n error message" do
@@ -300,7 +299,7 @@ describe CarrierWaveDirect::ActiveRecord do
 
               it "should include the white listed extensions in the error message" do
                 subject.valid?
-                subject.errors[:remote_video_net_url].first.should include("avi and mp4")
+                expect(subject.errors[:remote_video_net_url].first).to include("avi and mp4")
               end
             end
           end
@@ -311,7 +310,7 @@ describe CarrierWaveDirect::ActiveRecord do
             end
 
             it "should not be valid" do
-              subject.should_not be_valid
+              expect(subject).to_not be_valid
             end
 
             it_should_behave_like "a remote net url i18n error message" do
@@ -326,7 +325,7 @@ describe CarrierWaveDirect::ActiveRecord do
               end
 
               it "should be valid" do
-                subject.should be_valid
+                expect(subject).to be_valid
               end
             end
 
@@ -336,14 +335,14 @@ describe CarrierWaveDirect::ActiveRecord do
               end
 
               it "should be valid" do
-                subject.should be_valid
+                expect(subject).to be_valid
               end
             end
           end
 
           context "where the uploader specifies valid url schemes" do
             before do
-              subject.video.stub(:url_scheme_white_list).and_return(%w{http https})
+              allow(subject.video).to receive(:url_scheme_white_list).and_return(%w{http https})
             end
 
             context "and the url's scheme is included in the list" do
@@ -352,7 +351,7 @@ describe CarrierWaveDirect::ActiveRecord do
               end
 
               it "should be valid" do
-                subject.should be_valid
+                expect(subject).to be_valid
               end
             end
 
@@ -362,7 +361,7 @@ describe CarrierWaveDirect::ActiveRecord do
               end
 
               it "should not be valid" do
-                subject.should_not be_valid
+                expect(subject).to_not be_valid
               end
 
               it_should_behave_like "a remote net url i18n error message" do
@@ -371,7 +370,7 @@ describe CarrierWaveDirect::ActiveRecord do
 
               it "should include the white listed url schemes in the error message" do
                 subject.valid?
-                subject.errors[:remote_video_net_url].first.should include("http and https")
+                expect(subject.errors[:remote_video_net_url].first).to include("http and https")
               end
             end
           end
@@ -384,7 +383,7 @@ describe CarrierWaveDirect::ActiveRecord do
 
           it "should be valid" do
             subject.save(:validate => false)
-            subject.should be_valid
+            expect(subject).to be_valid
           end
         end
       end
@@ -395,7 +394,7 @@ describe CarrierWaveDirect::ActiveRecord do
         end
 
         it "should not validate the format of the remote net url" do
-          party_class.should_not_receive(:validates_remote_net_url_format_of)
+          expect(party_class).to_not receive(:validates_remote_net_url_format_of)
           mount_uploader
         end
       end
@@ -403,7 +402,7 @@ describe CarrierWaveDirect::ActiveRecord do
 
     describe ".validates_is_uploaded" do
       it "should be turned off by default" do
-        party_class.should_not_receive(:validates_is_uploaded)
+        expect(party_class).to_not receive(:validates_is_uploaded)
         mount_uploader
       end
 
@@ -413,7 +412,7 @@ describe CarrierWaveDirect::ActiveRecord do
         end
 
         it "should validate that a file has been uploaded" do
-          party_class.should_receive(:validates_is_uploaded).with(:video)
+          expect(party_class).to receive(:validates_is_uploaded).with(:video)
           mount_uploader
         end
       end
@@ -443,7 +442,7 @@ describe CarrierWaveDirect::ActiveRecord do
           end
 
           it "should be valid" do
-            subject.should be_valid
+            expect(subject).to be_valid
           end
         end
 
@@ -453,7 +452,7 @@ describe CarrierWaveDirect::ActiveRecord do
           end
 
           it "should be valid" do
-            subject.should be_valid
+            expect(subject).to be_valid
           end
         end
       end
@@ -461,7 +460,7 @@ describe CarrierWaveDirect::ActiveRecord do
 
     describe ".validates_is_attached" do
       it "should be turned off by default" do
-        party_class.should_not_receive(:validates_is_attached)
+        expect(party_class).to_not receive(:validates_is_attached)
         mount_uploader
       end
 
@@ -471,7 +470,7 @@ describe CarrierWaveDirect::ActiveRecord do
         end
 
         it "should validate that a file has been attached" do
-          party_class.should_receive(:validates_is_attached).with(:video)
+          expect(party_class).to receive(:validates_is_attached).with(:video)
           mount_uploader
         end
       end
@@ -501,13 +500,13 @@ describe CarrierWaveDirect::ActiveRecord do
 
     describe "#key" do
       it "should be accessible" do
-        party_class.new(:key => "some key").key.should == "some key"
+        expect(party_class.new(:key => "some key").key.split("/").last).to eq "some key"
       end
     end
 
     describe "#remote_\#\{column\}_net_url" do
       it "should be accessible" do
-        party_class.new(:remote_video_net_url => "some url").remote_video_net_url.should == "some url"
+        expect(party_class.new(:remote_video_net_url => "some url").remote_video_net_url).to eq "some url"
       end
     end
 
@@ -519,14 +518,14 @@ describe CarrierWaveDirect::ActiveRecord do
 
         context "where after the call, #errors" do
           it "should be empty" do
-            subject.errors.should be_empty
+            expect(subject.errors).to be_empty
           end
         end
       end
 
       context "does not have an upload" do
         it "should be true" do
-          subject.filename_valid?.should be_true
+          expect(subject.filename_valid?).to be_true
         end
 
         it_should_behave_like "having empty errors"
@@ -535,11 +534,11 @@ describe CarrierWaveDirect::ActiveRecord do
       context "has an upload" do
         context "with a valid filename" do
           before do
-            subject.key = sample_key(:model_class => subject.class)
+            #subject.key = sample_key(:model_class => subject.class)
           end
 
           it "should be true" do
-            subject.filename_valid?.should be_true
+            expect(subject.filename_valid?).to be_true
           end
 
           it_should_behave_like "having empty errors"
@@ -549,14 +548,14 @@ describe CarrierWaveDirect::ActiveRecord do
           before { subject.key = sample_key(:model_class => subject.class, :valid => false) }
 
           it "should be false" do
-            subject.filename_valid?.should be_false
+            expect(subject.filename_valid?).to be_false
           end
 
           context "after the call, #errors" do
             before { subject.filename_valid? }
 
             it "should only contain '\#\{column\}' errors" do
-              subject.errors.count.should == subject.errors[:video].count
+              expect(subject.errors.count).to eq subject.errors[:video].count
             end
           end
         end

@@ -14,6 +14,7 @@ describe CarrierWaveDirect::Mount do
   context "class Gathering; extend CarrierWave::Mount; extend CarrierWaveDirect::Mount; mount_uploader :video, DirectUploader; end" do
     let(:subject) { Gathering.new }
 
+
     it_should_have_accessor(:remote_video_net_url)
 
     describe "#has_video_upload?" do
@@ -40,7 +41,19 @@ describe CarrierWaveDirect::Mount do
       end
     end
 
-    it_should_delegate(:key, :to => "video#key", :accessible => { "has_video_upload?" => false })
+    describe "#key" do
+      it "delegates to video#key" do
+        allow(subject.video).to receive(:key).and_return('my-key')
+        expect(subject.key).to eq('my-key')
+      end
+    end
+
+    describe "#key=" do
+      it "delegates to video#key=" do
+        expect(subject.video).to receive(:key=).with('my-key')
+        subject.key = 'my-key'
+      end
+    end
   end
 end
 
