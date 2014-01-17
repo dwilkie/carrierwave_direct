@@ -6,4 +6,3 @@ Gemfile.lock
 pkg/*
 /.idea/
 vendor/ruby
-.ruby-version
