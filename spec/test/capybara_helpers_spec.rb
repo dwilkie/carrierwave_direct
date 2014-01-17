@@ -148,10 +148,15 @@ describe CarrierWaveDirect::Test::CapybaraHelpers do
   describe "#find_upload_path" do
     before do
       stub_page
-      find_element_value("input[@name='file']", "upload path")
     end
 
     it "should try to find the upload path on the page" do
+      find_element_value("input[@name='file']", "upload path")
+      expect(subject.find_upload_path).to eq "upload path"
+    end
+
+    it "strips fakepath for standards compliant browsers" do
+      find_element_value("input[@name='file']", "C:\\fakepath\\upload path")
       expect(subject.find_upload_path).to eq "upload path"
     end
   end
