@@ -443,7 +443,7 @@ describe CarrierWaveDirect::Uploader do
 
     it "should return a base64 encoded 'sha1' hash of the secret key and policy document" do
       expect(Base64.decode64(subject.signature)).to eq OpenSSL::HMAC.digest(
-        OpenSSL::Digest::Digest.new('sha1'),
+        OpenSSL::Digest.new('sha1'),
         subject.aws_secret_access_key, subject.policy
       )
     end
