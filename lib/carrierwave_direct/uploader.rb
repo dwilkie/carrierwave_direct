@@ -53,7 +53,7 @@ module CarrierWaveDirect
 
       Base64.encode64(
         {
-          'expiration' => Time.now.utc + options[:expiration],
+          'expiration' => (Time.now + options[:expiration]).utc.iso8601,
           'conditions' => conditions
         }.to_json
       ).gsub("\n","")
