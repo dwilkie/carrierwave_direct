@@ -445,6 +445,11 @@ CarrierWave.configure do |config|
   config.will_include_content_type = 'video/mp4'  # defaults to false; if true, content-type will be set
                                                   # on s3, but you must include an input field named
                                                   # Content-Type on every direct upload form
+                                                  
+  config.use_action_status = true                 # defaults to false; if true you must set in your uploader
+                                                  # 'uploader.success_action_status = 201' and set 
+                                                  # 'f.file_field :avatar, use_action_status: true' to works
+                                                  # properly
 end
 ```
 
