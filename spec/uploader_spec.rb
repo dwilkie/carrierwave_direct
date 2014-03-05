@@ -299,6 +299,16 @@ describe CarrierWaveDirect::Uploader do
       expect(subject.policy).to_not include("\n")
     end
 
+    it "should be cached" do
+      Timecop.freeze(Time.now) do
+        @policy_now = subject.policy
+      end
+      Timecop.freeze(1.second.from_now) do
+        @policy_later = subject.policy
+      end
+      expect(@policy_later).to eql @policy_now
+    end
+
     context "expiration" do
       def expiration(options = {})
         decoded_policy(options)["expiration"]
