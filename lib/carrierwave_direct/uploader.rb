@@ -37,6 +37,10 @@ module CarrierWaveDirect
       @policy ||= generate_policy(options)
     end
 
+    def clear_policy!
+      @policy = nil
+    end
+
     def signature
       Base64.encode64(
         OpenSSL::HMAC.digest(

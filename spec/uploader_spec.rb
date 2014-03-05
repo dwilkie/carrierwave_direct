@@ -446,6 +446,20 @@ describe CarrierWaveDirect::Uploader do
     end
   end
 
+  describe "clear_policy!" do
+    it "should reset the cached policy string" do
+      Timecop.freeze(Time.now) do
+        @policy_now = subject.policy
+      end
+      subject.clear_policy!
+
+      Timecop.freeze(1.second.from_now) do
+        @policy_after_reset = subject.policy
+      end
+      expect(@policy_after_reset).not_to eql @policy_now
+    end
+  end
+
   describe "#signature" do
     it "should not contain any new lines" do
       expect(subject.signature).to_not include("\n")
