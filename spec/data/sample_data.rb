@@ -1,6 +1,6 @@
 SAMPLE_DATA = {
   :path => "upload_dir/bliind.exe",
-  :path_with_special_chars => "upload_dir/some file & blah.exe",
+  :path_with_special_chars => "uploads/7cf36992-300b-4c54-8f74-c22bd76b69a6/Financial Module - Money Management - What is a Budget and Why is it Important?.pdf",
   :key => "some key",
   :guid => "guid",
   :store_dir => "store_dir",
