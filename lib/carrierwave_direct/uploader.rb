@@ -79,7 +79,7 @@ module CarrierWaveDirect
     def key
       return @key if @key.present?
       if present?
-        self.key = URI.parse(URI.encode(url, " []+()")).path[1 .. -1] # explicitly set key
+        self.key = URI.parse(encoded_url).path[1 .. -1] # explicitly set key
       else
         @key = "#{store_dir}/#{guid}/#{FILENAME_WILDCARD}"
       end
@@ -124,6 +124,10 @@ module CarrierWaveDirect
     end
 
     private
+
+    def encoded_url
+      URI.encode(URI.decode(url), " []+()") # Do not double encode!
+    end
 
     def key_from_file(fname)
       new_key_parts = key.split("/")
