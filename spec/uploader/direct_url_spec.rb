@@ -38,7 +38,6 @@ describe CarrierWaveDirect::Uploader::DirectUrl do
         end
       end
 
-
       context "#key is set to '#{sample(:path)}'" do
         before { subject.key = sample(:path) }
 
