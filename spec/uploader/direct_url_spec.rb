@@ -28,7 +28,7 @@ describe CarrierWaveDirect::Uploader::DirectUrl do
       end
 
       context "#key is set to '#{sample(:path_with_escaped_chars)}'" do
-        before { subject.key = escaped_path }
+        before { subject.key = sample(:path_with_escaped_chars) }
 
         it "should return the full url with '/#{sample(:path_with_escaped_chars)}' as the path" do
           direct_fog_url = CarrierWave::Storage::Fog::File.new(
