@@ -260,7 +260,7 @@ describe CarrierWaveDirect::Uploader do
         end
 
         it "should be escaped and replaced with non whitespace characters" do
-          expect(subject.key).to match /filename \(\)\+\[\]2.avi$/
+          expect(subject.key).to match /filename%20%28%29%2B%5B%5D2.avi/
         end
       end
 
@@ -272,7 +272,7 @@ describe CarrierWaveDirect::Uploader do
         end
 
         it "should not double escape already escaped characters" do
-          expect(subject.key).to match /filename \(\)\+\[\]2.avi$/
+          expect(subject.key).to match /filename%20%28%29%2B%5B%5D2.avi/
         end
 
       end
