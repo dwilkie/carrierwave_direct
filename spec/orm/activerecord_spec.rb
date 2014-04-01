@@ -154,7 +154,7 @@ describe CarrierWaveDirect::ActiveRecord do
 
     describe ".validates_filename_uniqueness_of" do
       it "should be turned on by default" do
-        party_class.should_receive(:validates_filename_uniqueness_of).with(:video)
+        party_class.should_receive(:validates_filename_uniqueness_of).with(:video, on: :create)
         mount_uploader
       end
 
@@ -205,7 +205,7 @@ describe CarrierWaveDirect::ActiveRecord do
 
     describe ".validates_filename_format_of" do
       it "should be turned on by default" do
-        party_class.should_receive(:validates_filename_format_of).with(:video)
+        party_class.should_receive(:validates_filename_format_of).with(:video, on: :create)
         mount_uploader
       end
 
@@ -282,7 +282,7 @@ describe CarrierWaveDirect::ActiveRecord do
 
     describe ".validates_remote_net_url_format_of" do
       it "should be turned on by default" do
-        party_class.should_receive(:validates_remote_net_url_format_of).with(:video)
+        party_class.should_receive(:validates_remote_net_url_format_of).with(:video, on: :create)
         mount_uploader
       end
 

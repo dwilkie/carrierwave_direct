@@ -11,7 +11,7 @@ module CarrierWaveDirect
 
       class UniqueFilenameValidator < ::ActiveModel::EachValidator
         def validate_each(record, attribute, value)
-          if record.new_record? && record.errors[attribute].empty? && (record.send("has_#{attribute}_upload?") || record.send("has_remote_#{attribute}_net_url?"))
+          if record.errors[attribute].empty? && (record.send("has_#{attribute}_upload?") || record.send("has_remote_#{attribute}_net_url?"))
             column = record.class.uploader_options[attribute].fetch(:mount_on, attribute)
             if record.class.where(column => record.send(attribute).filename).exists?
               record.errors.add(attribute, :carrierwave_direct_filename_taken)
@@ -22,7 +22,7 @@ module CarrierWaveDirect
 
       class FilenameFormatValidator < ::ActiveModel::EachValidator
         def validate_each(record, attribute, value)
-          if record.new_record? && record.send("has_#{attribute}_upload?") && record.key !~ record.send(attribute).key_regexp
+          if record.send("has_#{attribute}_upload?") && record.key !~ record.send(attribute).key_regexp
             extensions = record.send(attribute).extension_white_list
             message = I18n.t("errors.messages.carrierwave_direct_filename_invalid")
 
@@ -37,7 +37,7 @@ module CarrierWaveDirect
 
       class RemoteNetUrlFormatValidator < ::ActiveModel::EachValidator
         def validate_each(record, attribute, value)
-          if record.new_record? && record.send("has_remote_#{attribute}_net_url?")
+          if record.send("has_remote_#{attribute}_net_url?")
             remote_net_url = record.send("remote_#{attribute}_net_url")
             uploader = record.send(attribute)
             url_scheme_white_list = uploader.url_scheme_white_list
