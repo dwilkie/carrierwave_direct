@@ -51,7 +51,7 @@ module CarrierWaveDirect
 
       conditions << ["content-length-range", options[:min_file_size], options[:max_file_size]]
 
-      Base64.encode64(
+      @policy ||= Base64.encode64(
         {
           'expiration' => Time.now.utc + options[:expiration],
           'conditions' => conditions
