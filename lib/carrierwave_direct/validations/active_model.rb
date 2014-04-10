@@ -12,7 +12,8 @@ module CarrierWaveDirect
       class UniqueFilenameValidator < ::ActiveModel::EachValidator
         def validate_each(record, attribute, value)
           if record.new_record? && record.errors[attribute].empty? && (record.send("has_#{attribute}_upload?") || record.send("has_remote_#{attribute}_net_url?"))
-            if record.class.where(attribute => record.send(attribute).filename).exists?
+            column = record.class.uploader_options[attribute].fetch(:mount_on, attribute)
+            if record.class.where(column => record.send(attribute).filename).exists?
               record.errors.add(attribute, :carrierwave_direct_filename_taken)
             end
           end
