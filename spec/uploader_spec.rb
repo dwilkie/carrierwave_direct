@@ -253,7 +253,7 @@ describe CarrierWaveDirect::Uploader do
       end
 
       context "and the model's remote url contains escape characters" do
-        before do 
+        before do
             subject.key = nil
             allow(subject).to receive(:present?).and_return(:true)
             allow(subject).to receive(:url).and_return("http://anyurl.com/any_path/video_dir/filename ()+[]2.avi")
@@ -373,6 +373,13 @@ describe CarrierWaveDirect::Uploader do
           expect(conditions).to have_condition("success_action_redirect" => "http://example.com/some_url")
         end
 
+        it "'success_action_status'" do
+          subject.success_action_status = '200'
+          expect(conditions(
+            :use_action_status => true
+          )).to have_condition('success_action_status' => '200')
+        end
+
         it "does not have 'content-type' when will_include_content_type is false" do
           allow(subject.class).to receive(:will_include_content_type).and_return(false)
           expect(conditions).to_not have_condition('Content-Type')
@@ -400,6 +407,13 @@ describe CarrierWaveDirect::Uploader do
           it "does not have 'success_action_redirect'" do
             subject.success_action_redirect = "http://example.com/some_url"
             expect(conditions).to_not have_condition("success_action_redirect" => "http://example.com/some_url")
+          end
+
+          it 'can be overridden by options' do
+            subject.success_action_redirect = 'http://example.com/some_url'
+            expect(conditions(
+              :use_action_status => false
+            )).to have_condition('success_action_redirect' => 'http://example.com/some_url')
           end
         end
 
@@ -445,6 +459,14 @@ describe CarrierWaveDirect::Uploader do
       expect(Base64.decode64(subject.signature)).to eq OpenSSL::HMAC.digest(
         OpenSSL::Digest.new('sha1'),
         subject.aws_secret_access_key, subject.policy
+      )
+    end
+
+    it 'can accept an options hash for computing the policy' do
+      opts = { :use_action_status => true }
+      expect(Base64.decode64(subject.signature(opts))).to eq OpenSSL::HMAC.digest(
+        OpenSSL::Digest.new('sha1'),
+        subject.aws_secret_access_key, subject.policy(opts)
       )
     end
   end

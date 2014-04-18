@@ -5,7 +5,7 @@ module CarrierWaveDirect
     def file_field(method, options = {})
       options.merge!(:name => "file")
 
-      fields = required_base_fields
+      fields = required_base_fields(options)
 
       fields << content_type_field(options)
 
@@ -27,12 +27,12 @@ module CarrierWaveDirect
 
     private
 
-    def required_base_fields
+    def required_base_fields(options)
       hidden_field(:key,                     :name => "key") <<
       hidden_field(:aws_access_key_id,       :name => "AWSAccessKeyId") <<
       hidden_field(:acl,                     :name => "acl") <<
-      hidden_field(:policy,                  :name => "policy") <<
-      hidden_field(:signature,               :name => "signature")
+      hidden_field(:policy,                  :name => "policy",    :value => @object.policy(options)) <<
+      hidden_field(:signature,               :name => "signature", :value => @object.signature(options))
     end
 
     def content_type_field(options)
@@ -42,7 +42,7 @@ module CarrierWaveDirect
     end
 
     def success_action_field(options)
-      if @object.use_action_status
+      if options.fetch(:use_action_status, @object.use_action_status)
         hidden_field(:success_action_status, :name => "success_action_status")
       else
         hidden_field(:success_action_redirect, :name => "success_action_redirect")

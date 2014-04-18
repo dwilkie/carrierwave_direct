@@ -43,7 +43,7 @@ module CarrierWaveDirect
       conditions << {"bucket" => fog_directory}
       conditions << {"acl" => acl}
 
-      if use_action_status
+      if options.fetch(:use_action_status, use_action_status)
         conditions << {"success_action_status" => success_action_status}
       else
         conditions << {"success_action_redirect" => success_action_redirect}
@@ -59,11 +59,11 @@ module CarrierWaveDirect
       ).gsub("\n","")
     end
 
-    def signature
+    def signature(options = {})
       Base64.encode64(
         OpenSSL::HMAC.digest(
           OpenSSL::Digest.new('sha1'),
-          aws_secret_access_key, policy
+          aws_secret_access_key, policy(options)
         )
       ).gsub("\n","")
     end
@@ -105,7 +105,7 @@ module CarrierWaveDirect
 
     def extension_regexp
       allowed_file_types = extension_white_list
-      extension_regexp = allowed_file_types.present? && allowed_file_types.any? ?  "(#{allowed_file_types.join("|")})" : "\\w+"
+      allowed_file_types.present? && allowed_file_types.any? ?  "(#{allowed_file_types.join("|")})" : "\\w+"
     end
 
     def filename
