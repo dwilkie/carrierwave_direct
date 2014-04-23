@@ -20,6 +20,8 @@ Misc:
 
 ### 0.0.13
 
+[Full Changes](https://github.com/dwilkie/carrierwave_direct/compare/v0.0.12...v0.0.13)
+
 Features:
   * Add option to use success_action_status instead of success_action_redirect (Nick DeLuca @nddeluca)
 
@@ -35,6 +37,8 @@ Misc:
 
 ### 0.0.12
 
+[Full Changes](https://github.com/dwilkie/carrierwave_direct/compare/v0.0.11...v0.0.12)
+
 Features:
   * use uuidtools gem instead of uuid gem for uid generation (Filip Tepper @filiptepper)
 
@@ -45,3 +49,46 @@ Bug Fixes:
 Misc:
  * fix typo in readme (@hartator)
 
+### 0.0.11
+
+[Full Changes](https://github.com/dwilkie/carrierwave_direct/compare/v0.0.10...v0.0.11)
+
+### 0.0.10
+
+[Full Changes](https://github.com/dwilkie/carrierwave_direct/compare/v0.0.9...v0.0.10)
+
+### 0.0.9
+
+[Full Changes](https://github.com/dwilkie/carrierwave_direct/compare/v0.0.8...v0.0.9)
+
+### 0.0.8
+
+[Full Changes](https://github.com/dwilkie/carrierwave_direct/compare/v0.0.7...v0.0.8)
+
+### 0.0.7
+
+[Full Changes](https://github.com/dwilkie/carrierwave_direct/compare/v0.0.6...v0.0.7)
+
+### 0.0.6
+
+[Full Changes](https://github.com/dwilkie/carrierwave_direct/compare/v0.0.5...v0.0.6)
+
+### 0.0.5
+
+[Full Changes](https://github.com/dwilkie/carrierwave_direct/compare/v0.0.4...v0.0.5)
+
+### 0.0.4
+
+[Full Changes](https://github.com/dwilkie/carrierwave_direct/compare/v0.0.3...v0.0.4)
+
+### 0.0.3
+
+[Full Changes](https://github.com/dwilkie/carrierwave_direct/compare/v0.0.2...v0.0.3)
+
+### 0.0.2
+
+[Full Changes](https://github.com/dwilkie/carrierwave_direct/compare/v0.0.1...v0.0.2)
+
+### 0.0.1
+
+[Full Changes](https://github.com/dwilkie/carrierwave_direct/compare/e68498587a4e4209d121512dbb0df529e15e9282...v0.0.1)
