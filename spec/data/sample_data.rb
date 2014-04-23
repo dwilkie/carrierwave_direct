@@ -1,6 +1,7 @@
 SAMPLE_DATA = {
   :path => "upload_dir/bliind.exe",
   :path_with_special_chars => "upload_dir/some file & blah.exe",
+  :path_with_escaped_chars => "upload_dir/some%20file%20&%20blah.exe",
   :key => "some key",
   :guid => "guid",
   :store_dir => "store_dir",
