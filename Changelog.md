@@ -1,6 +1,6 @@
 ### 0.0.14
 
-[Full Changes](https://github.com/dwilkie/carrierwave_direct/compare/v0.0.13...master)
+[Full Changes](https://github.com/dwilkie/carrierwave_direct/compare/v0.0.13...v0.0.14)
 
 Features:
  * Add ability to set content type in upload form (John Kamenik @jkamenik)
