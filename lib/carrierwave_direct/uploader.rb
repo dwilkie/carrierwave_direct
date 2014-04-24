@@ -34,35 +34,17 @@ module CarrierWaveDirect
       options[:min_file_size] ||= min_file_size
       options[:max_file_size] ||= max_file_size
 
-      conditions = [
-        ["starts-with", "$utf8", ""],
-        ["starts-with", "$key", blank_key.sub(/#{Regexp.escape(FILENAME_WILDCARD)}\z/, "")]
-      ]
+      @policy ||= generate_policy(options)
+    end
 
-      conditions << ["starts-with", "$Content-Type", ""] if will_include_content_type
-      conditions << {"bucket" => fog_directory}
-      conditions << {"acl" => acl}
-
-      if use_action_status
-        conditions << {"success_action_status" => success_action_status}
-      else
-        conditions << {"success_action_redirect" => success_action_redirect}
-      end
-
-      conditions << ["content-length-range", options[:min_file_size], options[:max_file_size]]
-
-      Base64.encode64(
-        {
-          'expiration' => Time.now.utc + options[:expiration],
-          'conditions' => conditions
-        }.to_json
-      ).gsub("\n","")
+    def clear_policy!
+      @policy = nil
     end
 
     def signature
       Base64.encode64(
         OpenSSL::HMAC.digest(
-          OpenSSL::Digest::Digest.new('sha1'),
+          OpenSSL::Digest.new('sha1'),
           aws_secret_access_key, policy
         )
       ).gsub("\n","")
@@ -172,6 +154,32 @@ module CarrierWaveDirect
     def full_filename(for_file)
       extname = File.extname(for_file)
       [for_file.chomp(extname), version_name].compact.join('_') << extname
+    end
+
+    def generate_policy(options)
+      conditions = [
+        ["starts-with", "$utf8", ""],
+        ["starts-with", "$key", blank_key.sub(/#{Regexp.escape(FILENAME_WILDCARD)}\z/, "")]
+      ]
+
+      conditions << ["starts-with", "$Content-Type", ""] if will_include_content_type
+      conditions << {"bucket" => fog_directory}
+      conditions << {"acl" => acl}
+
+      if use_action_status
+        conditions << {"success_action_status" => success_action_status}
+      else
+        conditions << {"success_action_redirect" => success_action_redirect}
+      end
+
+      conditions << ["content-length-range", options[:min_file_size], options[:max_file_size]]
+
+      Base64.encode64(
+        {
+          'expiration' => Time.now.utc + options[:expiration],
+          'conditions' => conditions
+        }.to_json
+      ).gsub("\n","")
     end
   end
 end

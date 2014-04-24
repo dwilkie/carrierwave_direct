@@ -203,6 +203,16 @@ describe CarrierWaveDirect::Uploader do
       expect(subject.policy).to_not include("\n")
     end
 
+    it "should be cached" do
+      Timecop.freeze(Time.now) do
+        @policy_now = subject.policy
+      end
+      Timecop.freeze(1.second.from_now) do
+        @policy_later = subject.policy
+      end
+      expect(@policy_later).to eql @policy_now
+    end
+
     context "expiration" do
       def expiration(options = {})
         decoded_policy(options)["expiration"]
@@ -340,6 +350,20 @@ describe CarrierWaveDirect::Uploader do
     end
   end
 
+  describe "clear_policy!" do
+    it "should reset the cached policy string" do
+      Timecop.freeze(Time.now) do
+        @policy_now = subject.policy
+      end
+      subject.clear_policy!
+
+      Timecop.freeze(1.second.from_now) do
+        @policy_after_reset = subject.policy
+      end
+      expect(@policy_after_reset).not_to eql @policy_now
+    end
+  end
+
   describe "#signature" do
     it "should not contain any new lines" do
       expect(subject.signature).to_not include("\n")
@@ -347,7 +371,7 @@ describe CarrierWaveDirect::Uploader do
 
     it "should return a base64 encoded 'sha1' hash of the secret key and policy document" do
       expect(Base64.decode64(subject.signature)).to eq OpenSSL::HMAC.digest(
-        OpenSSL::Digest::Digest.new('sha1'),
+        OpenSSL::Digest.new('sha1'),
         subject.aws_secret_access_key, subject.policy
       )
     end

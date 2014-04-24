@@ -15,8 +15,12 @@ describe CarrierWaveDirect::Test::CapybaraHelpers do
     allow(subject).to receive(:page).and_return(page)
   end
 
-  def find_element_value(css, value)
-    allow(page).to receive(:find).with(css).and_return(selector)
+  def find_element_value(css, value, options = nil)
+    if options
+      allow(page).to receive(:find).with(css, options).and_return(selector)
+    else
+      allow(page).to receive(:find).with(css).and_return(selector)
+    end
     allow(selector).to receive(:value).and_return(value)
   end
 
@@ -40,7 +44,7 @@ describe CarrierWaveDirect::Test::CapybaraHelpers do
 
     def stub_common
       stub_page
-      find_element_value("input[@name='success_action_redirect']", "http://example.com")
+      find_element_value("input[name='success_action_redirect']", "http://example.com", visible: false)
       allow(subject).to receive(:visit)
     end
 
@@ -137,7 +141,7 @@ describe CarrierWaveDirect::Test::CapybaraHelpers do
   describe "#find_key" do
     before do
       stub_page
-      find_element_value("input[@name='key']", "key")
+      find_element_value("input[name='key']", "key", visible: false)
     end
 
     it "should try to find the key on the page" do
@@ -148,7 +152,7 @@ describe CarrierWaveDirect::Test::CapybaraHelpers do
   describe "#find_upload_path" do
     before do
       stub_page
-      find_element_value("input[@name='file']", "upload path")
+      find_element_value("input[name='file']", "upload path", visible: false)
     end
 
     it "should try to find the upload path on the page" do

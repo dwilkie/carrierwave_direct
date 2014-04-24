@@ -11,11 +11,11 @@ module CarrierWaveDirect
       end
 
       def find_key
-        key = page.find("input[@name='key']").value
+        key = page.find("input[name='key']", visible: false).value
       end
 
       def find_upload_path
-        page.find("input[@name='file']").value
+        page.find("input[name='file']", visible: false).value
       end
 
       def upload_directly(uploader, button_locator, options = {})
@@ -26,7 +26,7 @@ module CarrierWaveDirect
           # simulate a successful upload
 
           # form's success action redirect url
-          redirect_url = URI.parse(page.find("input[@name='success_action_redirect']").value)
+          redirect_url = URI.parse(page.find("input[name='success_action_redirect']", visible: false).value)
 
           unless options[:redirect_key]
             sample_key_args = [{:base => find_key, :filename => File.basename(find_upload_path)}]

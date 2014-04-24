@@ -14,15 +14,23 @@ describe CarrierWaveDirect::ActiveRecord do
       create_table :parties, :force => true do |t|
         t.column :video, :string
       end
+
+      create_table :dances, :force => true do |t|
+        t.column :location, :string
+      end
     end
 
     def self.down
       drop_table :parties
+      drop_table :dances
     end
   end
 
   class Party < ActiveRecord::Base
     mount_uploader :video, DirectUploader
+  end
+
+  class Dance < ActiveRecord::Base
   end
 
   ActiveRecord::Base.establish_connection(dbconfig)
@@ -147,6 +155,17 @@ describe CarrierWaveDirect::ActiveRecord do
       it "should be turned on by default" do
         allow(party_class).to receive(:validates_filename_uniqueness_of).with(:video)
         mount_uploader
+      end
+
+      context "mount_on: option is used" do
+        let(:dance) { Dance.new }
+
+        before { Dance.mount_uploader(:non_existing_column, DirectUploader, mount_on: :location)    }
+        before { dance.non_existing_column.key = sample_key}
+
+        it "uses the column it's mounted on for checking uniqueness" do
+          expect { dance.valid? }.to_not raise_error
+        end
       end
 
       context "another Party with a duplicate video filename" do
