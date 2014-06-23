@@ -19,6 +19,9 @@ describe CarrierWaveDirect::ActiveRecord do
       create_table :dances, :force => true do |t|
         t.column :location, :string
       end
+      create_table :resources, :force => true do |t|
+        t.column :file, :string
+      end
     end
 
     def self.down
@@ -32,6 +35,10 @@ describe CarrierWaveDirect::ActiveRecord do
   end
 
   class Dance < ActiveRecord::Base
+  end
+
+  class Resource < ActiveRecord::Base
+    mount_uploader :file, DirectUploader
   end
 
   ActiveRecord::Base.establish_connection(dbconfig)
@@ -581,5 +588,29 @@ describe CarrierWaveDirect::ActiveRecord do
         end
       end
     end
+  end
+
+  describe "class Resource < ActiveRecord::Base; mount_uploader :file, DirectUploader; end" do
+    include UploaderHelpers
+    include ModelHelpers
+
+    let(:resource_class) do
+      Class.new(Resource)
+    end
+
+    let(:subject) do
+      resource = resource_class.new
+    end
+
+    def mount_uploader
+      resource_class.mount_uploader :file, DirectUploader
+    end
+
+    #See resource table migration
+    it "should be valid still when a file column exists in table" do
+      expect(subject).to be_valid
+    end
+
+
   end
 end
