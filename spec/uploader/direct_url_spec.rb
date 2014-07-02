@@ -50,7 +50,16 @@ describe CarrierWaveDirect::Uploader::DirectUrl do
       end
     end
   end
+
+  describe "#asset_host" do
+    it "should return nil" do
+      subject.class.configure do |config|
+        config.asset_host = "http://foo.bar"
+      end
+
+      expect(subject.asset_host).to be_nil
+    end
+  end
+
 end
-
-
 

@@ -13,6 +13,11 @@ module CarrierWaveDirect
         fog_uri
       end
 
+      def asset_host
+        # overridden to prevent file uploads to the configured
+        # asset host (if any).
+      end
+
     end
   end
 end
