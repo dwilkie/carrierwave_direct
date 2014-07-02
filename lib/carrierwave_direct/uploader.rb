@@ -26,7 +26,7 @@ module CarrierWaveDirect
     include CarrierWaveDirect::Uploader::DirectUrl
 
     def acl
-      fog_public ? 'public-read' : 'private'
+      'private'
     end
 
     def policy(options = {})

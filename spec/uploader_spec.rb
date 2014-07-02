@@ -293,7 +293,7 @@ describe CarrierWaveDirect::Uploader do
 
   describe "#acl" do
     it "should return the correct s3 access policy" do
-      expect(subject.acl).to eq (subject.fog_public ? 'public-read' : 'private')
+      expect(subject.acl).to eql('private')
     end
   end
 
