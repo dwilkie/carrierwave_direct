@@ -5,6 +5,7 @@ SAMPLE_DATA = {
   :key => "some key",
   :guid => "guid",
   :store_dir => "store_dir",
+  :cache_dir => "cache_dir",
   :extension_regexp => "(avi)",
   :url => "http://example.com/some_url",
   :expiration => 60,
