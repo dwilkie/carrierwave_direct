@@ -8,6 +8,14 @@ require File.dirname(__FILE__) << '/support/view_helpers' # Catch dependency ord
 
 Dir[ File.dirname(__FILE__) << "/support/**/*.rb"].each {|file| require file }
 
-RSpec.configure do |c|
-  c.treat_symbols_as_metadata_keys_with_true_values = true
+RSpec.configure do |config|
+  config.expect_with :rspec do |c|
+    c.syntax = [:expect, :should]
+  end
+end
+
+RSpec.configure do |config|
+  config.mock_with :rspec do |mocks|
+    mocks.syntax = [:expect, :should]
+  end
 end
