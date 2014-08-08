@@ -545,7 +545,7 @@ describe CarrierWaveDirect::ActiveRecord do
 
       context "does not have an upload" do
         it "should be true" do
-          subject.filename_valid?.should be_true
+          subject.filename_valid?.should be true
         end
 
         it_should_behave_like "having empty errors"
@@ -558,7 +558,7 @@ describe CarrierWaveDirect::ActiveRecord do
           end
 
           it "should be true" do
-            subject.filename_valid?.should be_true
+            subject.filename_valid?.should be true
           end
 
           it_should_behave_like "having empty errors"
@@ -568,7 +568,7 @@ describe CarrierWaveDirect::ActiveRecord do
           before { subject.key = sample_key(:model_class => subject.class, :valid => false) }
 
           it "should be false" do
-            subject.filename_valid?.should be_false
+            subject.filename_valid?.should be false
           end
 
           context "after the call, #errors" do
