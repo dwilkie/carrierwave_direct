@@ -7,7 +7,7 @@ module CarrierWaveDirect
         if options[:with_path]
           uri = URI.parse(fog_uri.chomp('/'))
           path = "/#{URI.decode(key)}"
-          uri.path += URI.escape(path)
+          uri.path += URI.escape(path, '?:[]')
           fog_uri = uri.to_s
         end
         fog_uri
