@@ -172,6 +172,9 @@ Note if `User` is not an ActiveRecord object e.g.
 
 ```ruby
 class User
+  extend CarrierWave::Mount
+  extend CarrierWaveDirect::Mount
+
   mount_uploader :avatar, AvatarUploader
 end
 ```

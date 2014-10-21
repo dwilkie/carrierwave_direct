@@ -111,6 +111,7 @@ describe CarrierWaveDirect::Uploader do
     context "where #store_dir returns '#{sample(:store_dir)}'" do
       before do
         allow(subject).to receive(:store_dir).and_return(sample(:store_dir))
+        allow(subject).to receive(:cache_dir).and_return(sample(:cache_dir))
       end
 
       context "and #extension_regexp returns '#{sample(:extension_regexp)}'" do
@@ -118,8 +119,8 @@ describe CarrierWaveDirect::Uploader do
           allow(subject).to receive(:extension_regexp).and_return(sample(:extension_regexp))
         end
 
-        it "should return /\\A#{sample(:store_dir)}\\/#{GUID_REGEXP}\\/.+\\.#{sample(:extension_regexp)}\\z/" do
-          expect(subject.key_regexp).to eq /\A#{sample(:store_dir)}\/#{GUID_REGEXP}\/.+\.(?i)#{sample(:extension_regexp)}(?-i)\z/
+        it "should return /\\A(#{sample(:store_dir)}|#{sample(:cache_dir)})\\/#{GUID_REGEXP}\\/.+\\.#{sample(:extension_regexp)}\\z/" do
+          expect(subject.key_regexp).to eq /\A(#{sample(:store_dir)}|#{sample(:cache_dir)})\/#{GUID_REGEXP}\/.+\.(?i)#{sample(:extension_regexp)}(?-i)\z/
         end
       end
     end
@@ -253,7 +254,7 @@ describe CarrierWaveDirect::Uploader do
       end
 
       context "and the model's remote url contains escape characters" do
-        before do 
+        before do
           subject.key = nil
           allow(subject).to receive(:present?).and_return(:true)
           allow(subject).to receive(:url).and_return("http://anyurl.com/any_path/video_dir/filename ()+[]2.avi")

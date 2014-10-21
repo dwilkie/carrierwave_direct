@@ -154,7 +154,7 @@ describe CarrierWaveDirect::ActiveRecord do
 
     describe ".validates_filename_uniqueness_of" do
       it "should be turned on by default" do
-        party_class.should_receive(:validates_filename_uniqueness_of).with(:video)
+        party_class.should_receive(:validates_filename_uniqueness_of).with(:video, on: :create)
         mount_uploader
       end
 
@@ -205,7 +205,7 @@ describe CarrierWaveDirect::ActiveRecord do
 
     describe ".validates_filename_format_of" do
       it "should be turned on by default" do
-        party_class.should_receive(:validates_filename_format_of).with(:video)
+        party_class.should_receive(:validates_filename_format_of).with(:video, on: :create)
         mount_uploader
       end
 
@@ -282,7 +282,7 @@ describe CarrierWaveDirect::ActiveRecord do
 
     describe ".validates_remote_net_url_format_of" do
       it "should be turned on by default" do
-        party_class.should_receive(:validates_remote_net_url_format_of).with(:video)
+        party_class.should_receive(:validates_remote_net_url_format_of).with(:video, on: :create)
         mount_uploader
       end
 
@@ -545,7 +545,7 @@ describe CarrierWaveDirect::ActiveRecord do
 
       context "does not have an upload" do
         it "should be true" do
-          subject.filename_valid?.should be_true
+          subject.filename_valid?.should be true
         end
 
         it_should_behave_like "having empty errors"
@@ -558,7 +558,7 @@ describe CarrierWaveDirect::ActiveRecord do
           end
 
           it "should be true" do
-            subject.filename_valid?.should be_true
+            subject.filename_valid?.should be true
           end
 
           it_should_behave_like "having empty errors"
@@ -568,7 +568,7 @@ describe CarrierWaveDirect::ActiveRecord do
           before { subject.key = sample_key(:model_class => subject.class, :valid => false) }
 
           it "should be false" do
-            subject.filename_valid?.should be_false
+            subject.filename_valid?.should be false
           end
 
           context "after the call, #errors" do

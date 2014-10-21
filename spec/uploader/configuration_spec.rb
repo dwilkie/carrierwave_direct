@@ -12,19 +12,19 @@ describe CarrierWaveDirect::Uploader::Configuration do
 
   describe "default configuration" do
     it "returns false for validate_is_attached" do
-      expect(subject.validate_is_attached).to be_false
+      expect(subject.validate_is_attached).to be false
     end
 
     it "returns false for validate_is_uploaded" do
-      expect(subject.validate_is_uploaded).to be_false
+      expect(subject.validate_is_uploaded).to be false
     end
 
     it "return true for validate_unique_filename" do
-      expect(subject.validate_unique_filename).to be_true
+      expect(subject.validate_unique_filename).to be true
     end
 
     it "returns true for validate_remote_net_url_format" do
-      expect(subject.validate_remote_net_url_format).to be_true
+      expect(subject.validate_remote_net_url_format).to be true
     end
 
     it "has upload_expiration of 10 hours" do
@@ -40,7 +40,7 @@ describe CarrierWaveDirect::Uploader::Configuration do
     end
 
     it "returns false for use_action_status" do
-      expect(subject.use_action_status).to be_false
+      expect(subject.use_action_status).to be false
     end
   end
 end
