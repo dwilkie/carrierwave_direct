@@ -14,8 +14,9 @@ module CarrierWaveDirect
       end
 
       def asset_host
-        # overridden to prevent file uploads to the configured
-        # asset host (if any).
+        return super if file.respond_to?(:path) && !file.path.blank?
+        return super if respond_to?(:has_key?) && has_key?
+        nil
       end
 
     end
