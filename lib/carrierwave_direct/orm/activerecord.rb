@@ -39,6 +39,11 @@ module CarrierWaveDirect
       mod = Module.new
       include mod
       mod.class_eval <<-RUBY, __FILE__, __LINE__+1
+        def key=(k)
+          send(:#{column}_will_change!) if k != key
+          super
+        end
+
         def filename_valid?
           if has_#{column}_upload?
             self.skip_is_attached_validations = true

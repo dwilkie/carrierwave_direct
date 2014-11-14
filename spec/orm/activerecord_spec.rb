@@ -581,5 +581,19 @@ describe CarrierWaveDirect::ActiveRecord do
         end
       end
     end
+
+    describe "#save" do
+      it "should mark party as changed when saving a new party" do
+        expect(subject.video_changed?).to be false
+        subject.key = sample_key(:model_class => subject.class)
+        expect(subject.video_changed?).to be true
+        subject.save
+        subject.reload
+        expect(subject.video_changed?).to be false
+        subject.key = sample_key(:model_class => subject.class)
+        expect(subject.video_changed?).to be true
+        expect(subject.changed_for_autosave?).to be true
+      end
+    end
   end
 end
