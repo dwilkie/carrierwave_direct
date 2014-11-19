@@ -582,6 +582,8 @@ describe CarrierWaveDirect::ActiveRecord do
       end
     end
 
+    it_should_delegate(:video_key, :to => "video#key", :accessible => { "has_video_upload?" => false })
+
     describe "#save" do
       it "should mark party as changed when saving a new party" do
         expect(subject.video_changed?).to be false

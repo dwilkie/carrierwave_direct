@@ -39,8 +39,13 @@ module CarrierWaveDirect
       mod = Module.new
       include mod
       mod.class_eval <<-RUBY, __FILE__, __LINE__+1
+        def key
+          super
+        end
+
         def key=(k)
-          send(:#{column}_will_change!) if k != key
+          column = _mounter(:#{column}).serialization_column
+          send(:"\#{column}_will_change!") if k != key
           super
         end
 
@@ -59,6 +64,9 @@ module CarrierWaveDirect
             true
           end
         end
+
+        alias_method :#{column}_key, :key
+        alias_method :#{column}_key=, :key=
       RUBY
     end
   end
