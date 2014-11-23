@@ -23,11 +23,11 @@ module CarrierWaveDirect
       include mod
       mod.class_eval <<-RUBY, __FILE__, __LINE__+1
 
-        def key
+        def #{column}_key
           send(:#{column}).key
         end
 
-        def key=(k)
+        def #{column}_key=(k)
           send(:#{column}).key = k
         end
 

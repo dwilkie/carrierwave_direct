@@ -156,7 +156,7 @@ end
 After uploading to S3, You'll need to update the uploader object with the returned key in the controller action that corresponds to `new_user_url`:
 
 ```ruby
-@uploader.update_attribute :key, params[:key]
+@uploader.update_attribute :avatar_key, params[:key]
 ```
 
 You can also pass html options like this:
