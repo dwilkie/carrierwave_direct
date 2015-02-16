@@ -340,7 +340,7 @@ class AvatarProcessor
 end
 ```
 
-The method `self.remote_avatar_url=` from [CarrierWave](https://github.com/jnicklas/carrierwave) downloads the avatar from S3 and processes it. `save` then re-uploads the processed avatar to to S3
+The method `self.remote_avatar_url=` from [CarrierWave](https://github.com/jnicklas/carrierwave) downloads the avatar from S3 and processes it. `save` then re-uploads the processed avatar to S3
 
 ## Uploading from a remote location
 
