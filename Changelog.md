@@ -3,8 +3,8 @@
 [Full Changes](https://github.com/dwilkie/carrierwave_direct/compare/v0.0.14...v0.0.15)
 
 Features:
-  * Allow format validators to be used on update (@greysteil)
-  * Add cache_dir to allowed paths (@greysteil)
+  * Allow format validators to be used on update (Grey Baker @greysteil)
+  * Add cache_dir to allowed paths (Grey Baker @greysteil)
 
 Bug Fixes:
   * Use Carrierwave to generate URL's (Petrik de Heus @p8)
