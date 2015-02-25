@@ -1,3 +1,21 @@
+### 0.0.15
+
+[Full Changes](https://github.com/dwilkie/carrierwave_direct/compare/v0.0.14...v0.0.15)
+
+Features:
+  * Allow format validators to be used on update (@greysteil)
+  * Add cache_dir to allowed paths (@greysteil)
+
+Bug Fixes:
+  * Use Carrierwave to generate URL's (Petrik de Heus @p8)
+
+Misc:
+  * README update (Samuel Reh @samuelreh)
+  * Fix typo in README (Brandon Conway @brandoncc)
+  * Fix specs for rspec 3 (Hanachin @hanachin)
+  * Fix typo in nl.yml (Petrik de Heus @p8)
+  * Add multiple rails versions support to travis (Petrik de Heus @p8)
+
 ### 0.0.14
 
 [Full Changes](https://github.com/dwilkie/carrierwave_direct/compare/v0.0.13...v0.0.14)
