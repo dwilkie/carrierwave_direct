@@ -44,7 +44,7 @@ describe CarrierWaveDirect::Test::CapybaraHelpers do
 
     def stub_common
       stub_page
-      find_element_value("input[name='success_action_redirect']", "http://example.com", visible: false)
+      find_element_value("input[name='success_action_redirect']", "http://example.com?custom_param=value", visible: false)
       allow(subject).to receive(:visit)
     end
 
@@ -79,8 +79,8 @@ describe CarrierWaveDirect::Test::CapybaraHelpers do
 
       it_should_behave_like "submitting the form"
 
-      it "should redirect to the page's success_action_redirect url" do
-        expect(subject).to receive(:visit).with(/^http:\/\/example.com/)
+      it "should redirect to the page's success_action_redirect url and preserve custom parameters" do
+        expect(subject).to receive(:visit).with(/^http:\/\/example.com\?.*custom_param=value/)
         upload_directly
       end
 
@@ -160,4 +160,3 @@ describe CarrierWaveDirect::Test::CapybaraHelpers do
     end
   end
 end
-
