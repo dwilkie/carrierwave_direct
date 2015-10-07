@@ -1,5 +1,6 @@
 # encoding: utf-8
 
+require "securerandom"
 require "carrierwave_direct/uploader/content_type"
 require "carrierwave_direct/uploader/direct_url"
 
@@ -74,7 +75,7 @@ module CarrierWaveDirect
     end
 
     def guid
-      UUIDTools::UUID.random_create
+      SecureRandom.uuid
     end
 
     def has_key?

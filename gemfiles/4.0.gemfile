@@ -1,7 +1,6 @@
 source "https://rubygems.org"
 
 gem "carrierwave"
-gem "uuidtools"
 gem "fog"
 
 group :test do
