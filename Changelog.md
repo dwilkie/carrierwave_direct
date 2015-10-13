@@ -1,3 +1,8 @@
+### Unreleased changes
+
+Bug Fixes:
+  * Allow uploader columns to be named `file` (Diego Plentz @plentz and Moisés Viloria @mois3x) 
+
 ### 0.0.15
 
 [Full Changes](https://github.com/dwilkie/carrierwave_direct/compare/v0.0.14...v0.0.15)
