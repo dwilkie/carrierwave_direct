@@ -554,8 +554,6 @@ en:
 
 ## Caveats
 
-Don't name your string column `file`. It will result in a stack level too deep exception. See [this issue](https://github.com/dwilkie/carrierwave_direct/issues/10) for more info.
-
 If you're Rails app was newly generated *after* version 3.2.3 and your testing this in development you may run into an issue where an `ActiveModel::MassAssignmentSecurity::Error` is raised when being redirected from S3. You can fix this by setting `config.active_record.mass_assignment_sanitizer = :logger` in your `config/environments/development.rb` file.
 
 ## Contributing to CarrierWaveDirect
@@ -598,3 +596,4 @@ Thank you to everybody who has contributed to [CarrierWaveDirect](https://github
 * [colinyoung (Colin Young)](https://github.com/colinyoung) - Content-Type support
 * [jkamenik (John Kamenik)](https://github.com/jkamenik) - Content-Type support
 * [filiptepper (Filip Tepper)](https://github.com/filiptepper) - Autoload UUID on heroku
+* [mois3x (Moisés Viloria)](https://github.com/mois3x) and [plentz (Diego Plentz)](https://github.com/plentz) - Allow uploader columns to be named `file`
