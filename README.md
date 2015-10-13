@@ -429,6 +429,29 @@ CarrierWave.configure do |config|
 end
 ```
 
+## Bucket CORS configuration and usage with CloudFront
+
+If you are using a javascript uploader (e.g. Dropzone, jQuery Upload, Uploadify, etc.) you will need to add CORS configuration to your bucket, otherwise default bucket configuration will deny CORS requests. To do that open your bucket in Amazon console, click on its properties and add a CORS configuration similar to this
+
+```xml
+<CORSConfiguration>
+    <CORSRule>
+        <!--  Optionally change this with your domain, it should not be an issue since your bucket accepts only signed writes -->
+        <AllowedOrigin>*</AllowedOrigin>
+        <AllowedMethod>GET</AllowedMethod>
+        <AllowedMethod>POST</AllowedMethod>
+        <MaxAgeSeconds>3000</MaxAgeSeconds>
+        <AllowedHeader>Authorization</AllowedHeader>
+        <AllowedHeader>Content-Type</AllowedHeader>
+        <AllowedHeader>Origin</AllowedHeader>
+    </CORSRule>
+</CORSConfiguration>
+```
+
+When you use this gem in conjunction with CloudFront you'll need an additional step otherwise it won't work as expected. This is strictly necessary if you configured CarrierWave `asset_host` to use a CloudFront in front of your bucket because your forms will be posted to that url.
+
+To solve this issue you must enable POST requests in your CloudFront distribution settings. Here is a [step by step walkthrough](http://blog.celingest.com/en/2014/10/02/tutorial-using-cors-with-cloudfront-and-s3/) that explain this setup. It also explain CORS configuration.
+
 ## Testing with CarrierWaveDirect
 
 CarrierWaveDirect provides a couple of helpers to help with integration and unit testing. You don't want to contact the Internet during your tests as this is slow, expensive and unreliable. You should first put fog into mock mode by doing something like this.
