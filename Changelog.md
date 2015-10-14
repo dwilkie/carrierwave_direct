@@ -1,7 +1,8 @@
 ### Unreleased changes
 
 Bug Fixes:
-  * Allow uploader columns to be named `file` (Diego Plentz @plentz and Moisés Viloria @mois3x) 
+  * Allow uploader columns to be named `file` (Diego Plentz @plentz and Moisés Viloria @mois3x)
+  * `["starts-with", "$utf8", ""]` is not needed as condition (Rocco Galluzzo @byterussian)
 
 ### 0.0.15
 

@@ -353,10 +353,6 @@ describe CarrierWaveDirect::Uploader do
       end
 
       context "should include" do
-        # Rails form builder conditions
-        it "'utf8'" do
-          expect(conditions).to have_condition(:utf8)
-        end
 
         # S3 conditions
         it "'key'" do
