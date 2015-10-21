@@ -316,14 +316,15 @@ describe CarrierWaveDirect::Uploader do
         decoded_policy(options)["expiration"]
       end
 
+      # JSON times have no seconds, so accept upto one second inaccuracy
       def have_expiration(expires_in = DirectUploader.upload_expiration)
-        eql(
-          Time.parse(
-            JSON.parse({
-              "expiry" => Time.now + expires_in
-            }.to_json)["expiry"]
-          )
-        )
+        be_within(1.second).of (Time.now + expires_in)
+      end
+
+      it "should be valid ISO8601 and not use default Time#to_json" do
+        Time.any_instance.stub(:to_json) { '"Invalid time"' } # JSON gem
+        Time.any_instance.stub(:as_json) { '"Invalid time"' } # Active Support
+        expect { Time.iso8601(expiration) }.to_not raise_error
       end
 
       it "should be #{DirectUploader.upload_expiration / 3600} hours from now" do
