@@ -24,10 +24,18 @@ module CarrierWaveDirect
       mod.class_eval <<-RUBY, __FILE__, __LINE__+1
 
         def key
-          send(:#{column}).key
+          warn "key method is deprecated, please use column_key method instead."
         end
 
         def key=(k)
+          warn "key= method is deprecated, please use column_key= method instead."
+        end
+
+        def #{column}_key
+          send(:#{column}).key
+        end
+
+        def #{column}_key=(k)
           send(:#{column}).key = k
         end
 
