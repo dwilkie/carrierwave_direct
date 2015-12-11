@@ -24,7 +24,12 @@ module CarrierWaveDirect
 
     include CarrierWaveDirect::Uploader::ContentType
     include CarrierWaveDirect::Uploader::DirectUrl
-
+    
+    #ensure that region returns something. Since sig v4 it is required in the signing key & credentials
+    def region
+      defined?(super) ? super : "us-east-1"
+    end
+    
     def acl
       fog_public ? 'public-read' : 'private'
     end
