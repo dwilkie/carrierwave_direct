@@ -33,21 +33,36 @@ module CarrierWaveDirect
       options[:expiration] ||= upload_expiration
       options[:min_file_size] ||= min_file_size
       options[:max_file_size] ||= max_file_size
-
+      @date ||= Time.now.utc.strftime("%Y%m%d")
+      @timestamp ||= Time.now.utc.strftime("%Y%m%dT%H%M%SZ")
       @policy ||= generate_policy(options)
     end
 
+    def date
+      @timestamp ||= Time.now.utc.strftime("%Y%m%dT%H%M%SZ")
+    end
+    
+    def algorithm
+      'AWS4-HMAC-SHA256'
+    end
+    
+    def credential
+      @date ||= Time.now.utc.strftime("%Y%m%d")
+      "#{aws_access_key_id}/#{@date}/#{region}/s3/aws4_request"
+    end
+    
     def clear_policy!
       @policy = nil
+      @date = nil
+      @timestamp = nil
     end
 
     def signature
-      Base64.encode64(
-        OpenSSL::HMAC.digest(
-          OpenSSL::Digest.new('sha1'),
-          aws_secret_access_key, policy
-        )
-      ).gsub("\n","")
+      OpenSSL::HMAC.hexdigest(
+        'sha256', 
+        signing_key, 
+        policy
+      )
     end
 
     def url_scheme_white_list
@@ -132,9 +147,13 @@ module CarrierWaveDirect
       [for_file.chomp(extname), version_name].compact.join('_') << extname
     end
 
-    def generate_policy(options)
+    def generate_policy(options)      
       conditions = [
-        ["starts-with", "$key", key.sub(/#{Regexp.escape(FILENAME_WILDCARD)}\z/, "")]
+        ["starts-with", "$utf8", ""],
+        ["starts-with", "$key", key.sub(/#{Regexp.escape(FILENAME_WILDCARD)}\z/, "")],
+        {'X-Amz-Algorithm' => algorithm},
+        {'X-Amz-Credential' => credential},
+        {'X-Amz-Date' => date}
       ]
 
       conditions << ["starts-with", "$Content-Type", ""] if will_include_content_type
@@ -155,6 +174,17 @@ module CarrierWaveDirect
           'conditions' => conditions
         }.to_json
       ).gsub("\n","")
+    end
+    
+    def signing_key(options = {})
+      @date ||= Time.now.utc.strftime("%Y%m%d")
+      #AWS Signature Version 4
+      kDate    = OpenSSL::HMAC.digest('sha256', "AWS4" + aws_secret_access_key, @date)
+      kRegion  = OpenSSL::HMAC.digest('sha256', kDate, region)
+      kService = OpenSSL::HMAC.digest('sha256', kRegion, 's3')
+      kSigning = OpenSSL::HMAC.digest('sha256', kService, "aws4_request")
+
+      kSigning
     end
   end
 end
