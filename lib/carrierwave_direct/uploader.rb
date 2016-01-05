@@ -29,12 +29,12 @@ module CarrierWaveDirect
       fog_public ? 'public-read' : 'private'
     end
 
-    def policy(options = {})
+    def policy(options = {}, &block)
       options[:expiration] ||= upload_expiration
       options[:min_file_size] ||= min_file_size
       options[:max_file_size] ||= max_file_size
 
-      @policy ||= generate_policy(options)
+      @policy ||= generate_policy(options, &block)
     end
 
     def clear_policy!
@@ -148,6 +148,8 @@ module CarrierWaveDirect
       end
 
       conditions << ["content-length-range", options[:min_file_size], options[:max_file_size]]
+
+      yield conditions if block_given?
 
       Base64.encode64(
         {

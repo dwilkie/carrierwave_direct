@@ -288,9 +288,28 @@ describe CarrierWaveDirect::Uploader do
 
   # http://aws.amazon.com/articles/1434?_encoding=UTF8
   describe "#policy" do
-    def decoded_policy(options = {})
+
+
+    def decoded_policy(options = {}, &block)
       instance = options.delete(:subject) || subject
-      JSON.parse(Base64.decode64(instance.policy(options)))
+      JSON.parse(Base64.decode64(instance.policy(options, &block)))
+    end
+
+    context "policy is given a block" do
+      it "should yield the options to the block" do
+        number = 0
+        subject.policy do |conditions|
+          number+=1
+        end
+        expect(number).to eq 1
+      end
+      it "should include new options in the conditions" do
+        policy = subject.policy do |conditions|
+          conditions << {"x-aws-storage-class" => "STANDARD"}
+        end
+        decoded = JSON.parse(Base64.decode64(policy))
+        expect(decoded['conditions'].last['x-aws-storage-class']).to eq "STANDARD"
+      end
     end
 
     it "should return Base64-encoded JSON" do
