@@ -133,9 +133,10 @@ module CarrierWaveDirect
     end
 
     def generate_policy(options)
-      conditions = [
-        ["starts-with", "$key", key.sub(/#{Regexp.escape(FILENAME_WILDCARD)}\z/, "")]
-      ]
+      conditions = []
+
+      conditions << ["starts-with", "$utf8", ""] if options[:enforce_utf8]
+      conditions << ["starts-with", "$key", key.sub(/#{Regexp.escape(FILENAME_WILDCARD)}\z/, "")]
 
       conditions << ["starts-with", "$Content-Type", ""] if will_include_content_type
       conditions << {"bucket" => fog_directory}

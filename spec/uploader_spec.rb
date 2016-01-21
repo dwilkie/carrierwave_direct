@@ -354,6 +354,13 @@ describe CarrierWaveDirect::Uploader do
       end
 
       context "should include" do
+        it "'utf8' if enforce_ut8 is set" do
+          expect(conditions(enforce_utf8: true)).to have_condition(:utf8)
+        end
+
+        it "'utf8' if enforce_ut8 is set" do
+          expect(conditions).to_not have_condition(:utf8)
+        end
 
         # S3 conditions
         it "'key'" do

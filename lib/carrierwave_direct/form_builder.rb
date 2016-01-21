@@ -3,6 +3,8 @@
 module CarrierWaveDirect
   class FormBuilder < ActionView::Helpers::FormBuilder
     def file_field(method, options = {})
+      @object.policy(enforce_utf8: true)
+
       options.merge!(:name => "file")
 
       fields = required_base_fields
