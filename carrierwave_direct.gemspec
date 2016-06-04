@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency "carrierwave"
   s.add_dependency "uuidtools"
-  s.add_dependency "fog"
+  s.add_dependency "fog-aws"
 
   s.add_development_dependency "rspec"
   s.add_development_dependency "timecop"
