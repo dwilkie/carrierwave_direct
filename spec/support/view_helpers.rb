@@ -10,7 +10,7 @@ module ViewHelpers
   end
 
   def have_parent_selector(options = {})
-    have_selector(:xpath, parent_selector_xpath, options)
+    have_selector(:xpath, parent_selector_xpath, options.merge(visible: false))
   end
 
   def parent_selector_xpath
