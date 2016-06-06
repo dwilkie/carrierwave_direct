@@ -7,7 +7,7 @@ describe CarrierWaveDirect::Uploader do
   include ModelHelpers
 
   let(:subject) { DirectUploader.new }
-  let(:mounted_model) { double(sample(:mounted_model_name)) }
+  let(:mounted_model) { double(sample(:mounted_model_name), video_identifier: sample(:stored_filename)) }
   let(:mounted_subject) { DirectUploader.new(mounted_model, sample(:mounted_as)) }
   let(:direct_subject) { DirectUploader.new }
 
@@ -73,6 +73,7 @@ describe CarrierWaveDirect::Uploader do
 
       context "but the uploaders url is '#{sample(:s3_file_url)}'" do
         before do
+          allow(mounted_subject).to receive(:store_dir).and_return(sample(:store_dir))
           allow(mounted_subject).to receive(:url).and_return(sample(:s3_file_url))
           allow(mounted_subject).to receive(:present?).and_return(true)
         end
@@ -251,19 +252,6 @@ describe CarrierWaveDirect::Uploader do
           mounted_subject.filename
           expect(mounted_subject.key).to match /filename___\+__2.avi$/
         end
-      end
-
-      context "and the model's remote url contains already escaped characters" do
-        before do
-          subject.key = nil
-          allow(subject).to receive(:present?).and_return(:true)
-          allow(subject).to receive(:url).and_return("http://anyurl.com/any_path/video_dir/filename%20%28%29%2B%5B%5D2.avi")
-        end
-
-        it "should not double escape already escaped characters" do
-          expect(subject.key).to match /filename \(\)\+\[\]2.avi/
-        end
-
       end
 
       context "and the model's remote #{sample(:mounted_as)} url is blank" do

@@ -62,7 +62,8 @@ module CarrierWaveDirect
     def key
       return @key if @key.present?
       if present?
-        self.key = decoded_key # explicitly set key
+        identifier = model.send("#{mounted_as}_identifier")
+        self.key = "#{store_dir}/#{identifier}"
       else
         @key = "#{store_dir}/#{guid}/#{FILENAME_WILDCARD}"
       end
