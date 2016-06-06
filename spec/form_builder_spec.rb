@@ -12,11 +12,13 @@ end
 shared_examples_for 'hidden values form' do
   hidden_fields = [
                     :key,
-                    {:aws_access_key_id => "AWSAccessKeyId"},
+                    {:credential => "X-Amz-Credential"},
+                    {:algorithm => "X-Amz-Algorithm"},
+                    {:date => "X-Amz-Date"},
+                    {:signature => "X-Amz-Signature"},
                     :acl,
                     :success_action_redirect,
-                    :policy,
-                    :signature
+                    :policy
                   ]
 
   hidden_fields.each do |input|
@@ -60,19 +62,23 @@ describe CarrierWaveDirect::FormBuilder do
 
     default_hidden_fields = [
                       :key,
-                      {:aws_access_key_id => "AWSAccessKeyId"},
+                      {:credential => "X-Amz-Credential"},
+                      {:algorithm => "X-Amz-Algorithm"},
+                      {:date => "X-Amz-Date"},
+                      {:signature => "X-Amz-Signature"},
                       :acl,
                       :success_action_redirect,
                       :policy,
-                      :signature
                     ]
     status_hidden_fields = [
                       :key,
-                      {:aws_access_key_id => "AWSAccessKeyId"},
+                      {:credential => "X-Amz-Credential"},
+                      {:algorithm => "X-Amz-Algorithm"},
+                      {:date => "X-Amz-Date"},
+                      {:signature => "X-Amz-Signature"},
                       :acl,
                       :success_action_status,
                       :policy,
-                      :signature
                     ]
 
     # http://aws.amazon.com/articles/1434?_encoding=UTF8
