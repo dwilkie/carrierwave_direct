@@ -287,6 +287,7 @@ describe CarrierWaveDirect::Uploader do
   end
 
   # http://aws.amazon.com/articles/1434?_encoding=UTF8
+  #http://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-UsingHTTPPOST.html
   describe "#policy" do
     def decoded_policy(options = {})
       instance = options.delete(:subject) || subject
@@ -471,11 +472,22 @@ describe CarrierWaveDirect::Uploader do
       expect(subject.signature).to_not include("\n")
     end
 
-    it "should return a base64 encoded 'sha1' hash of the secret key and policy document" do
-      expect(Base64.decode64(subject.signature)).to eq OpenSSL::HMAC.digest(
-        OpenSSL::Digest.new('sha1'),
-        subject.aws_secret_access_key, subject.policy
+    it "should return a HMAC hexdigest encoded 'sha256' hash of the secret key and policy document" do
+      expect(subject.signature).to eq OpenSSL::HMAC.hexdigest(
+        OpenSSL::Digest.new('sha256'),
+        subject.send(:signing_key), subject.policy
       )
+    end
+  end
+  #http://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-UsingHTTPPOST.html
+  describe "#signature_key" do
+    it "should include correct signature_key elements" do
+      kDate    = OpenSSL::HMAC.digest('sha256', "AWS4" + subject.aws_secret_access_key, Time.now.utc.strftime("%Y%m%d"))
+      kRegion  = OpenSSL::HMAC.digest('sha256', kDate, subject.region)
+      kService = OpenSSL::HMAC.digest('sha256', kRegion, 's3')
+      kSigning = OpenSSL::HMAC.digest('sha256', kService, "aws4_request")
+
+      expect(subject.send(:signing_key)).to eq (kSigning)
     end
   end
 
