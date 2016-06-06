@@ -4,6 +4,10 @@ Bug Fixes:
   * Allow uploader columns to be named `file` (Diego Plentz @plentz and Moisés Viloria @mois3x)
   * `["starts-with", "$utf8", ""]` is not needed as condition (Rocco Galluzzo @byterussian)
 
+Misc:
+  * Dropped support for ruby 1.9, it has [reached its end of life](https://www.ruby-lang.org/en/news/2014/01/10/ruby-1-9-3-will-end-on-2015/) 
+  * Add 2.2.0 support to travis. 
+
 ### 0.0.15
 
 [Full Changes](https://github.com/dwilkie/carrierwave_direct/compare/v0.0.14...v0.0.15)

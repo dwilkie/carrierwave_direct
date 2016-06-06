@@ -10,12 +10,11 @@ Gem::Specification.new do |s|
   s.homepage    = "https://github.com/dwilkie/carrierwave_direct"
   s.summary     = %q{Upload direct to S3 using CarrierWave}
   s.description = %q{Process your uploads in the background by uploading directly to S3}
-  s.required_ruby_version = ">= 1.9.0"
+  s.required_ruby_version = ">= 2.0.0"
 
   s.rubyforge_project = "carrierwave_direct"
 
   s.add_dependency "carrierwave"
-  s.add_dependency "uuidtools"
   s.add_dependency "fog"
 
   s.add_development_dependency "rspec"
