@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 require "carrierwave"
-require "fog"
+require "fog/aws"
 
 module CarrierWaveDirect
 
