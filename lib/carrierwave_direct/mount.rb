@@ -25,10 +25,12 @@ module CarrierWaveDirect
 
         def key
           warn "key method is deprecated, please use column_key method instead."
+          send(:#{column}).key
         end
 
         def key=(k)
           warn "key= method is deprecated, please use column_key= method instead."
+          send(:#{column}).key = k
         end
 
         def #{column}_key
