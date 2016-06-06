@@ -26,6 +26,11 @@ module CarrierWaveDirect
     include CarrierWaveDirect::Uploader::ContentType
     include CarrierWaveDirect::Uploader::DirectUrl
 
+    #ensure that region returns something. Since sig v4 it is required in the signing key & credentials
+    def region
+      defined?(super) ? super : "us-east-1"
+    end
+
     def acl
       fog_public ? 'public-read' : 'private'
     end
@@ -35,20 +40,36 @@ module CarrierWaveDirect
       options[:min_file_size] ||= min_file_size
       options[:max_file_size] ||= max_file_size
 
+      @date ||= Time.now.utc.strftime("%Y%m%d")
+      @timestamp ||= Time.now.utc.strftime("%Y%m%dT%H%M%SZ")
       @policy ||= generate_policy(options, &block)
+    end
+
+    def date
+      @timestamp ||= Time.now.utc.strftime("%Y%m%dT%H%M%SZ")
+    end
+
+    def algorithm
+      'AWS4-HMAC-SHA256'
+    end
+
+    def credential
+      @date ||= Time.now.utc.strftime("%Y%m%d")
+      "#{aws_access_key_id}/#{@date}/#{region}/s3/aws4_request"
     end
 
     def clear_policy!
       @policy = nil
+      @date = nil
+      @timestamp = nil
     end
 
     def signature
-      Base64.encode64(
-        OpenSSL::HMAC.digest(
-          OpenSSL::Digest.new('sha1'),
-          aws_secret_access_key, policy
-        )
-      ).gsub("\n","")
+      OpenSSL::HMAC.hexdigest(
+        'sha256',
+        signing_key,
+        policy
+      )
     end
 
     def url_scheme_white_list
@@ -139,7 +160,9 @@ module CarrierWaveDirect
 
       conditions << ["starts-with", "$utf8", ""] if options[:enforce_utf8]
       conditions << ["starts-with", "$key", key.sub(/#{Regexp.escape(FILENAME_WILDCARD)}\z/, "")]
-
+      conditions << {'X-Amz-Algorithm' => algorithm}
+      conditions << {'X-Amz-Credential' => credential}
+      conditions << {'X-Amz-Date' => date}
       conditions << ["starts-with", "$Content-Type", ""] if will_include_content_type
       conditions << {"bucket" => fog_directory}
       conditions << {"acl" => acl}
@@ -160,6 +183,17 @@ module CarrierWaveDirect
           'conditions' => conditions
         }.to_json
       ).gsub("\n","")
+    end
+
+    def signing_key(options = {})
+      @date ||= Time.now.utc.strftime("%Y%m%d")
+      #AWS Signature Version 4
+      kDate    = OpenSSL::HMAC.digest('sha256', "AWS4" + aws_secret_access_key, @date)
+      kRegion  = OpenSSL::HMAC.digest('sha256', kDate, region)
+      kService = OpenSSL::HMAC.digest('sha256', kRegion, 's3')
+      kSigning = OpenSSL::HMAC.digest('sha256', kService, "aws4_request")
+
+      kSigning
     end
   end
 end
