@@ -1,4 +1,7 @@
-### Unreleased changes
+### 0.0.16 (Pending)
+
+Features:
+  * Upgraded signing algorithm to use [AWS V4 POST authentication](http://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-authentication-HTTPPOST.html). This is a breaking change if you are constructing your own upload forms or submitting your own POST requests via Javascript. See the Sinatra section of the README for a summary of the new fields required in your V4 POST request.
 
 Bug Fixes:
   * Allow uploader columns to be named `file` (Diego Plentz @plentz and Moisés Viloria @mois3x)
@@ -7,6 +10,8 @@ Bug Fixes:
 Misc:
   * Dropped support for ruby 1.9, it has [reached its end of life](https://www.ruby-lang.org/en/news/2014/01/10/ruby-1-9-3-will-end-on-2015/) 
   * Add 2.2.0 support to travis. 
+  * Compatible with Capybara 2.7
+  * Replaced fog dependency with fog-aws; significantly reduces gem footprint
 
 ### 0.0.15
 
