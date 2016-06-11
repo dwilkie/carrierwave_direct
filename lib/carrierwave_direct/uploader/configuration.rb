@@ -30,9 +30,9 @@ module CarrierWaveDirect
           configure do |config|
             config.validate_is_attached = false
             config.validate_is_uploaded = false
-            config.validate_unique_filename = true
-            config.validate_filename_format = true
-            config.validate_remote_net_url_format = true
+            config.validate_unique_filename = false
+            config.validate_filename_format = false
+            config.validate_remote_net_url_format = false
 
             config.min_file_size = 1
             config.max_file_size = 5242880

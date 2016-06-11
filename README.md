@@ -280,7 +280,7 @@ If your upload was successful then you will be redirected to the `success_action
 
 The `key` is the most important piece of information as we can use it for validating the file extension, downloading the file from S3, processing it and re-uploading it.
 
-If you're using ActiveRecord, CarrierWaveDirect will by default validate the file extension based off your `extension_white_list` in your uploader. See the [CarrierWave readme](https://github.com/jnicklas/carrierwave) for more info. You can then use the helper `filename_valid?` to check if the filename is valid. e.g.
+If you're using ActiveRecord, CarrierWaveDirect can validate the file extension based off your `extension_white_list` in your uploader. See the [CarrierWave readme](https://github.com/jnicklas/carrierwave) and the Validations section below for more info. You can then use the helper `filename_valid?` to check if the filename is valid. e.g.
 
 ```ruby
 class UsersController < ApplicationController
@@ -375,37 +375,37 @@ The methods `has_avatar_upload?`, `remote_avatar_net_url` and `has_remote_avatar
 
 ## Validations
 
-Along with validating the extension of the filename, CarrierWaveDirect also gives you some other validations:
+In addition to validating the extension of the filename, CarrierWaveDirect also gives you some additional optional validations. All validations below are turned off by default, and can be enabled globally in your CarrierWave config, or within individual models as shown below:
 
 ```ruby
 validates :avatar :is_uploaded => true
 ```
 
-Validates that your mounted model has an avatar uploaded from file or specified by remote url. It does not check that an your mounted model actually has a valid avatar after the download has taken place. Turned *off* by default
+Validates that your mounted model has an avatar uploaded from file or specified by remote url. It does not check that an your mounted model actually has a valid avatar after the download has taken place.
 
 ```ruby
 validates :avatar, :is_attached => true
 ```
 
-Validates that your mounted model has an avatar attached. This checks whether there is an actual avatar attached to the mounted model after downloading. Turned *off* by default
+Validates that your mounted model has an avatar attached. This checks whether there is an actual avatar attached to the mounted model after downloading.
 
 ```ruby
 validates :avatar, :filename_uniqueness => true
 ```
 
-Validates that the filename in the database is unique. Turned *on* by default
+Validates that the filename in the database is unique.
 
 ```ruby
 validates :avatar, :filename_format => true
 ```
 
-Validates that the uploaded filename is valid. As well as validating the extension against the `extension_white_list` it also validates that the `upload_dir` is correct. Turned *on* by default
+Validates that the uploaded filename is valid. As well as validating the extension against the `extension_white_list` it also validates that the `upload_dir` is correct.
 
 ```ruby
 validates :avatar, :remote_net_url_format => true
 ```
 
-Validates that the remote net url is valid. As well as validating the extension against the `extension_white_list` it also validates that url is valid and has only the schemes specified in the `url_scheme_whitelist`. Turned *on* by default
+Validates that the remote net url is valid. As well as validating the extension against the `extension_white_list` it also validates that url is valid and has only the schemes specified in the `url_scheme_whitelist`.
 
 ## Configuration
 
@@ -415,9 +415,9 @@ As well as the built in validations CarrierWaveDirect provides, some validations
 CarrierWave.configure do |config|
   config.validate_is_attached = true             # defaults to false
   config.validate_is_uploaded = true             # defaults to false
-  config.validate_unique_filename = false        # defaults to true
-  config.validate_filename_format = false        # defaults to true
-  config.validate_remote_net_url_format = false  # defaults to true
+  config.validate_unique_filename = true         # defaults to false
+  config.validate_filename_format = true         # defaults to false
+  config.validate_remote_net_url_format = true   # defaults to false
 
   config.min_file_size             = 5.kilobytes  # defaults to 1.byte
   config.max_file_size             = 10.megabytes # defaults to 5.megabytes

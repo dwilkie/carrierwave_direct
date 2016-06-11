@@ -19,12 +19,12 @@ describe CarrierWaveDirect::Uploader::Configuration do
       expect(subject.validate_is_uploaded).to be false
     end
 
-    it "return true for validate_unique_filename" do
-      expect(subject.validate_unique_filename).to be true
+    it "return false for validate_unique_filename" do
+      expect(subject.validate_unique_filename).to be false
     end
 
-    it "returns true for validate_remote_net_url_format" do
-      expect(subject.validate_remote_net_url_format).to be true
+    it "returns false for validate_remote_net_url_format" do
+      expect(subject.validate_remote_net_url_format).to be false
     end
 
     it "has upload_expiration of 10 hours" do
