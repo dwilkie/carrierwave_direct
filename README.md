@@ -113,15 +113,19 @@ end
 ```
 ```haml
 # index.haml
+# Now using AWS POST authentication V4
+# See http://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-authentication-HTTPPOST.html for more information
 
 %form{:action => @uploader.direct_fog_url, :method => "post", :enctype => "multipart/form-data"}
   %input{:name => "utf8", :type => "hidden"}
   %input{:type => "hidden", :name => "key", :value => @uploader.key}
-  %input{:type => "hidden", :name => "AWSAccessKeyId", :value => @uploader.aws_access_key_id}
   %input{:type => "hidden", :name => "acl", :value => @uploader.acl}
   %input{:type => "hidden", :name => "success_action_redirect", :value => @uploader.success_action_redirect}
   %input{:type => "hidden", :name => "policy", :value => @uploader.policy}
-  %input{:type => "hidden", :name => "signature", :value => @uploader.signature}
+  %input{:type => "hidden", :name => "x-amz-algorithm", :value => @uploader.algorithm}
+  %input{:type => "hidden", :name => "x-amz-credential", :value => @uploader.credential}
+  %input{:type => "hidden", :name => "x-amz-date", :value => @uploader.date}
+  %input{:type => "hidden", :name => "x-amz-signature", :value => @uploader.signature}
   %input{:name => "file", :type => "file"}
   %input{:type => "submit", :value => "Upload to S3"}
 ```
@@ -156,7 +160,7 @@ end
 After uploading to S3, You'll need to update the uploader object with the returned key in the controller action that corresponds to `new_user_url`:
 
 ```ruby
-@uploader.update_attribute :key, params[:key]
+@uploader.update_attribute :avatar_key, params[:key]
 ```
 
 You can also pass html options like this:
@@ -340,7 +344,7 @@ class AvatarProcessor
 end
 ```
 
-The method `self.remote_avatar_url=` from [CarrierWave](https://github.com/jnicklas/carrierwave) downloads the avatar from S3 and processes it. `save` then re-uploads the processed avatar to to S3
+The method `self.remote_avatar_url=` from [CarrierWave](https://github.com/jnicklas/carrierwave) downloads the avatar from S3 and processes it. `save` then re-uploads the processed avatar to S3
 
 ## Uploading from a remote location
 
@@ -428,6 +432,29 @@ CarrierWave.configure do |config|
                                                   # properly
 end
 ```
+
+## Bucket CORS configuration and usage with CloudFront
+
+If you are using a javascript uploader (e.g. Dropzone, jQuery Upload, Uploadify, etc.) you will need to add CORS configuration to your bucket, otherwise default bucket configuration will deny CORS requests. To do that open your bucket in Amazon console, click on its properties and add a CORS configuration similar to this
+
+```xml
+<CORSConfiguration>
+    <CORSRule>
+        <!--  Optionally change this with your domain, it should not be an issue since your bucket accepts only signed writes -->
+        <AllowedOrigin>*</AllowedOrigin>
+        <AllowedMethod>GET</AllowedMethod>
+        <AllowedMethod>POST</AllowedMethod>
+        <MaxAgeSeconds>3000</MaxAgeSeconds>
+        <AllowedHeader>Authorization</AllowedHeader>
+        <AllowedHeader>Content-Type</AllowedHeader>
+        <AllowedHeader>Origin</AllowedHeader>
+    </CORSRule>
+</CORSConfiguration>
+```
+
+When you use this gem in conjunction with CloudFront you'll need an additional step otherwise it won't work as expected. This is strictly necessary if you configured CarrierWave `asset_host` to use a CloudFront in front of your bucket because your forms will be posted to that url.
+
+To solve this issue you must enable POST requests in your CloudFront distribution settings. Here is a [step by step walkthrough](http://blog.celingest.com/en/2014/10/02/tutorial-using-cors-with-cloudfront-and-s3/) that explain this setup. It also explain CORS configuration.
 
 ## Testing with CarrierWaveDirect
 
@@ -531,8 +558,6 @@ en:
 
 ## Caveats
 
-Don't name your string column `file`. It will result in a stack level too deep exception. See [this issue](https://github.com/dwilkie/carrierwave_direct/issues/10) for more info.
-
 If you're Rails app was newly generated *after* version 3.2.3 and your testing this in development you may run into an issue where an `ActiveModel::MassAssignmentSecurity::Error` is raised when being redirected from S3. You can fix this by setting `config.active_record.mass_assignment_sanitizer = :logger` in your `config/environments/development.rb` file.
 
 ## Contributing to CarrierWaveDirect
@@ -575,3 +600,4 @@ Thank you to everybody who has contributed to [CarrierWaveDirect](https://github
 * [colinyoung (Colin Young)](https://github.com/colinyoung) - Content-Type support
 * [jkamenik (John Kamenik)](https://github.com/jkamenik) - Content-Type support
 * [filiptepper (Filip Tepper)](https://github.com/filiptepper) - Autoload UUID on heroku
+* [mois3x (Moisés Viloria)](https://github.com/mois3x) and [plentz (Diego Plentz)](https://github.com/plentz) - Allow uploader columns to be named `file`

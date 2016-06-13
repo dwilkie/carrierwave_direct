@@ -33,12 +33,14 @@ module CarrierWaveDirect
             sample_key_args.unshift(uploader) if method(:sample_key).arity == -2
             options[:redirect_key] = sample_key(*sample_key_args)
           end
-
+          
+          redirect_url_params = Rack::Utils.parse_nested_query(redirect_url.query)
+          
           redirect_url.query = Rack::Utils.build_nested_query({
             :bucket => uploader.fog_directory,
             :key => options[:redirect_key],
             :etag => "\"d41d8cd98f00b204e9800998ecf8427\""
-          })
+          }.merge(redirect_url_params))
 
           # click the button
           click_button button_locator

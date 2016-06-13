@@ -7,7 +7,7 @@ describe CarrierWaveDirect::Uploader do
   include ModelHelpers
 
   let(:subject) { DirectUploader.new }
-  let(:mounted_model) { double(sample(:mounted_model_name)) }
+  let(:mounted_model) { double(sample(:mounted_model_name), video_identifier: sample(:stored_filename)) }
   let(:mounted_subject) { DirectUploader.new(mounted_model, sample(:mounted_as)) }
   let(:direct_subject) { DirectUploader.new }
 
@@ -73,6 +73,7 @@ describe CarrierWaveDirect::Uploader do
 
       context "but the uploaders url is '#{sample(:s3_file_url)}'" do
         before do
+          allow(mounted_subject).to receive(:store_dir).and_return(sample(:store_dir))
           allow(mounted_subject).to receive(:url).and_return(sample(:s3_file_url))
           allow(mounted_subject).to receive(:present?).and_return(true)
         end
@@ -240,42 +241,17 @@ describe CarrierWaveDirect::Uploader do
         end
       end
 
-      context "and the model's remote #{sample(:mounted_as)} url has whitespace in it" do
+      context "and the model's remote #{sample(:mounted_as)} url has special characters in it" do
         before do
           allow(mounted_model).to receive(
             "remote_#{mounted_subject.mounted_as}_url"
-          ).and_return("http://anyurl.com/any_path/video_dir/filename 2.avi")
+          ).and_return("http://anyurl.com/any_path/video_dir/filename ()+[]2.avi")
         end
 
-        it "should be sanitized (whitespace replaced with _)" do
+        it "should be sanitized (special characters replaced with _)" do
           mounted_subject.filename
-          expect(mounted_subject.key).to match /filename_2.avi$/
+          expect(mounted_subject.key).to match /filename___\+__2.avi$/
         end
-      end
-
-      context "and the model's remote url contains escape characters" do
-        before do
-          subject.key = nil
-          allow(subject).to receive(:present?).and_return(:true)
-          allow(subject).to receive(:url).and_return("http://anyurl.com/any_path/video_dir/filename ()+[]2.avi")
-        end
-
-        it "should be escaped and replaced with non whitespace characters" do
-          expect(subject.key).to match /filename%20%28%29%2B%5B%5D2.avi/
-        end
-      end
-
-      context "and the model's remote url contains already escaped characters" do
-        before do
-          subject.key = nil
-          allow(subject).to receive(:present?).and_return(:true)
-          allow(subject).to receive(:url).and_return("http://anyurl.com/any_path/video_dir/filename%20%28%29%2B%5B%5D2.avi")
-        end
-
-        it "should not double escape already escaped characters" do
-          expect(subject.key).to match /filename%20%28%29%2B%5B%5D2.avi/
-        end
-
       end
 
       context "and the model's remote #{sample(:mounted_as)} url is blank" do
@@ -299,10 +275,30 @@ describe CarrierWaveDirect::Uploader do
   end
 
   # http://aws.amazon.com/articles/1434?_encoding=UTF8
+  #http://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-UsingHTTPPOST.html
   describe "#policy" do
-    def decoded_policy(options = {})
+
+
+    def decoded_policy(options = {}, &block)
       instance = options.delete(:subject) || subject
-      JSON.parse(Base64.decode64(instance.policy(options)))
+      JSON.parse(Base64.decode64(instance.policy(options, &block)))
+    end
+
+    context "policy is given a block" do
+      it "should yield the options to the block" do
+        number = 0
+        subject.policy do |conditions|
+          number+=1
+        end
+        expect(number).to eq 1
+      end
+      it "should include new options in the conditions" do
+        policy = subject.policy do |conditions|
+          conditions << {"x-aws-storage-class" => "STANDARD"}
+        end
+        decoded = JSON.parse(Base64.decode64(policy))
+        expect(decoded['conditions'].last['x-aws-storage-class']).to eq "STANDARD"
+      end
     end
 
     it "should return Base64-encoded JSON" do
@@ -328,14 +324,15 @@ describe CarrierWaveDirect::Uploader do
         decoded_policy(options)["expiration"]
       end
 
+      # JSON times have no seconds, so accept upto one second inaccuracy
       def have_expiration(expires_in = DirectUploader.upload_expiration)
-        eql(
-          Time.parse(
-            JSON.parse({
-              "expiry" => Time.now + expires_in
-            }.to_json)["expiry"]
-          )
-        )
+        be_within(1.second).of (Time.now + expires_in)
+      end
+
+      it "should be valid ISO8601 and not use default Time#to_json" do
+        Time.any_instance.stub(:to_json) { '"Invalid time"' } # JSON gem
+        Time.any_instance.stub(:as_json) { '"Invalid time"' } # Active Support
+        expect { Time.iso8601(expiration) }.to_not raise_error
       end
 
       it "should be #{DirectUploader.upload_expiration / 3600} hours from now" do
@@ -365,9 +362,12 @@ describe CarrierWaveDirect::Uploader do
       end
 
       context "should include" do
-        # Rails form builder conditions
-        it "'utf8'" do
-          expect(conditions).to have_condition(:utf8)
+        it "'utf8' if enforce_ut8 is set" do
+          expect(conditions(enforce_utf8: true)).to have_condition(:utf8)
+        end
+
+        it "'utf8' if enforce_ut8 is set" do
+          expect(conditions).to_not have_condition(:utf8)
         end
 
         # S3 conditions
@@ -479,11 +479,22 @@ describe CarrierWaveDirect::Uploader do
       expect(subject.signature).to_not include("\n")
     end
 
-    it "should return a base64 encoded 'sha1' hash of the secret key and policy document" do
-      expect(Base64.decode64(subject.signature)).to eq OpenSSL::HMAC.digest(
-        OpenSSL::Digest.new('sha1'),
-        subject.aws_secret_access_key, subject.policy
+    it "should return a HMAC hexdigest encoded 'sha256' hash of the secret key and policy document" do
+      expect(subject.signature).to eq OpenSSL::HMAC.hexdigest(
+        OpenSSL::Digest.new('sha256'),
+        subject.send(:signing_key), subject.policy
       )
+    end
+  end
+  #http://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-UsingHTTPPOST.html
+  describe "#signature_key" do
+    it "should include correct signature_key elements" do
+      kDate    = OpenSSL::HMAC.digest('sha256', "AWS4" + subject.aws_secret_access_key, Time.now.utc.strftime("%Y%m%d"))
+      kRegion  = OpenSSL::HMAC.digest('sha256', kDate, subject.region)
+      kService = OpenSSL::HMAC.digest('sha256', kRegion, 's3')
+      kSigning = OpenSSL::HMAC.digest('sha256', kService, "aws4_request")
+
+      expect(subject.send(:signing_key)).to eq (kSigning)
     end
   end
 

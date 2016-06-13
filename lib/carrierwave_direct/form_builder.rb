@@ -3,6 +3,8 @@
 module CarrierWaveDirect
   class FormBuilder < ActionView::Helpers::FormBuilder
     def file_field(method, options = {})
+      @object.policy(enforce_utf8: true)
+
       options.merge!(:name => "file")
 
       fields = required_base_fields
@@ -29,10 +31,12 @@ module CarrierWaveDirect
 
     def required_base_fields
       hidden_field(:key,                     :name => "key") <<
-      hidden_field(:aws_access_key_id,       :name => "AWSAccessKeyId") <<
       hidden_field(:acl,                     :name => "acl") <<
       hidden_field(:policy,                  :name => "policy") <<
-      hidden_field(:signature,               :name => "signature")
+      hidden_field(:signature,               :name => "X-Amz-Signature") <<
+      hidden_field(:credential,              :name => "X-Amz-Credential") <<
+      hidden_field(:algorithm,               :name => "X-Amz-Algorithm") <<
+      hidden_field(:date,                    :name => "X-Amz-Date")
     end
 
     def content_type_field(options)

@@ -1,3 +1,36 @@
+### 0.0.16 (Pending)
+
+Features:
+  * Upgraded signing algorithm to use [AWS V4 POST authentication](http://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-authentication-HTTPPOST.html). This is a breaking change if you are constructing your own upload forms or submitting your own POST requests. See the Sinatra section of the README for a summary of the new fields required in your V4 POST request.
+
+Bug Fixes:
+  * Allow uploader columns to be named `file` (Diego Plentz @plentz and Moisés Viloria @mois3x)
+  * `["starts-with", "$utf8", ""]` is not needed as condition (Rocco Galluzzo @byterussian)
+
+Misc:
+  * Dropped support for ruby 1.9, it has [reached its end of life](https://www.ruby-lang.org/en/news/2014/01/10/ruby-1-9-3-will-end-on-2015/) 
+  * Add 2.2.0 support to travis. 
+  * Compatible with Capybara 2.7
+  * Replaced fog dependency with fog-aws; significantly reduces gem footprint
+
+### 0.0.15
+
+[Full Changes](https://github.com/dwilkie/carrierwave_direct/compare/v0.0.14...v0.0.15)
+
+Features:
+  * Allow format validators to be used on update (Grey Baker @greysteil)
+  * Add cache_dir to allowed paths (Grey Baker @greysteil)
+
+Bug Fixes:
+  * Use Carrierwave to generate URL's (Petrik de Heus @p8)
+
+Misc:
+  * README update (Samuel Reh @samuelreh)
+  * Fix typo in README (Brandon Conway @brandoncc)
+  * Fix specs for rspec 3 (Hanachin @hanachin)
+  * Fix typo in nl.yml (Petrik de Heus @p8)
+  * Add multiple rails versions support to travis (Petrik de Heus @p8)
+
 ### 0.0.14
 
 [Full Changes](https://github.com/dwilkie/carrierwave_direct/compare/v0.0.13...v0.0.14)
