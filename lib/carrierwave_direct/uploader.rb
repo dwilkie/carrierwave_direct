@@ -32,7 +32,7 @@ module CarrierWaveDirect
     end
 
     def acl
-      fog_public ? 'public-read' : 'private'
+      'private'
     end
 
     def policy(options = {}, &block)

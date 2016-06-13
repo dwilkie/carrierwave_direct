@@ -10,6 +10,12 @@ module CarrierWaveDirect
         end
       end
 
+      def asset_host
+        return super if file.respond_to?(:path) && !file.path.blank?
+        return super if respond_to?(:has_key?) && has_key?
+        nil
+      end
+
     end
   end
 end

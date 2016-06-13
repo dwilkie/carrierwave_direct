@@ -7,8 +7,10 @@ module CarrierWaveDirect
 
   module Uploader
     require "carrierwave_direct/uploader/configuration"
+    require "carrierwave_direct/uploader/default_url"
 
     CarrierWave::Uploader::Base.send(:include, Configuration)
+    CarrierWave::Uploader::Base.send(:include, DefaultUrl)
   end
 
   module Test
