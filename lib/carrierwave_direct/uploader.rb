@@ -151,6 +151,7 @@ module CarrierWaveDirect
     # Put the version name at the end of the filename since the guid is also stored
     # e.g. guid/filename_thumb.jpg instead of CarrierWave's default: thumb_guid/filename.jpg
     def full_filename(for_file)
+      return unless for_file
       extname = File.extname(for_file)
       [for_file.chomp(extname), version_name].compact.join('_') << extname
     end
