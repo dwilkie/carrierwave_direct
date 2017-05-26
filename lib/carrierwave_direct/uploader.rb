@@ -164,7 +164,7 @@ module CarrierWaveDirect
       conditions << {'X-Amz-Credential' => credential}
       conditions << {'X-Amz-Date' => date}
       conditions << ["starts-with", "$Content-Type", ""] if will_include_content_type
-      conditions << {"bucket" => fog_directory}
+      conditions << {"bucket" => aws_bucket}
       conditions << {"acl" => acl}
 
       if use_action_status
