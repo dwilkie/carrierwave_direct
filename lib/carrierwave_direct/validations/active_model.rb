@@ -23,7 +23,7 @@ module CarrierWaveDirect
       class FilenameFormatValidator < ::ActiveModel::EachValidator
         def validate_each(record, attribute, value)
           if record.send("has_#{attribute}_upload?") && record.send("#{attribute}_key") !~ record.send(attribute).key_regexp
-            extensions = record.send(attribute).extension_white_list
+            extensions = record.send(attribute).extension_whitelist
             message = I18n.t("errors.messages.carrierwave_direct_filename_invalid")
 
             if extensions.present?
@@ -43,7 +43,7 @@ module CarrierWaveDirect
             url_scheme_white_list = uploader.url_scheme_white_list
 
             if (remote_net_url !~ URI.regexp(url_scheme_white_list) || remote_net_url !~ /#{uploader.extension_regexp}\z/)
-              extensions = uploader.extension_white_list
+              extensions = uploader.extension_whitelist
 
               message = I18n.t("errors.messages.carrierwave_direct_filename_invalid")
 

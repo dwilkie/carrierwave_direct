@@ -12,10 +12,10 @@ describe CarrierWaveDirect::Uploader do
   let(:direct_subject) { DirectUploader.new }
 
 
-  DirectUploader.fog_credentials.keys.each do |key|
+  DirectUploader.aws_credentials.keys.each do |key|
     describe "##{key}" do
       it "should return the #{key.to_s.capitalize}" do
-        expect(subject.send(key)).to eq subject.class.fog_credentials[key]
+        expect(subject.send(key)).to eq subject.class.aws_credentials[key]
       end
 
       it "should not be nil" do
@@ -138,26 +138,26 @@ describe CarrierWaveDirect::Uploader do
       expect(subject.extension_regexp).to be_a(String)
     end
 
-    context "where #extension_white_list returns nil" do
+    context "where #extension_whitelist returns nil" do
       before do
-        allow(subject).to receive(:extension_white_list).and_return(nil)
+        allow(subject).to receive(:extension_whitelist).and_return(nil)
       end
 
       it_should_behave_like "a globally allowed file extension"
     end
 
-    context "where #extension_white_list returns []" do
+    context "where #extension_whitelist returns []" do
       before do
-        allow(subject).to receive(:extension_white_list).and_return([])
+        allow(subject).to receive(:extension_whitelist).and_return([])
       end
 
       it_should_behave_like "a globally allowed file extension"
     end
 
-    context "where #extension_white_list returns ['exe', 'bmp']" do
+    context "where #extension_whitelist returns ['exe', 'bmp']" do
 
       before do
-        allow(subject).to receive(:extension_white_list).and_return(%w{exe bmp})
+        allow(subject).to receive(:extension_whitelist).and_return(%w{exe bmp})
       end
 
       it "should return '(exe|bmp)'" do
@@ -489,7 +489,7 @@ describe CarrierWaveDirect::Uploader do
   #http://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-UsingHTTPPOST.html
   describe "#signature_key" do
     it "should include correct signature_key elements" do
-      kDate    = OpenSSL::HMAC.digest('sha256', "AWS4" + subject.aws_secret_access_key, Time.now.utc.strftime("%Y%m%d"))
+      kDate    = OpenSSL::HMAC.digest('sha256', "AWS4" + subject.secret_access_key, Time.now.utc.strftime("%Y%m%d"))
       kRegion  = OpenSSL::HMAC.digest('sha256', kDate, subject.region)
       kService = OpenSSL::HMAC.digest('sha256', kRegion, 's3')
       kSigning = OpenSSL::HMAC.digest('sha256', kService, "aws4_request")

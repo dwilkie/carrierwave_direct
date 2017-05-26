@@ -100,8 +100,8 @@ describe CarrierWaveDirect::ActiveRecord do
         messages = I18n.t("errors.messages.carrierwave_direct_filename_invalid")
 
         if i18n_options
-          if i18n_options[:extension_white_list]
-            extensions = i18n_options[:extension_white_list].to_sentence
+          if i18n_options[:extension_whitelist]
+            extensions = i18n_options[:extension_whitelist].to_sentence
             messages += I18n.t("errors.messages.carrierwave_direct_allowed_extensions", :extensions => extensions)
           end
 
@@ -240,7 +240,7 @@ describe CarrierWaveDirect::ActiveRecord do
 
       context "where the uploader has an extension white list" do
         before do
-          subject.video.stub(:extension_white_list).and_return(%w{avi mp4})
+          subject.video.stub(:extension_whitelist).and_return(%w{avi mp4})
         end
 
         context "and the uploaded file's extension is included in the list" do
@@ -298,7 +298,7 @@ describe CarrierWaveDirect::ActiveRecord do
         context "on create" do
           context "where the uploader has an extension white list" do
             before do
-              subject.video.stub(:extension_white_list).and_return(%w{avi mp4})
+              subject.video.stub(:extension_whitelist).and_return(%w{avi mp4})
             end
 
             context "and the url's extension is included in the list" do
@@ -321,7 +321,7 @@ describe CarrierWaveDirect::ActiveRecord do
               end
 
               it_should_behave_like "a remote net url i18n error message" do
-                let(:i18n_options) { {:extension_white_list => %w{avi mp4} } }
+                let(:i18n_options) { {:extension_whitelist => %w{avi mp4} } }
               end
 
               it "should include the white listed extensions in the error message" do

@@ -11,14 +11,14 @@ module CarrierWaveDirect
     FILENAME_WILDCARD = "${filename}"
 
     included do
-      storage :fog
+      storage :aws
 
       attr_accessor :success_action_redirect
       attr_accessor :success_action_status
 
-      fog_credentials.keys.each do |key|
+      aws_credentials.keys.each do |key|
         define_method(key) do
-          fog_credentials[key]
+          aws_credentials[key]
         end
       end
     end
@@ -55,7 +55,7 @@ module CarrierWaveDirect
 
     def credential
       @date ||= Time.now.utc.strftime("%Y%m%d")
-      "#{aws_access_key_id}/#{@date}/#{region}/s3/aws4_request"
+      "#{access_key_id}/#{@date}/#{region}/s3/aws4_request"
     end
 
     def clear_policy!
@@ -109,7 +109,7 @@ module CarrierWaveDirect
     end
 
     def extension_regexp
-      allowed_file_types = extension_white_list
+      allowed_file_types = extension_whitelist
       extension_regexp = allowed_file_types.present? && allowed_file_types.any? ?  "(#{allowed_file_types.join("|")})" : "\\w+"
     end
 
@@ -188,7 +188,7 @@ module CarrierWaveDirect
     def signing_key(options = {})
       @date ||= Time.now.utc.strftime("%Y%m%d")
       #AWS Signature Version 4
-      kDate    = OpenSSL::HMAC.digest('sha256', "AWS4" + aws_secret_access_key, @date)
+      kDate    = OpenSSL::HMAC.digest('sha256', "AWS4" + secret_access_key, @date)
       kRegion  = OpenSSL::HMAC.digest('sha256', kDate, region)
       kService = OpenSSL::HMAC.digest('sha256', kRegion, 's3')
       kSigning = OpenSSL::HMAC.digest('sha256', kService, "aws4_request")
