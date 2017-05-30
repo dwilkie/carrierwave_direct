@@ -7,8 +7,6 @@ describe CarrierWaveDirect::Uploader::DirectUrl do
 
   let(:subject) { DirectUploader.new }
 
-  let(:mounted_subject) { DirectUploader.new(mounted_model, sample(:mounted_as)) }
-
   describe "#direct_aws_url" do
     it "should return the result from CarrierWave::Storage::AWSFile#public_url" do
       expect(subject.direct_aws_url).to eq CarrierWave::Storage::AWSFile.new(
