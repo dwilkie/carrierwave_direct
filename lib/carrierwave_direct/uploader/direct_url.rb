@@ -2,7 +2,7 @@ module CarrierWaveDirect
   module Uploader
     module DirectUrl
 
-      def direct_fog_url(options = {})
+      def direct_aws_url(options = {})
         if options[:with_path]
           url
         else

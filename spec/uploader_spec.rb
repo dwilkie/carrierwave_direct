@@ -385,7 +385,7 @@ describe CarrierWaveDirect::Uploader do
         end
 
         it "'bucket'" do
-          expect(conditions).to have_condition("bucket" => subject.fog_directory)
+          expect(conditions).to have_condition("bucket" => subject.aws_bucket)
         end
 
         it "'acl'" do

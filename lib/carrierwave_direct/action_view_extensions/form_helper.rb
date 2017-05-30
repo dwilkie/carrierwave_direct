@@ -25,7 +25,7 @@ module CarrierWaveDirect
           record,
           *(args << options.merge(
             :builder => CarrierWaveDirect::FormBuilder,
-            :url => record.direct_fog_url,
+            :url => record.direct_aws_url,
             :html => html_options,
             :authenticity_token => false,
             :include_id => false

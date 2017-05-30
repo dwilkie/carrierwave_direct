@@ -14,10 +14,10 @@ describe CarrierWaveDirect::ActionViewExtensions::FormHelper do
 
     context "the form" do
       before do
-        allow(direct_uploader).to receive(:direct_fog_url).and_return("http://example.com")
+        allow(direct_uploader).to receive(:direct_aws_url).and_return("http://example.com")
       end
 
-      it "should post to the uploader's #direct_fog_url as a multipart form" do
+      it "should post to the uploader's #direct_aws_url as a multipart form" do
         expect(form).to submit_to(
           :action => "http://example.com", :method => "post", :enctype => "multipart/form-data"
         )
