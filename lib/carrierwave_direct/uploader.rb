@@ -31,10 +31,6 @@ module CarrierWaveDirect
       defined?(super) ? super : "us-east-1"
     end
 
-    def acl
-      fog_public ? 'public-read' : 'private'
-    end
-
     def policy(options = {}, &block)
       options[:expiration] ||= upload_expiration
       options[:min_file_size] ||= min_file_size
@@ -165,7 +161,7 @@ module CarrierWaveDirect
       conditions << {'X-Amz-Date' => date}
       conditions << ["starts-with", "$Content-Type", ""] if will_include_content_type
       conditions << {"bucket" => aws_bucket}
-      conditions << {"acl" => acl}
+      conditions << {"aws_acl" => aws_acl}
 
       if use_action_status
         conditions << {"success_action_status" => success_action_status}

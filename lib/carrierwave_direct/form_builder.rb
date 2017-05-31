@@ -31,7 +31,7 @@ module CarrierWaveDirect
 
     def required_base_fields
       hidden_field(:key,                     :name => "key") <<
-      hidden_field(:acl,                     :name => "acl") <<
+      hidden_field(:aws_acl,                     :name => "aws_acl") <<
       hidden_field(:policy,                  :name => "policy") <<
       hidden_field(:signature,               :name => "X-Amz-Signature") <<
       hidden_field(:credential,              :name => "X-Amz-Credential") <<

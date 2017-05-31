@@ -268,16 +268,9 @@ describe CarrierWaveDirect::Uploader do
     end
   end
 
-  describe "#acl" do
-    it "should return the correct s3 access policy" do
-      expect(subject.acl).to eq (subject.fog_public ? 'public-read' : 'private')
-    end
-  end
-
   # http://aws.amazon.com/articles/1434?_encoding=UTF8
   #http://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-UsingHTTPPOST.html
   describe "#policy" do
-
 
     def decoded_policy(options = {}, &block)
       instance = options.delete(:subject) || subject
@@ -389,7 +382,7 @@ describe CarrierWaveDirect::Uploader do
         end
 
         it "'acl'" do
-          expect(conditions).to have_condition("acl" => subject.acl)
+          expect(conditions).to have_condition("aws_acl" => subject.aws_acl)
         end
 
         it "'success_action_redirect'" do

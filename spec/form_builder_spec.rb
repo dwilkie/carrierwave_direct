@@ -16,7 +16,7 @@ shared_examples_for 'hidden values form' do
                     {:algorithm => "X-Amz-Algorithm"},
                     {:date => "X-Amz-Date"},
                     {:signature => "X-Amz-Signature"},
-                    :acl,
+                    :aws_acl,
                     :success_action_redirect,
                     :policy
                   ]
@@ -66,7 +66,7 @@ describe CarrierWaveDirect::FormBuilder do
                       {:algorithm => "X-Amz-Algorithm"},
                       {:date => "X-Amz-Date"},
                       {:signature => "X-Amz-Signature"},
-                      :acl,
+                      :aws_acl,
                       :success_action_redirect,
                       :policy,
                     ]
@@ -76,7 +76,7 @@ describe CarrierWaveDirect::FormBuilder do
                       {:algorithm => "X-Amz-Algorithm"},
                       {:date => "X-Amz-Date"},
                       {:signature => "X-Amz-Signature"},
-                      :acl,
+                      :aws_acl,
                       :success_action_status,
                       :policy,
                     ]
