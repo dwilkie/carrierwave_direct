@@ -6,7 +6,7 @@ CarrierWave.configure do |config|
   config.aws_credentials = {
     :access_key_id      => 'AWS_ACCESS_KEY_ID',
     :secret_access_key  => 'AWS_SECRET_ACCESS_KEY',
-    :region => 'aws_region'
+    :region => 'AWS_REGION'
   }
 end
 

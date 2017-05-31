@@ -25,3 +25,10 @@ RSpec.configure do |config|
     mocks.syntax = [:expect, :should]
   end
 end
+
+RSpec.configure do |config|
+  config.before(:each) do
+    allow(CarrierWave::Storage::AWSFile).to receive(:new).and_return(double("AWSFile", :public_url => "url"))
+    allow(CarrierWave::Storage::AWS).to receive(:new).and_return(double("AWS", :connection => "AWSconnection"))
+  end
+end
