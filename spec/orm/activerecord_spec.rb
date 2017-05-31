@@ -4,6 +4,8 @@ require 'spec_helper'
 require 'carrierwave/orm/activerecord'
 require 'carrierwave_direct/orm/activerecord'
 
+ActiveRecord::Base.raise_in_transactional_callbacks = true
+
 describe CarrierWaveDirect::ActiveRecord do
   dbconfig = {
     :adapter => 'sqlite3',
