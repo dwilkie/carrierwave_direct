@@ -5,8 +5,8 @@ CarrierWave.configure do |config|
   config.aws_bucket = 'AWS_FOG_DIRECTORY' # bucket name
   config.aws_credentials = {
     :access_key_id      => 'AWS_ACCESS_KEY_ID',
-    :secret_access_key  => 'AWS_SECRET_ACCESS_KEY'
-    :region => 'AWS_REGION',
+    :secret_access_key  => 'AWS_SECRET_ACCESS_KEY',
+    :region => 'aws_region'
   }
 end
 
