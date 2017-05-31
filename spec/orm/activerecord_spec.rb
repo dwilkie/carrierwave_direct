@@ -190,11 +190,11 @@ describe CarrierWaveDirect::ActiveRecord do
           another_party
         end
 
-        it "should not be valid" do
+        it "should not be valid", :skip_aws_stub => true do
           another_party.should_not be_valid
         end
 
-        it "should use I18n for the error messages" do
+        it "should use I18n for the error messages", :skip_aws_stub => true do
           another_party.valid?
           another_party.errors[:video].should == [I18n.t("errors.messages.carrierwave_direct_filename_taken")]
         end

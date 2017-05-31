@@ -27,8 +27,13 @@ RSpec.configure do |config|
 end
 
 RSpec.configure do |config|
+  config.before(:each, :skip_aws_stub => true) do
+    @skip_aws_stub = true
+  end
   config.before(:each) do
-    allow(CarrierWave::Storage::AWSFile).to receive(:new).and_return(double("AWSFile", :public_url => "url"))
-    allow(CarrierWave::Storage::AWS).to receive(:new).and_return(double("AWS", :connection => "AWSconnection"))
+    unless defined?(@skip_aws_stub) && @skip_aws_stub
+      allow(CarrierWave::Storage::AWSFile).to receive(:new).and_return(double("AWSFile", :public_url => "url"))
+      allow(CarrierWave::Storage::AWS).to receive(:new).and_return(double("AWS", :connection => "AWSconnection"))
+    end
   end
 end
