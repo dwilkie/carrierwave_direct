@@ -11,8 +11,8 @@ end
 
 shared_examples_for 'hidden values form' do
   hidden_fields = [
-                    :key,
-                    {:credential => "X-Amz-Credential"},
+                    { :blank_key => "key" },
+                    { :credential => "X-Amz-Credential" },
                     {:algorithm => "X-Amz-Algorithm"},
                     {:date => "X-Amz-Date"},
                     {:signature => "X-Amz-Signature"},
@@ -61,7 +61,7 @@ describe CarrierWaveDirect::FormBuilder do
     end
 
     default_hidden_fields = [
-                      :key,
+                      { :blank_key => "key" },
                       {:credential => "X-Amz-Credential"},
                       {:algorithm => "X-Amz-Algorithm"},
                       {:date => "X-Amz-Date"},
@@ -71,7 +71,7 @@ describe CarrierWaveDirect::FormBuilder do
                       :policy,
                     ]
     status_hidden_fields = [
-                      :key,
+                      { :blank_key => "key" },
                       {:credential => "X-Amz-Credential"},
                       {:algorithm => "X-Amz-Algorithm"},
                       {:date => "X-Amz-Date"},
@@ -197,14 +197,14 @@ describe CarrierWaveDirect::FormBuilder do
     end
 
     before do
-      allow(direct_uploader).to receive('key').and_return('foo')
+      allow(direct_uploader).to receive('blank_key').and_return('foo')
       allow(direct_uploader.class).to receive(:will_include_content_type).and_return(true)
     end
 
     it 'should only include the hidden values once' do
       expect(dom).to have_input(
                    :direct_uploader,
-                   'key',
+                   'blank_key',
                    :type => :hidden,
                    :name => 'key',
                    :value => 'foo',

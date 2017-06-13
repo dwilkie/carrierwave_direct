@@ -26,6 +26,10 @@ module CarrierWaveDirect
     include CarrierWaveDirect::Uploader::ContentType
     include CarrierWaveDirect::Uploader::DirectUrl
 
+    def blank_key
+      @blank_key ||= "#{store_dir}/#{generate_guid}/#{FILENAME_WILDCARD}"
+    end
+
     #ensure that region returns something. Since sig v4 it is required in the signing key & credentials
     def region
       defined?(super) ? super : "us-east-1"
@@ -155,7 +159,7 @@ module CarrierWaveDirect
       conditions = []
 
       conditions << ["starts-with", "$utf8", ""] if options[:enforce_utf8]
-      conditions << ["starts-with", "$key", key.sub(/#{Regexp.escape(FILENAME_WILDCARD)}\z/, "")]
+      conditions << ["starts-with", "$key", blank_key.sub(/#{Regexp.escape(FILENAME_WILDCARD)}\z/, "")]
       conditions << {'X-Amz-Algorithm' => algorithm}
       conditions << {'X-Amz-Credential' => credential}
       conditions << {'X-Amz-Date' => date}
@@ -179,6 +183,10 @@ module CarrierWaveDirect
           'conditions' => conditions
         }.to_json
       ).gsub("\n","")
+    end
+
+    def generate_guid()
+      SecureRandom.uuid
     end
 
     def signing_key(options = {})
