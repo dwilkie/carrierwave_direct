@@ -365,7 +365,7 @@ describe CarrierWaveDirect::Uploader do
 
         # S3 conditions
         it "'key'" do
-          allow(mounted_subject).to receive(:key).and_return(sample(:s3_key))
+          allow(mounted_subject).to receive(:blank_key).and_return(sample(:s3_key))
           expect(conditions(
             :subject => mounted_subject
           )).to have_condition(:key, sample(:s3_key))
@@ -374,7 +374,7 @@ describe CarrierWaveDirect::Uploader do
         it "'key' without FILENAME_WILDCARD" do
           expect(conditions(
             :subject => mounted_subject
-          )).to have_condition(:key, mounted_subject.key.sub("${filename}", ""))
+          )).to have_condition(:key, mounted_subject.blank_key.sub("${filename}", ""))
         end
 
         it "'bucket'" do
