@@ -165,7 +165,7 @@ module CarrierWaveDirect
       conditions << {'X-Amz-Date' => date}
       conditions << ["starts-with", "$Content-Type", ""] if will_include_content_type
       conditions << {"bucket" => aws_bucket}
-      conditions << {"aws_acl" => aws_acl}
+      conditions << {"acl" => aws_acl}
 
       if use_action_status
         conditions << {"success_action_status" => success_action_status}

@@ -382,7 +382,7 @@ describe CarrierWaveDirect::Uploader do
         end
 
         it "'acl'" do
-          expect(conditions).to have_condition("aws_acl" => subject.aws_acl)
+          expect(conditions).to have_condition("acl" => subject.aws_acl)
         end
 
         it "'success_action_redirect'" do
