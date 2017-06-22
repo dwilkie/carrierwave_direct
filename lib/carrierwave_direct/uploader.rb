@@ -11,7 +11,6 @@ module CarrierWaveDirect
     FILENAME_WILDCARD = "${filename}"
 
     included do
-      storage :aws
 
       attr_accessor :success_action_redirect
       attr_accessor :success_action_status
