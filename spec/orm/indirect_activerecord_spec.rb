@@ -10,7 +10,7 @@ describe CarrierWave::ActiveRecord do
     :database => ':memory:'
   }
 
-  class OtherTestMigration < ActiveRecord::Migration
+  class OtherTestMigration < ActiveRecord::Migration[4.2]
     def self.up
       create_table :other_parties, :force => true do |t|
         t.column :video, :string

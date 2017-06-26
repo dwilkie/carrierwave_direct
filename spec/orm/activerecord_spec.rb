@@ -10,7 +10,7 @@ describe CarrierWaveDirect::ActiveRecord do
     :database => ':memory:'
   }
 
-  class TestMigration < ActiveRecord::Migration
+  class TestMigration < ActiveRecord::Migration[4.2]
     def self.up
       create_table :parties, :force => true do |t|
         t.column :video, :string
