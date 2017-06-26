@@ -1,7 +1,12 @@
+### 1.0.0 (Pending)
+
+Features:
+  * [BREAKING CHANGE] Add support for Carrierwave 1.x. Drops support for Carrierwave < 1.0 (Kevin Reintjes @kreintjes).
+
 ### 0.0.16 (Pending)
 
 Features:
-  * Upgraded signing algorithm to use [AWS V4 POST authentication](http://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-authentication-HTTPPOST.html). This is a breaking change if you are constructing your own upload forms or submitting your own POST requests. See the Sinatra section of the README for a summary of the new fields required in your V4 POST request.
+  * [BREAKING CHANGE] Upgraded signing algorithm to use [AWS V4 POST authentication](http://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-authentication-HTTPPOST.html). This is a breaking change if you are constructing your own upload forms or submitting your own POST requests. See the Sinatra section of the README for a summary of the new fields required in your V4 POST request.
 
 Bug Fixes:
   * Allow uploader columns to be named `file` (Diego Plentz @plentz and Moisés Viloria @mois3x)
