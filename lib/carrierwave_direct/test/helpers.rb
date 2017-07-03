@@ -11,14 +11,14 @@ module CarrierWaveDirect
       def sample_key(uploader, options = {})
         options[:valid] = true unless options[:valid] == false
         options[:valid] &&= !options[:invalid]
-        options[:base] ||= uploader.key
+        options[:base] ||= uploader.blank_key
         if options[:filename]
           filename_parts = options[:filename].split(".")
           options[:extension] = filename_parts.pop if filename_parts.size > 1
           options[:filename] = filename_parts.join(".")
         end
         options[:filename] ||= "filename"
-        valid_extension = uploader.extension_white_list.first if uploader.extension_white_list
+        valid_extension = uploader.extension_whitelist.first if uploader.extension_whitelist
         options[:extension] = options[:extension] ? options[:extension].gsub(".", "") : (valid_extension || "extension")
         key = options[:base].split("/")
         key.pop

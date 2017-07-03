@@ -11,14 +11,13 @@ module CarrierWaveDirect
     FILENAME_WILDCARD = "${filename}"
 
     included do
-      storage :fog
 
       attr_accessor :success_action_redirect
       attr_accessor :success_action_status
 
-      fog_credentials.keys.each do |key|
+      aws_credentials.keys.each do |key|
         define_method(key) do
-          fog_credentials[key]
+          aws_credentials[key]
         end
       end
     end
@@ -26,13 +25,13 @@ module CarrierWaveDirect
     include CarrierWaveDirect::Uploader::ContentType
     include CarrierWaveDirect::Uploader::DirectUrl
 
+    def blank_key
+      @blank_key ||= "#{store_dir}/#{generate_guid}/#{FILENAME_WILDCARD}"
+    end
+
     #ensure that region returns something. Since sig v4 it is required in the signing key & credentials
     def region
       defined?(super) ? super : "us-east-1"
-    end
-
-    def acl
-      fog_public ? 'public-read' : 'private'
     end
 
     def policy(options = {}, &block)
@@ -55,7 +54,7 @@ module CarrierWaveDirect
 
     def credential
       @date ||= Time.now.utc.strftime("%Y%m%d")
-      "#{aws_access_key_id}/#{@date}/#{region}/s3/aws4_request"
+      "#{access_key_id}/#{@date}/#{region}/s3/aws4_request"
     end
 
     def clear_policy!
@@ -109,7 +108,7 @@ module CarrierWaveDirect
     end
 
     def extension_regexp
-      allowed_file_types = extension_white_list
+      allowed_file_types = extension_whitelist
       extension_regexp = allowed_file_types.present? && allowed_file_types.any? ?  "(#{allowed_file_types.join("|")})" : "\\w+"
     end
 
@@ -159,13 +158,13 @@ module CarrierWaveDirect
       conditions = []
 
       conditions << ["starts-with", "$utf8", ""] if options[:enforce_utf8]
-      conditions << ["starts-with", "$key", key.sub(/#{Regexp.escape(FILENAME_WILDCARD)}\z/, "")]
+      conditions << ["starts-with", "$key", blank_key.sub(/#{Regexp.escape(FILENAME_WILDCARD)}\z/, "")]
       conditions << {'X-Amz-Algorithm' => algorithm}
       conditions << {'X-Amz-Credential' => credential}
       conditions << {'X-Amz-Date' => date}
       conditions << ["starts-with", "$Content-Type", ""] if will_include_content_type
-      conditions << {"bucket" => fog_directory}
-      conditions << {"acl" => acl}
+      conditions << {"bucket" => aws_bucket}
+      conditions << {"acl" => aws_acl}
 
       if use_action_status
         conditions << {"success_action_status" => success_action_status}
@@ -185,10 +184,14 @@ module CarrierWaveDirect
       ).gsub("\n","")
     end
 
+    def generate_guid()
+      SecureRandom.uuid
+    end
+
     def signing_key(options = {})
       @date ||= Time.now.utc.strftime("%Y%m%d")
       #AWS Signature Version 4
-      kDate    = OpenSSL::HMAC.digest('sha256', "AWS4" + aws_secret_access_key, @date)
+      kDate    = OpenSSL::HMAC.digest('sha256', "AWS4" + secret_access_key, @date)
       kRegion  = OpenSSL::HMAC.digest('sha256', kDate, region)
       kService = OpenSSL::HMAC.digest('sha256', kRegion, 's3')
       kSigning = OpenSSL::HMAC.digest('sha256', kService, "aws4_request")

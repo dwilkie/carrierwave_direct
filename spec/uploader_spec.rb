@@ -12,10 +12,10 @@ describe CarrierWaveDirect::Uploader do
   let(:direct_subject) { DirectUploader.new }
 
 
-  DirectUploader.fog_credentials.keys.each do |key|
+  DirectUploader.aws_credentials.keys.each do |key|
     describe "##{key}" do
       it "should return the #{key.to_s.capitalize}" do
-        expect(subject.send(key)).to eq subject.class.fog_credentials[key]
+        expect(subject.send(key)).to eq subject.class.aws_credentials[key]
       end
 
       it "should not be nil" do
@@ -138,26 +138,26 @@ describe CarrierWaveDirect::Uploader do
       expect(subject.extension_regexp).to be_a(String)
     end
 
-    context "where #extension_white_list returns nil" do
+    context "where #extension_whitelist returns nil" do
       before do
-        allow(subject).to receive(:extension_white_list).and_return(nil)
+        allow(subject).to receive(:extension_whitelist).and_return(nil)
       end
 
       it_should_behave_like "a globally allowed file extension"
     end
 
-    context "where #extension_white_list returns []" do
+    context "where #extension_whitelist returns []" do
       before do
-        allow(subject).to receive(:extension_white_list).and_return([])
+        allow(subject).to receive(:extension_whitelist).and_return([])
       end
 
       it_should_behave_like "a globally allowed file extension"
     end
 
-    context "where #extension_white_list returns ['exe', 'bmp']" do
+    context "where #extension_whitelist returns ['exe', 'bmp']" do
 
       before do
-        allow(subject).to receive(:extension_white_list).and_return(%w{exe bmp})
+        allow(subject).to receive(:extension_whitelist).and_return(%w{exe bmp})
       end
 
       it "should return '(exe|bmp)'" do
@@ -268,16 +268,9 @@ describe CarrierWaveDirect::Uploader do
     end
   end
 
-  describe "#acl" do
-    it "should return the correct s3 access policy" do
-      expect(subject.acl).to eq (subject.fog_public ? 'public-read' : 'private')
-    end
-  end
-
   # http://aws.amazon.com/articles/1434?_encoding=UTF8
   #http://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-UsingHTTPPOST.html
   describe "#policy" do
-
 
     def decoded_policy(options = {}, &block)
       instance = options.delete(:subject) || subject
@@ -372,7 +365,7 @@ describe CarrierWaveDirect::Uploader do
 
         # S3 conditions
         it "'key'" do
-          allow(mounted_subject).to receive(:key).and_return(sample(:s3_key))
+          allow(mounted_subject).to receive(:blank_key).and_return(sample(:s3_key))
           expect(conditions(
             :subject => mounted_subject
           )).to have_condition(:key, sample(:s3_key))
@@ -381,15 +374,15 @@ describe CarrierWaveDirect::Uploader do
         it "'key' without FILENAME_WILDCARD" do
           expect(conditions(
             :subject => mounted_subject
-          )).to have_condition(:key, mounted_subject.key.sub("${filename}", ""))
+          )).to have_condition(:key, mounted_subject.blank_key.sub("${filename}", ""))
         end
 
         it "'bucket'" do
-          expect(conditions).to have_condition("bucket" => subject.fog_directory)
+          expect(conditions).to have_condition("bucket" => subject.aws_bucket)
         end
 
         it "'acl'" do
-          expect(conditions).to have_condition("acl" => subject.acl)
+          expect(conditions).to have_condition("acl" => subject.aws_acl)
         end
 
         it "'success_action_redirect'" do
@@ -489,7 +482,7 @@ describe CarrierWaveDirect::Uploader do
   #http://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-UsingHTTPPOST.html
   describe "#signature_key" do
     it "should include correct signature_key elements" do
-      kDate    = OpenSSL::HMAC.digest('sha256', "AWS4" + subject.aws_secret_access_key, Time.now.utc.strftime("%Y%m%d"))
+      kDate    = OpenSSL::HMAC.digest('sha256', "AWS4" + subject.secret_access_key, Time.now.utc.strftime("%Y%m%d"))
       kRegion  = OpenSSL::HMAC.digest('sha256', kDate, subject.region)
       kService = OpenSSL::HMAC.digest('sha256', kRegion, 's3')
       kSigning = OpenSSL::HMAC.digest('sha256', kService, "aws4_request")

@@ -2,11 +2,11 @@ module CarrierWaveDirect
   module Uploader
     module DirectUrl
 
-      def direct_fog_url(options = {})
+      def direct_aws_url(options = {})
         if options[:with_path]
           url
         else
-          CarrierWave::Storage::Fog::File.new(self, CarrierWave::Storage::Fog.new(self), nil).public_url
+          CarrierWave::Storage::AWSFile.new(self, CarrierWave::Storage::AWS.new(self).connection, "").public_url
         end
       end
 
