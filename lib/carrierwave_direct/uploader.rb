@@ -163,6 +163,7 @@ module CarrierWaveDirect
       conditions << {'X-Amz-Algorithm' => algorithm}
       conditions << {'X-Amz-Credential' => credential}
       conditions << {'X-Amz-Date' => date}
+      conditions << {'X-Amz-Server-Side-Encryption' => 'AES256'} if options[:encrypt]
       conditions << ["starts-with", "$Content-Type", ""] if will_include_content_type
       conditions << {"bucket" => fog_directory}
       conditions << {"acl" => acl}
