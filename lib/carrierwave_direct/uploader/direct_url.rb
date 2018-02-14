@@ -3,10 +3,11 @@ module CarrierWaveDirect
     module DirectUrl
 
       def direct_fog_url(options = {})
+        base_url = CarrierWave::Storage::Fog::File.new(self, CarrierWave::Storage::Fog.new(self), nil).public_url
         if options[:with_path]
-          url
+          base_url + key
         else
-          CarrierWave::Storage::Fog::File.new(self, CarrierWave::Storage::Fog.new(self), nil).public_url
+          base_url
         end
       end
 
