@@ -3,6 +3,9 @@
 require "securerandom"
 require "carrierwave_direct/uploader/content_type"
 require "carrierwave_direct/uploader/direct_url"
+require "carrierwave_direct/policies/base"
+require "carrierwave_direct/policies/aws_sha1"
+require "carrierwave_direct/policies/aws4_hmac_sha256"
 
 module CarrierWaveDirect
   module Uploader
@@ -36,40 +39,27 @@ module CarrierWaveDirect
     end
 
     def policy(options = {}, &block)
-      options[:expiration] ||= upload_expiration
-      options[:min_file_size] ||= min_file_size
-      options[:max_file_size] ||= max_file_size
-
-      @date ||= Time.now.utc.strftime("%Y%m%d")
-      @timestamp ||= Time.now.utc.strftime("%Y%m%dT%H%M%SZ")
-      @policy ||= generate_policy(options, &block)
+      signing_policy.policy(options, &block)
     end
 
     def date
-      @timestamp ||= Time.now.utc.strftime("%Y%m%dT%H%M%SZ")
+      signing_policy.timestamp
     end
 
     def algorithm
-      'AWS4-HMAC-SHA256'
+      signing_policy.algorithm
     end
 
     def credential
-      @date ||= Time.now.utc.strftime("%Y%m%d")
-      "#{aws_access_key_id}/#{@date}/#{region}/s3/aws4_request"
+      signing_policy.credential
     end
 
     def clear_policy!
-      @policy = nil
-      @date = nil
-      @timestamp = nil
+      signing_policy.clear!
     end
 
     def signature
-      OpenSSL::HMAC.hexdigest(
-        'sha256',
-        signing_key,
-        policy
-      )
+      signing_policy.signature
     end
 
     def url_scheme_white_list
@@ -155,45 +145,12 @@ module CarrierWaveDirect
       [for_file.chomp(extname), version_name].compact.join('_') << extname
     end
 
-    def generate_policy(options)
-      conditions = []
-
-      conditions << ["starts-with", "$utf8", ""] if options[:enforce_utf8]
-      conditions << ["starts-with", "$key", key.sub(/#{Regexp.escape(FILENAME_WILDCARD)}\z/, "")]
-      conditions << {'X-Amz-Algorithm' => algorithm}
-      conditions << {'X-Amz-Credential' => credential}
-      conditions << {'X-Amz-Date' => date}
-      conditions << ["starts-with", "$Content-Type", ""] if will_include_content_type
-      conditions << {"bucket" => fog_directory}
-      conditions << {"acl" => acl}
-
-      if use_action_status
-        conditions << {"success_action_status" => success_action_status}
-      else
-        conditions << {"success_action_redirect" => success_action_redirect}
-      end
-
-      conditions << ["content-length-range", options[:min_file_size], options[:max_file_size]]
-
-      yield conditions if block_given?
-
-      Base64.encode64(
-        {
-          'expiration' => (Time.now + options[:expiration]).utc.iso8601,
-          'conditions' => conditions
-        }.to_json
-      ).gsub("\n","")
+    def signing_key(options = {})
+      signing_policy.signing_key(options)
     end
 
-    def signing_key(options = {})
-      @date ||= Time.now.utc.strftime("%Y%m%d")
-      #AWS Signature Version 4
-      kDate    = OpenSSL::HMAC.digest('sha256', "AWS4" + aws_secret_access_key, @date)
-      kRegion  = OpenSSL::HMAC.digest('sha256', kDate, region)
-      kService = OpenSSL::HMAC.digest('sha256', kRegion, 's3')
-      kSigning = OpenSSL::HMAC.digest('sha256', kService, "aws4_request")
-
-      kSigning
+    def signing_policy
+      @signing_policy ||= Policies::Aws4HmacSha256.new(self)
     end
   end
 end
