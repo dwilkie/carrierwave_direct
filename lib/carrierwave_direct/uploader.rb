@@ -3,8 +3,7 @@
 require "securerandom"
 require "carrierwave_direct/uploader/content_type"
 require "carrierwave_direct/uploader/direct_url"
-require "carrierwave_direct/policies/base"
-require "carrierwave_direct/policies/aws_sha1"
+require "carrierwave_direct/policies/aws_base64_sha1"
 require "carrierwave_direct/policies/aws4_hmac_sha256"
 
 module CarrierWaveDirect
@@ -68,6 +67,14 @@ module CarrierWaveDirect
 
     def persisted?
       false
+    end
+
+    def signing_policy_class
+      @signing_policy_class ||= Policies::Aws4HmacSha256
+    end
+
+    def signing_policy_class=(signing_policy_class)
+      @signing_policy_class = signing_policy_class
     end
 
     def key
@@ -150,7 +157,7 @@ module CarrierWaveDirect
     end
 
     def signing_policy
-      @signing_policy ||= Policies::Aws4HmacSha256.new(self)
+      @signing_policy ||= signing_policy_class.new(self)
     end
   end
 end
