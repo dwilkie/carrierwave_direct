@@ -1,4 +1,4 @@
-### 2.0.0 (Pending)
+### 2.0.0
 
 Features:
   * [BREAKING CHANGE] Add support for Carrierwave 1.x. Drops support for Carrierwave < 1.0 (Kevin Reintjes @kreintjes).
