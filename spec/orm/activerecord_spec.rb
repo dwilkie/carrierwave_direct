@@ -164,160 +164,207 @@ describe CarrierWaveDirect::ActiveRecord do
     end
 
     describe ".validates_filename_uniqueness_of" do
-      it "should be turned on by default" do
-        party_class.should_receive(:validates_filename_uniqueness_of).with(:video, on: :create)
+      it "should be turned off by default" do
+        party_class.should_not_receive(:validates_filename_uniqueness_of).with(:video, on: :create)
         mount_uploader
       end
 
-      context "mount_on: option is used" do
-        let(:dance) { Dance.new }
-
-        before { Dance.mount_uploader(:non_existing_column, DirectUploader, mount_on: :location)    }
-        before { dance.non_existing_column_key = sample_key}
-
-        it "uses the column it's mounted on for checking uniqueness" do
-          expect { dance.valid? }.to_not raise_error
-        end
-      end
-
-      context "another Party with a duplicate video filename" do
+      context "is turned on in the configuration" do
         before do
-          subject.video.key = sample_key
-          subject.save
+          DirectUploader.validate_unique_filename = true
         end
 
-        let(:another_party) do
-          another_party = party_class.new
-          another_party.video.key = subject.video.key
-          another_party
-        end
-
-        it "should not be valid" do
-          another_party.should_not be_valid
-        end
-
-        it "should use I18n for the error messages" do
-          another_party.valid?
-          another_party.errors[:video].should == [I18n.t("errors.messages.carrierwave_direct_filename_taken")]
-        end
-      end
-
-      context "is turned off in the configuration" do
-        before do
-          DirectUploader.validate_unique_filename = false
-        end
-
-        it "should not validate the filename uniqueness" do
-          party_class.should_not_receive(:validates_filename_uniqueness_of)
+        it "should validate the filename uniqueness" do
+          party_class.should_receive(:validates_filename_uniqueness_of)
           mount_uploader
+        end
+      end
+
+      context "is on" do
+        before do
+          party_class.validates_filename_uniqueness_of :video, on: :create
+        end
+
+        context "mount_on: option is used" do
+          let(:dance) { Dance.new }
+
+          before { Dance.mount_uploader(:non_existing_column, DirectUploader, mount_on: :location)    }
+          before { dance.non_existing_column_key = sample_key }
+
+          it "uses the column it's mounted on for checking uniqueness" do
+            expect { dance.valid? }.to_not raise_error
+          end
+        end
+
+        context "another Party with a duplicate video filename" do
+          before do
+            subject.video.key = sample_key
+            subject.save
+          end
+
+          let(:another_party) do
+            another_party = party_class.new
+            another_party.video.key = subject.video.key
+            another_party
+          end
+
+          it "should not be valid" do
+            another_party.should_not be_valid
+          end
+
+          it "should use I18n for the error messages" do
+            another_party.valid?
+            another_party.errors[:video].should == [I18n.t("errors.messages.carrierwave_direct_filename_taken")]
+          end
         end
       end
     end
 
     describe ".validates_filename_format_of" do
-      it "should be turned on by default" do
-        party_class.should_receive(:validates_filename_format_of).with(:video, on: :create)
+      it "should be turned off by default" do
+        party_class.should_not_receive(:validates_filename_format_of).with(:video, on: :create)
         mount_uploader
-      end
-
-      context "where the file upload is" do
-        context "nil" do
-          before do
-            subject.video_key = nil
-          end
-
-          it "should be valid" do
-            subject.should be_valid
-          end
-        end
-
-        context "blank" do
-          before do
-            subject.video_key = ""
-          end
-
-          it "should be valid" do
-            subject.should be_valid
-          end
-        end
-      end
-
-      context "where the uploader has an extension white list" do
-        before do
-          subject.video.stub(:extension_white_list).and_return(%w{avi mp4})
-        end
-
-        context "and the uploaded file's extension is included in the list" do
-          before do
-            subject.video_key = sample_key(:extension => "avi")
-          end
-
-          it "should be valid" do
-            subject.should be_valid
-          end
-        end
-
-        context "but uploaded file's extension is not included in the list" do
-          before do
-            subject.video_key = sample_key(:extension => "mp3")
-          end
-
-          it_should_behave_like "an invalid filename"
-
-          it "should include the white listed extensions in the error message" do
-            subject.valid?
-            subject.errors[:video].first.should include("avi and mp4")
-          end
-        end
-
-        context "and the video's key does not contain a guid" do
-          before do
-            subject.video.key = sample_key(:valid => false)
-          end
-
-          it_should_behave_like "an invalid filename"
-        end
       end
 
       context "is turned off in the configuration" do
         before do
-          DirectUploader.validate_filename_format = false
+          DirectUploader.validate_filename_format = true
         end
 
-        it "should not validate the filename format" do
-          party_class.should_not_receive(:validates_filename_format_of)
+        it "should validate the filename format" do
+          party_class.should_receive(:validates_filename_format_of)
           mount_uploader
+        end
+      end
+
+      context "is on" do
+        before do
+          party_class.validates_filename_format_of :video, on: :create
+        end
+
+        context "where the file upload is" do
+          context "nil" do
+            before do
+              subject.video_key = nil
+            end
+
+            it "should be valid" do
+              subject.should be_valid
+            end
+          end
+
+          context "blank" do
+            before do
+              subject.video_key = ""
+            end
+
+            it "should be valid" do
+              subject.should be_valid
+            end
+          end
+        end
+
+        context "where the uploader has an extension white list" do
+          before do
+            subject.video.stub(:extension_white_list).and_return(%w{avi mp4})
+          end
+
+          context "and the uploaded file's extension is included in the list" do
+            before do
+              subject.video_key = sample_key(:extension => "avi")
+            end
+
+            it "should be valid" do
+              subject.should be_valid
+            end
+          end
+
+          context "but uploaded file's extension is not included in the list" do
+            before do
+              subject.video_key = sample_key(:extension => "mp3")
+            end
+
+            it_should_behave_like "an invalid filename"
+
+            it "should include the white listed extensions in the error message" do
+              subject.valid?
+              subject.errors[:video].first.should include("avi and mp4")
+            end
+          end
+
+          context "and the video's key does not contain a guid" do
+            before do
+              subject.video.key = sample_key(:valid => false)
+            end
+
+            it_should_behave_like "an invalid filename"
+          end
         end
       end
     end
 
     describe ".validates_remote_net_url_format_of" do
-      it "should be turned on by default" do
-        party_class.should_receive(:validates_remote_net_url_format_of).with(:video, on: :create)
+      it "should be turned off by default" do
+        party_class.should_not_receive(:validates_remote_net_url_format_of).with(:video, on: :create)
         mount_uploader
       end
 
-      context "with an invalid remote image net url" do
+      context "is turned on in the configuration" do
+        before do
+          DirectUploader.validate_remote_net_url_format = true
+        end
 
-        context "on create" do
-          context "where the uploader has an extension white list" do
-            before do
-              subject.video.stub(:extension_white_list).and_return(%w{avi mp4})
-            end
+        it "should validate the format of the remote net url" do
+          party_class.should_receive(:validates_remote_net_url_format_of)
+          mount_uploader
+        end
+      end
 
-            context "and the url's extension is included in the list" do
+      context "is on" do
+        before do
+          party_class.validates_remote_net_url_format_of :video, on: :create
+        end
+        context "with an invalid remote image net url" do
+
+          context "on create" do
+            context "where the uploader has an extension white list" do
               before do
-                subject.remote_video_net_url = "http://example.com/some_video.mp4"
+                subject.video.stub(:extension_white_list).and_return(%w{avi mp4})
               end
 
-              it "should be valid" do
-                subject.should be_valid
+              context "and the url's extension is included in the list" do
+                before do
+                  subject.remote_video_net_url = "http://example.com/some_video.mp4"
+                end
+
+                it "should be valid" do
+                  subject.should be_valid
+                end
+              end
+
+              context "but the url's extension is not included in the list" do
+                before do
+                  subject.remote_video_net_url = "http://example.com/some_video.mp3"
+                end
+
+                it "should not be valid" do
+                  subject.should_not be_valid
+                end
+
+                it_should_behave_like "a remote net url i18n error message" do
+                  let(:i18n_options) { {:extension_white_list => %w{avi mp4} } }
+                end
+
+                it "should include the white listed extensions in the error message" do
+                  subject.valid?
+                  subject.errors[:remote_video_net_url].first.should include("avi and mp4")
+                end
               end
             end
 
-            context "but the url's extension is not included in the list" do
+            context "where the url is invalid" do
               before do
-                subject.remote_video_net_url = "http://example.com/some_video.mp3"
+                subject.remote_video_net_url = "http$://example.com/some_video.mp4"
               end
 
               it "should not be valid" do
@@ -325,108 +372,78 @@ describe CarrierWaveDirect::ActiveRecord do
               end
 
               it_should_behave_like "a remote net url i18n error message" do
-                let(:i18n_options) { {:extension_white_list => %w{avi mp4} } }
+                let(:i18n_options) { nil }
+              end
+            end
+
+            context "where the url is" do
+              context "nil" do
+                before do
+                  subject.remote_video_net_url = nil
+                end
+
+                it "should be valid" do
+                  subject.should be_valid
+                end
               end
 
-              it "should include the white listed extensions in the error message" do
-                subject.valid?
-                subject.errors[:remote_video_net_url].first.should include("avi and mp4")
+              context "blank" do
+                before do
+                  subject.remote_video_net_url = ""
+                end
+
+                it "should be valid" do
+                  subject.should be_valid
+                end
+              end
+            end
+
+            context "where the uploader specifies valid url schemes" do
+              before do
+                subject.video.stub(:url_scheme_white_list).and_return(%w{http https})
+              end
+
+              context "and the url's scheme is included in the list" do
+                before do
+                  subject.remote_video_net_url = "https://example.com/some_video.mp3"
+                end
+
+                it "should be valid" do
+                  subject.should be_valid
+                end
+              end
+
+              context "but the url's scheme is not included in the list" do
+                before do
+                  subject.remote_video_net_url = "ftp://example.com/some_video.mp3"
+                end
+
+                it "should not be valid" do
+                  subject.should_not be_valid
+                end
+
+                it_should_behave_like "a remote net url i18n error message" do
+                  let(:i18n_options) { {:url_scheme_white_list => %w{http https} } }
+                end
+
+                it "should include the white listed url schemes in the error message" do
+                  subject.valid?
+                  subject.errors[:remote_video_net_url].first.should include("http and https")
+                end
               end
             end
           end
 
-          context "where the url is invalid" do
+          context "on update" do
             before do
               subject.remote_video_net_url = "http$://example.com/some_video.mp4"
             end
 
-            it "should not be valid" do
-              subject.should_not be_valid
-            end
-
-            it_should_behave_like "a remote net url i18n error message" do
-              let(:i18n_options) { nil }
+            it "should be valid" do
+              subject.save(:validate => false)
+              subject.should be_valid
             end
           end
-
-          context "where the url is" do
-            context "nil" do
-              before do
-                subject.remote_video_net_url = nil
-              end
-
-              it "should be valid" do
-                subject.should be_valid
-              end
-            end
-
-            context "blank" do
-              before do
-                subject.remote_video_net_url = ""
-              end
-
-              it "should be valid" do
-                subject.should be_valid
-              end
-            end
-          end
-
-          context "where the uploader specifies valid url schemes" do
-            before do
-              subject.video.stub(:url_scheme_white_list).and_return(%w{http https})
-            end
-
-            context "and the url's scheme is included in the list" do
-              before do
-                subject.remote_video_net_url = "https://example.com/some_video.mp3"
-              end
-
-              it "should be valid" do
-                subject.should be_valid
-              end
-            end
-
-            context "but the url's scheme is not included in the list" do
-              before do
-                subject.remote_video_net_url = "ftp://example.com/some_video.mp3"
-              end
-
-              it "should not be valid" do
-                subject.should_not be_valid
-              end
-
-              it_should_behave_like "a remote net url i18n error message" do
-                let(:i18n_options) { {:url_scheme_white_list => %w{http https} } }
-              end
-
-              it "should include the white listed url schemes in the error message" do
-                subject.valid?
-                subject.errors[:remote_video_net_url].first.should include("http and https")
-              end
-            end
-          end
-        end
-
-        context "on update" do
-          before do
-            subject.remote_video_net_url = "http$://example.com/some_video.mp4"
-          end
-
-          it "should be valid" do
-            subject.save(:validate => false)
-            subject.should be_valid
-          end
-        end
-      end
-
-      context "is turned off in the configuration" do
-        before do
-          DirectUploader.validate_remote_net_url_format = false
-        end
-
-        it "should not validate the format of the remote net url" do
-          party_class.should_not_receive(:validates_remote_net_url_format_of)
-          mount_uploader
         end
       end
     end
@@ -575,8 +592,11 @@ describe CarrierWaveDirect::ActiveRecord do
           it_should_behave_like "having empty errors"
         end
 
-        context "with an invalid filename" do
-          before { subject.video_key = sample_key(:model_class => subject.class, :valid => false) }
+        context "with an invalid filename and filename validations enabled" do
+          before do
+            party_class.validates_filename_format_of :video, on: :create
+            subject.video_key = sample_key(:model_class => subject.class, :valid => false)
+          end
 
           it "should be false" do
             subject.filename_valid?.should be false
