@@ -326,7 +326,7 @@ Now that the basic building blocks are in place you can process and save your av
 class User < ActiveRecord::Base
   def save_and_process_avatar(options = {})
     if options[:now]
-      self.remote_avatar_url = avatar.direct_fog_url(:with_path => true)
+      self.remote_avatar_url = avatar.url
       save
     else
       Resque.enqueue(AvatarProcessor, attributes)
@@ -534,7 +534,7 @@ upload_path = find_upload_path
 redirect_key = sample_key(:base => find_key, :filename => File.basename(upload_path))
 
 uploader.key = redirect_key
-download_url = uploader.direct_fog_url(:with_path => true)
+download_url = uploader.url
 
 # Register the download url and return the uploaded file in the body
 FakeWeb.register_uri(:get, download_url, :body => File.open(upload_path))

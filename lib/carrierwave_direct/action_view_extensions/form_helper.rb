@@ -18,7 +18,7 @@ module CarrierWaveDirect
         options = args.extract_options!
 
         html_options = {
-          :multipart => true 
+          :multipart => true
         }.update(options[:html] || {})
 
         form_for(

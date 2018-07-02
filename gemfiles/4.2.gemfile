@@ -1,10 +1,10 @@
 source "https://rubygems.org"
 
 gem "carrierwave"
-gem "fog"
+gem "fog-aws"
 
 group :test do
-  gem "rspec", '3.0.0'
+  gem "rspec", '~> 3.0'
   gem "timecop"
   gem "rails", "~>4.2.0"
   gem "sqlite3", :platform => [:ruby, :mswin, :mingw]
