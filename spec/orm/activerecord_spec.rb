@@ -9,8 +9,12 @@ describe CarrierWaveDirect::ActiveRecord do
     :adapter => 'sqlite3',
     :database => ':memory:'
   }
-
-  class TestMigration < ActiveRecord::Migration
+  if ActiveRecord::VERSION::MAJOR >= 5
+    migration_class = ::ActiveRecord::Migration[5.0]
+  else
+    migration_class = ::ActiveRecord::Migration
+  end
+  class TestMigration < migration_class
     def self.up
       create_table :parties, :force => true do |t|
         t.column :video, :string
