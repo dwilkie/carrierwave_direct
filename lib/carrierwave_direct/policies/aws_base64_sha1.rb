@@ -12,6 +12,17 @@ module CarrierWaveDirect
         ).gsub("\n", "")
       end
 
+      def direct_fog_hash
+        {
+          key:            uploader.key,
+          AWSAccessKeyId: uploader.aws_access_key_id,
+          acl:            uploader.acl,
+          policy:         policy,
+          signature:      signature,
+          uri:            uploader.direct_fog_url
+        }
+      end
+
       def generate(options, &block)
 
         return @policy if @policy.present?

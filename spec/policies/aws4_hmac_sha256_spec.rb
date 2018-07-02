@@ -8,6 +8,16 @@ describe CarrierWaveDirect::Policies::Aws4HmacSha256 do
   let(:mounted_model) { double(sample(:mounted_model_name), video_identifier: sample(:stored_filename)) }
   let(:mounted_subject) { DirectUploader.new(mounted_model, sample(:mounted_as)) }
 
+  describe "#direct_fog_hash" do
+    it "should return the policy hash" do
+      expect(subject.direct_fog_hash.keys).to eq([:key, :acl, :policy, :"X-Amz-Signature", :"X-Amz-Credential", :"X-Amz-Algorithm", :"X-Amz-Date", :uri])
+      expect(subject.direct_fog_hash[:acl]).to eq 'public-read'
+      expect(subject.direct_fog_hash[:key]).to match /\$\{filename\}/
+      expect(subject.direct_fog_hash[:"X-Amz-Algorithm"]).to eq "AWS4-HMAC-SHA256"
+      expect(subject.direct_fog_hash[:uri]).to eq "https://s3.amazonaws.com/AWS_FOG_DIRECTORY/"
+    end
+  end
+
   # http://aws.amazon.com/articles/1434?_encoding=UTF8
   #http://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-UsingHTTPPOST.html
   describe "#policy" do
