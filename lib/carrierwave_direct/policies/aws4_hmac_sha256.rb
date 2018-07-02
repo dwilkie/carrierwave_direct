@@ -4,10 +4,6 @@ module CarrierWaveDirect
   module Policies
     class Aws4HmacSha256 < Base
 
-      def date
-        @date ||= Time.now.utc.strftime("%Y%m%d")
-      end
-
       def direct_fog_hash
         {
           key:                uploader.key,
@@ -16,13 +12,13 @@ module CarrierWaveDirect
           'X-Amz-Signature':  signature,
           'X-Amz-Credential': credential,
           'X-Amz-Algorithm':  algorithm,
-          'X-Amz-Date':       timestamp,
+          'X-Amz-Date':       date,
           uri:                uploader.direct_fog_url,
         }
       end
 
-      def timestamp
-        @timestamp ||= Time.now.utc.strftime("%Y%m%dT%H%M%SZ")
+      def date
+        timestamp.strftime("%Y%m%dT%H%M%SZ")
       end
 
       def generate(options, &block)
@@ -58,7 +54,7 @@ module CarrierWaveDirect
       end
 
       def credential
-        "#{uploader.aws_access_key_id}/#{date}/#{uploader.region}/s3/aws4_request"
+        "#{uploader.aws_access_key_id}/#{timestamp.strftime("%Y%m%d")}/#{uploader.region}/s3/aws4_request"
       end
 
       def algorithm
@@ -67,7 +63,6 @@ module CarrierWaveDirect
 
       def clear!
         super
-        @date = nil
         @timestamp = nil
       end
 
@@ -81,13 +76,18 @@ module CarrierWaveDirect
 
       def signing_key(options = {})
         #AWS Signature Version 4
-        kDate    = OpenSSL::HMAC.digest('sha256', "AWS4" + uploader.aws_secret_access_key, date)
+        kDate    = OpenSSL::HMAC.digest('sha256', "AWS4" + uploader.aws_secret_access_key, timestamp.strftime("%Y%m%d"))
         kRegion  = OpenSSL::HMAC.digest('sha256', kDate, uploader.region)
         kService = OpenSSL::HMAC.digest('sha256', kRegion, 's3')
         kSigning = OpenSSL::HMAC.digest('sha256', kService, "aws4_request")
 
         kSigning
       end
+
+      def timestamp
+        @timestamp ||= Time.now.utc
+      end
+
     end
   end
 end
