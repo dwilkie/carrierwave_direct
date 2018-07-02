@@ -1,7 +1,12 @@
-### 1.0.0 (Pending)
+### 1.0.0
 
 Features:
   * Upgraded signing algorithm to use [AWS V4 POST authentication](http://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-authentication-HTTPPOST.html). This is a breaking change if you are constructing your own upload forms or submitting your own POST requests. See the Sinatra section of the README for a summary of the new fields required in your V4 POST request. (Fran Worley @fran-worley)
+
+### 0.0.17
+
+Misc:
+  * Pin carrierwave to 0.11
 
 ### 0.0.16
 
