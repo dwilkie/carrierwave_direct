@@ -3,6 +3,7 @@
 require 'carrierwave_direct'
 require 'json'
 require 'timecop'
+require 'byebug'
 
 require File.dirname(__FILE__) << '/support/view_helpers' # Catch dependency order
 
