@@ -2,8 +2,6 @@ rvm:
  - 2.3.0
  - 2.4.0
  - 2.5.0
-install:
-  - 'travis_retry bundle install'
 script: 'bundle exec rspec spec'
 gemfile:
   - Gemfile
@@ -12,3 +10,4 @@ gemfile:
   - gemfiles/5.1.gemfile
 # Move to containerized travis, see http://docs.travis-ci.com/user/migrating-from-legacy
 sudo: false
+cache: bundler
