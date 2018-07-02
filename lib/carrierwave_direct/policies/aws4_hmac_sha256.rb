@@ -8,6 +8,19 @@ module CarrierWaveDirect
         @date ||= Time.now.utc.strftime("%Y%m%d")
       end
 
+      def direct_fog_hash
+        {
+          key:                uploader.key,
+          acl:                uploader.acl,
+          policy:             policy,
+          'X-Amz-Signature':  signature,
+          'X-Amz-Credential': credential,
+          'X-Amz-Algorithm':  algorithm,
+          'X-Amz-Date':       timestamp,
+          uri:                uploader.direct_fog_url,
+        }
+      end
+
       def timestamp
         @timestamp ||= Time.now.utc.strftime("%Y%m%dT%H%M%SZ")
       end
