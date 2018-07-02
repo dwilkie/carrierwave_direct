@@ -363,7 +363,7 @@ Your users may find it convenient to upload a file from a location on the Intern
 class User < ActiveRecord::Base
   def save_and_process_avatar(options = {})
     if options[:now]
-      self.remote_avatar_url = has_remote_avatar_net_url? ? remote_avatar_net_url : avatar.direct_fog_url(:with_path => true)
+      self.remote_avatar_url = has_remote_avatar_net_url? ? remote_avatar_net_url : avatar.url
       save
     else
       Resque.enqueue(AvatarProcessor, attributes)
