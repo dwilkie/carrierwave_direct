@@ -1,3 +1,9 @@
+### 1.1.0
+
+Deprecations:
+  * Calling `direct_for_url` with `:with_path` is deprecated, please use `url` instead.
+
+
 ### 1.0.0
 
 Features:
