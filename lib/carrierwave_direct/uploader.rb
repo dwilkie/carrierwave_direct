@@ -79,6 +79,10 @@ module CarrierWaveDirect
     def persisted?
       false
     end
+    
+    def key_with_unique
+      true
+    end
 
     def key
       return @key if @key.present?
@@ -123,7 +127,7 @@ module CarrierWaveDirect
       key_path = key.split("/")
       filename_parts = []
       filename_parts.unshift(key_path.pop)
-      unique_key = key_path.pop
+      unique_key = key_path.pop if key_with_unique
       filename_parts.unshift(unique_key) if unique_key
       filename_parts.join("/")
     end
