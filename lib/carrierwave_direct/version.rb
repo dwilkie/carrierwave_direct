@@ -1,6 +1,6 @@
 # encoding: utf-8
 
 module CarrierwaveDirect
-  VERSION = "0.0.16"
+  VERSION = "0.0.17"
 end
 

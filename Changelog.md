@@ -1,4 +1,9 @@
-### Unreleased changes
+### 0.0.17
+
+Misc:
+  * Pin carrierwave to 0.11
+
+### 0.0.16
 
 Bug Fixes:
   * Allow uploader columns to be named `file` (Diego Plentz @plentz and Moisés Viloria @mois3x)
@@ -7,6 +12,8 @@ Bug Fixes:
 Misc:
   * Dropped support for ruby 1.9, it has [reached its end of life](https://www.ruby-lang.org/en/news/2014/01/10/ruby-1-9-3-will-end-on-2015/) 
   * Add 2.2.0 support to travis. 
+  * Compatible with Capybara 2.7
+  * Replaced fog dependency with fog-aws; significantly reduces gem footprint
 
 ### 0.0.15
 
@@ -120,3 +127,4 @@ Misc:
 ### 0.0.1
 
 [Full Changes](https://github.com/dwilkie/carrierwave_direct/compare/e68498587a4e4209d121512dbb0df529e15e9282...v0.0.1)
+
