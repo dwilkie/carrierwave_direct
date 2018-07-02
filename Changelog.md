@@ -1,8 +1,16 @@
+### 2.0.0 (Pending)
+
+Features:
+  * [BREAKING CHANGE] Add support for Carrierwave 1.x. Drops support for Carrierwave < 1.0 (Kevin Reintjes @kreintjes).
+
+Misc:
+  * Dropped support for ruby 2.0 and 2.1, they have [reached their end of life](https://www.ruby-lang.org/en/news/2017/04/01/support-of-ruby-2-1-has-ended/)
+  * Update Ruby and Rails versions for Travis so builds succeed once again (Kevin Reintjes @kreintjes)
+
 ### 1.1.0
 
 Deprecations:
   * Calling `direct_for_url` with `:with_path` is deprecated, please use `url` instead.
-
 
 ### 1.0.0
 

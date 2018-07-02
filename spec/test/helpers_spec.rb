@@ -19,7 +19,7 @@ describe CarrierWaveDirect::Test::Helpers do
 
         context "['exe', 'bmp']" do
           before do
-            allow(direct_uploader).to receive(:extension_white_list).and_return(%w{exe bmp})
+            allow(direct_uploader).to receive(:extension_whitelist).and_return(%w{exe bmp})
           end
 
           it "should return '*/guid/filename.exe'" do
@@ -29,7 +29,7 @@ describe CarrierWaveDirect::Test::Helpers do
 
         context "[]" do
           before do
-            allow(direct_uploader).to receive(:extension_white_list).and_return([])
+            allow(direct_uploader).to receive(:extension_whitelist).and_return([])
           end
 
           it_should_behave_like "returning the default extension"
@@ -37,7 +37,7 @@ describe CarrierWaveDirect::Test::Helpers do
 
         context "nil" do
           before do
-            allow(direct_uploader).to receive(:extension_white_list).and_return(nil)
+            allow(direct_uploader).to receive(:extension_whitelist).and_return(nil)
           end
 
           it_should_behave_like "returning the default extension"

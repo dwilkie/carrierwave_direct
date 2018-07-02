@@ -10,13 +10,7 @@ describe CarrierWave::ActiveRecord do
     :database => ':memory:'
   }
 
-  if ActiveRecord::VERSION::MAJOR >= 5
-    migration_class = ::ActiveRecord::Migration[5.0]
-  else
-    migration_class = ::ActiveRecord::Migration
-  end
-
-  class OtherTestMigration < migration_class
+  class OtherTestMigration < ActiveRecord::Migration[4.2]
     def self.up
       create_table :other_parties, :force => true do |t|
         t.column :video, :string
