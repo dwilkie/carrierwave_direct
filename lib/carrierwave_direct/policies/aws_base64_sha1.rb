@@ -1,3 +1,5 @@
+require "carrierwave_direct/policies/base"
+
 module CarrierWaveDirect
   module Policies
     class AwsBase64Sha1 < Base
