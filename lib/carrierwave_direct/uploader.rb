@@ -42,7 +42,7 @@ module CarrierWaveDirect
     end
 
     def date
-      signing_policy.timestamp
+      signing_policy.date
     end
 
     def algorithm
