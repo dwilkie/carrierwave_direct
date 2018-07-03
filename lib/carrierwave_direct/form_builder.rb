@@ -40,7 +40,7 @@ module CarrierWaveDirect
 
     def required_base_fields
       fields = ''.html_safe
-      @object.direct_fog_hash.each do |key, value|
+      @object.direct_fog_hash(enforce_utf8: true).each do |key, value|
         normalized_keys = {
           'X-Amz-Signature':  'signature',
           'X-Amz-Credential': 'credential',
