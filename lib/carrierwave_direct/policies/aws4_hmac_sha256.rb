@@ -4,11 +4,11 @@ module CarrierWaveDirect
   module Policies
     class Aws4HmacSha256 < Base
 
-      def direct_fog_hash
+      def direct_fog_hash(policy_options = {})
         {
           key:                uploader.key,
           acl:                uploader.acl,
-          policy:             policy,
+          policy:             policy(policy_options),
           'X-Amz-Signature':  signature,
           'X-Amz-Credential': credential,
           'X-Amz-Algorithm':  algorithm,

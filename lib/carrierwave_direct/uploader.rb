@@ -125,8 +125,8 @@ module CarrierWaveDirect
       filename_parts.join("/")
     end
 
-    def direct_fog_hash
-      signing_policy.direct_fog_hash
+    def direct_fog_hash(policy_options = {})
+      signing_policy.direct_fog_hash(policy_options)
     end
 
     private
