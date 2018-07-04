@@ -1,7 +1,28 @@
-### 0.0.16 (Pending)
+### 2.0.0
 
 Features:
-  * Upgraded signing algorithm to use [AWS V4 POST authentication](http://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-authentication-HTTPPOST.html). This is a breaking change if you are constructing your own upload forms or submitting your own POST requests. See the Sinatra section of the README for a summary of the new fields required in your V4 POST request.
+  * [BREAKING CHANGE] Add support for Carrierwave 1.x. Drops support for Carrierwave < 1.0 (Kevin Reintjes @kreintjes).
+
+Misc:
+  * Dropped support for ruby 2.0 and 2.1, they have [reached their end of life](https://www.ruby-lang.org/en/news/2017/04/01/support-of-ruby-2-1-has-ended/)
+  * Update Ruby and Rails versions for Travis so builds succeed once again (Kevin Reintjes @kreintjes)
+
+### 1.1.0
+
+Deprecations:
+  * Calling `direct_for_url` with `:with_path` is deprecated, please use `url` instead.
+
+### 1.0.0
+
+Features:
+  * Upgraded signing algorithm to use [AWS V4 POST authentication](http://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-authentication-HTTPPOST.html). This is a breaking change if you are constructing your own upload forms or submitting your own POST requests. See the Sinatra section of the README for a summary of the new fields required in your V4 POST request. (Fran Worley @fran-worley)
+
+### 0.0.17
+
+Misc:
+  * Pin carrierwave to 0.11
+
+### 0.0.16
 
 Bug Fixes:
   * Allow uploader columns to be named `file` (Diego Plentz @plentz and Moisés Viloria @mois3x)

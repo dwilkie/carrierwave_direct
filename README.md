@@ -280,7 +280,7 @@ If your upload was successful then you will be redirected to the `success_action
 
 The `key` is the most important piece of information as we can use it for validating the file extension, downloading the file from S3, processing it and re-uploading it.
 
-If you're using ActiveRecord, CarrierWaveDirect will by default validate the file extension based off your `extension_white_list` in your uploader. See the [CarrierWave readme](https://github.com/jnicklas/carrierwave) for more info. You can then use the helper `filename_valid?` to check if the filename is valid. e.g.
+If you're using ActiveRecord, CarrierWaveDirect will by default validate the file extension based off your `extension_whitelist` in your uploader. See the [CarrierWave readme](https://github.com/jnicklas/carrierwave) for more info. You can then use the helper `filename_valid?` to check if the filename is valid. e.g.
 
 ```ruby
 class UsersController < ApplicationController
@@ -326,7 +326,7 @@ Now that the basic building blocks are in place you can process and save your av
 class User < ActiveRecord::Base
   def save_and_process_avatar(options = {})
     if options[:now]
-      self.remote_avatar_url = avatar.direct_fog_url(:with_path => true)
+      self.remote_avatar_url = avatar.url
       save
     else
       Resque.enqueue(AvatarProcessor, attributes)
@@ -363,7 +363,7 @@ Your users may find it convenient to upload a file from a location on the Intern
 class User < ActiveRecord::Base
   def save_and_process_avatar(options = {})
     if options[:now]
-      self.remote_avatar_url = has_remote_avatar_net_url? ? remote_avatar_net_url : avatar.direct_fog_url(:with_path => true)
+      self.remote_avatar_url = has_remote_avatar_net_url? ? remote_avatar_net_url : avatar.url
       save
     else
       Resque.enqueue(AvatarProcessor, attributes)
@@ -399,13 +399,13 @@ Validates that the filename in the database is unique. Turned *on* by default
 validates :avatar, :filename_format => true
 ```
 
-Validates that the uploaded filename is valid. As well as validating the extension against the `extension_white_list` it also validates that the `upload_dir` is correct. Turned *on* by default
+Validates that the uploaded filename is valid. As well as validating the extension against the `extension_whitelist` it also validates that the `upload_dir` is correct. Turned *on* by default
 
 ```ruby
 validates :avatar, :remote_net_url_format => true
 ```
 
-Validates that the remote net url is valid. As well as validating the extension against the `extension_white_list` it also validates that url is valid and has only the schemes specified in the `url_scheme_whitelist`. Turned *on* by default
+Validates that the remote net url is valid. As well as validating the extension against the `extension_whitelist` it also validates that url is valid and has only the schemes specified in the `url_scheme_whitelist`. Turned *on* by default
 
 ## Configuration
 
@@ -521,7 +521,7 @@ Factory.define :user |f|
 end
 ```
 
-This will return a valid key based off your `upload_dir` and your `extension_white_list`
+This will return a valid key based off your `upload_dir` and your `extension_whitelist`
 
 ### Faking a background download
 
@@ -534,7 +534,7 @@ upload_path = find_upload_path
 redirect_key = sample_key(:base => find_key, :filename => File.basename(upload_path))
 
 uploader.key = redirect_key
-download_url = uploader.direct_fog_url(:with_path => true)
+download_url = uploader.url
 
 # Register the download url and return the uploaded file in the body
 FakeWeb.register_uri(:get, download_url, :body => File.open(upload_path))

@@ -3,6 +3,11 @@
 require 'carrierwave_direct'
 require 'json'
 require 'timecop'
+begin
+  require 'byebug'
+rescue LoadError
+  puts "Byebug not installed"
+end
 
 require File.dirname(__FILE__) << '/support/view_helpers' # Catch dependency order
 
