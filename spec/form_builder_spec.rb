@@ -30,13 +30,14 @@ shared_examples_for 'hidden values form' do
     end
 
     it "should have a hidden field for '#{name}'" do
+      allow(direct_uploader.send(:signing_policy)).to receive(key).and_return(key.to_s)
       allow(direct_uploader).to receive(key).and_return(key.to_s)
       expect(subject).to have_input(
         :direct_uploader,
         key,
         :type => :hidden,
         :name => name,
-        :value => key,
+        :value => direct_uploader.send(key),
         :required => false
       )
     end
@@ -83,7 +84,7 @@ describe CarrierWaveDirect::FormBuilder do
 
     # http://aws.amazon.com/articles/1434?_encoding=UTF8
     context "form" do
-      let(:subject) {form_with_default_file_field}
+      subject { form_with_default_file_field }
       it_should_behave_like 'hidden values form'
 
       default_hidden_fields.each do |input|
@@ -95,13 +96,14 @@ describe CarrierWaveDirect::FormBuilder do
         end
 
         it "should have a hidden field for '#{name}'" do
+          allow(direct_uploader.send(:signing_policy)).to receive(key).and_return(key.to_s)
           allow(direct_uploader).to receive(key).and_return(key.to_s)
-          expect(form_with_default_file_field).to have_input(
+          expect(subject).to have_input(
             :direct_uploader,
             key,
             :type => :hidden,
             :name => name,
-            :value => key,
+            :value => direct_uploader.send(key),
             :required => false
           )
         end
@@ -116,20 +118,21 @@ describe CarrierWaveDirect::FormBuilder do
         end
 
         it "should have a hidden field for '#{name}'" do
+          allow(direct_uploader.send(:signing_policy)).to receive(key).and_return(key.to_s)
           allow(direct_uploader).to receive(key).and_return(key.to_s)
           expect(form_with_file_field_and_no_redirect).to have_input(
             :direct_uploader,
             key,
             :type => :hidden,
             :name => name,
-            :value => key,
+            :value => direct_uploader.send(key),
             :required => false
           )
         end
       end
 
       it "should have an input for a file to upload" do
-        expect(form_with_default_file_field).to have_input(
+        expect(subject).to have_input(
           :direct_uploader,
           :video,
           :type => :file,
@@ -142,7 +145,7 @@ describe CarrierWaveDirect::FormBuilder do
 
   describe "#content_type_select" do
     context "form" do
-      let(:subject) do
+      subject do
         form do |f|
           f.content_type_select
         end
@@ -178,7 +181,7 @@ describe CarrierWaveDirect::FormBuilder do
 
   describe "#content_type_label" do
     context "form" do
-      let(:subject) do
+      subject do
         form do |f|
           f.content_type_label
         end

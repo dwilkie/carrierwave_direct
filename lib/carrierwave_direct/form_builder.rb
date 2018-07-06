@@ -39,13 +39,20 @@ module CarrierWaveDirect
     end
 
     def required_base_fields
-      hidden_field(:key,                     :name => "key") <<
-      hidden_field(:acl,                     :name => "acl") <<
-      hidden_field(:policy,                  :name => "policy") <<
-      hidden_field(:signature,               :name => "X-Amz-Signature") <<
-      hidden_field(:credential,              :name => "X-Amz-Credential") <<
-      hidden_field(:algorithm,               :name => "X-Amz-Algorithm") <<
-      hidden_field(:date,                    :name => "X-Amz-Date")
+      fields = ''.html_safe
+      @object.direct_fog_hash(enforce_utf8: true).each do |key, value|
+        normalized_keys = {
+          'X-Amz-Signature':  'signature',
+          'X-Amz-Credential': 'credential',
+          'X-Amz-Algorithm':  'algorithm',
+          'X-Amz-Date': 'date'
+        }
+        id = "#{@template.dom_class(@object)}_#{normalized_keys[key] || key}"
+        if key != :uri
+          fields << @template.hidden_field_tag(key, value, id: id, required: false)
+        end
+      end
+      fields
     end
 
     def content_type_field(options)
