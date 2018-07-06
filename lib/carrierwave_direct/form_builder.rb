@@ -5,17 +5,19 @@ module CarrierWaveDirect
     def file_field(method, options = {})
       @object.policy(enforce_utf8: true)
 
-      options.merge!(:name => "file")
-
-      fields = required_base_fields
-
-      fields << content_type_field(options)
-
-      fields << success_action_field(options)
+      fields = hidden_fields(options)
 
       # The file field must be the last element in the form.
       # Any element after this will be ignored by Amazon.
+      options.merge!(:name => "file")
+
       fields << super
+    end
+
+    def fields_except_file_field(options = {})
+      @object.policy(enforce_utf8: true)
+
+      hidden_fields(options)
     end
 
     def content_type_label(content=nil)
@@ -28,6 +30,13 @@ module CarrierWaveDirect
     end
 
     private
+
+    def hidden_fields(options)
+      fields = required_base_fields
+      fields << content_type_field(options)
+      fields << success_action_field(options)
+      fields
+    end
 
     def required_base_fields
       hidden_field(:key,                     :name => "key") <<
