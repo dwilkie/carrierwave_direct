@@ -1,3 +1,10 @@
+### 1.2.0 (unreleased)
+
+Features:
+  * Refactor policies to seperate classes and add back the old policy for
+    backwards compatibility.
+  * Added `direct_fog_hash` method that can be used for returning json
+
 ### 1.1.0
 
 Deprecations:
