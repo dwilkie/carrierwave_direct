@@ -5,6 +5,9 @@ Features:
     backwards compatibility.
   * Added `direct_fog_hash` method that can be used for returning json
 
+Misc:
+  * Removed deprecated `key` methods.
+
 ### 2.0.0
 
 Features:

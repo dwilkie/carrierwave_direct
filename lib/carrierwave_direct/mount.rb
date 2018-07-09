@@ -14,7 +14,7 @@ module CarrierWaveDirect
            def #{column}; self; end
         RUBY
       end
- 
+
       self.instance_eval <<-RUBY, __FILE__, __LINE__+1
         attr_accessor :remote_#{column}_net_url
       RUBY
@@ -22,16 +22,6 @@ module CarrierWaveDirect
       mod = Module.new
       include mod
       mod.class_eval <<-RUBY, __FILE__, __LINE__+1
-
-        def key
-          warn "key method is deprecated, please use column_key method instead."
-          send(:#{column}).key
-        end
-
-        def key=(k)
-          warn "key= method is deprecated, please use column_key= method instead."
-          send(:#{column}).key = k
-        end
 
         def #{column}_key
           send(:#{column}).key
