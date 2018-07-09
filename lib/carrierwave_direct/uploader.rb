@@ -130,10 +130,6 @@ module CarrierWaveDirect
 
     private
 
-    def decoded_key
-      URI.decode(URI.parse(url).path[1 .. -1])
-    end
-
     def key_from_file(filename)
       new_key_parts = key.split("/")
       new_key_parts.pop
