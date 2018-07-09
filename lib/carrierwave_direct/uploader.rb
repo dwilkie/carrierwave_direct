@@ -155,10 +155,6 @@ module CarrierWaveDirect
       [for_file.chomp(extname), version_name].compact.join('_') << extname
     end
 
-    def signing_key(options = {})
-      signing_policy.signing_key(options)
-    end
-
     def signing_policy
       @signing_policy ||= signing_policy_class.new(self)
     end

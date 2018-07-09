@@ -224,7 +224,7 @@ describe CarrierWaveDirect::Policies::Aws4HmacSha256 do
     it "should return a HMAC hexdigest encoded 'sha256' hash of the secret key and policy document" do
       expect(subject.signature).to eq OpenSSL::HMAC.hexdigest(
         OpenSSL::Digest.new('sha256'),
-        subject.send(:signing_key), subject.policy
+        subject.signing_key, subject.policy
       )
     end
   end
@@ -236,7 +236,7 @@ describe CarrierWaveDirect::Policies::Aws4HmacSha256 do
       kService = OpenSSL::HMAC.digest('sha256', kRegion, 's3')
       kSigning = OpenSSL::HMAC.digest('sha256', kService, "aws4_request")
 
-      expect(subject.send(:signing_key)).to eq (kSigning)
+      expect(subject.signing_key).to eq (kSigning)
     end
   end
 end
