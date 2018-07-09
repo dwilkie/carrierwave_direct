@@ -83,6 +83,7 @@ module CarrierWaveDirect
         identifier = model.send("#{mounted_as}_identifier")
         self.key = "#{store_dir}/#{identifier}"
       else
+        guid = SecureRandom.uuid
         @key = "#{store_dir}/#{guid}/#{FILENAME_WILDCARD}"
       end
       @key
@@ -91,10 +92,6 @@ module CarrierWaveDirect
     def key=(k)
       @key = k
       update_version_keys(:with => @key)
-    end
-
-    def guid
-      SecureRandom.uuid
     end
 
     def has_key?
@@ -114,14 +111,16 @@ module CarrierWaveDirect
       unless has_key?
         # Use the attached models remote url to generate a new key otherwise return nil
         remote_url = model.send("remote_#{mounted_as}_url")
-        remote_url ? key_from_file(CarrierWave::SanitizedFile.new(remote_url).filename) : return
+        if remote_url ? key_from_file(CarrierWave::SanitizedFile.new(remote_url).filename) : return
       end
 
-      key_path = key.split("/")
+      key_parts = key.split("/")
+      filename  = key_parts.pop
+      guid      = key_parts.pop
+
       filename_parts = []
-      filename_parts.unshift(key_path.pop)
-      unique_key = key_path.pop
-      filename_parts.unshift(unique_key) if unique_key
+      filename_parts << guid if guid
+      filename_parts << filename
       filename_parts.join("/")
     end
 
@@ -135,10 +134,10 @@ module CarrierWaveDirect
       URI.decode(URI.parse(url).path[1 .. -1])
     end
 
-    def key_from_file(fname)
+    def key_from_file(filename)
       new_key_parts = key.split("/")
       new_key_parts.pop
-      new_key_parts << fname
+      new_key_parts << filename
       self.key = new_key_parts.join("/")
     end
 
