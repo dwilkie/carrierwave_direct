@@ -81,10 +81,10 @@ module CarrierWaveDirect
       return @key if @key.present?
       if present?
         identifier = model.send("#{mounted_as}_identifier")
-        self.key = "#{store_dir}/#{identifier}"
+        self.key = [store_dir, identifier].join("/")
       else
         guid = SecureRandom.uuid
-        @key = "#{store_dir}/#{guid}/#{FILENAME_WILDCARD}"
+        @key = [store_dir, guid, FILENAME_WILDCARD].join("/")
       end
       @key
     end
