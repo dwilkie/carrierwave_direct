@@ -112,7 +112,7 @@ module CarrierWaveDirect
         # Use the attached models remote url to generate a new key otherwise return nil
         remote_url = model.send("remote_#{mounted_as}_url")
         if remote_url
-          filename = CarrierWave::SanitizedFile.new(remote_url).filename)
+          key_from_file(CarrierWave::SanitizedFile.new(remote_url).filename)
         else
           return
         end
