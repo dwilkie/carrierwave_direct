@@ -104,6 +104,14 @@ describe CarrierWaveDirect::Uploader do
     end
   end
 
+  describe "#direct_fog_url" do
+    it "should return the result from CarrierWave::Storage::Fog::File#public_url" do
+      expect(subject.direct_fog_url).to eq CarrierWave::Storage::Fog::File.new(
+        subject, nil, nil
+      ).public_url
+    end
+  end
+
   describe "#key_regexp" do
     it "should return a regexp" do
       expect(subject.key_regexp).to be_a(Regexp)

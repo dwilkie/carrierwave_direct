@@ -7,6 +7,7 @@ Features:
 
 Misc:
   * Removed deprecated `key` methods.
+  * Removed deprecated `:with_path` option for `direct_fog_url`
 
 ### 2.0.0
 
@@ -20,7 +21,7 @@ Misc:
 ### 1.1.0
 
 Deprecations:
-  * Calling `direct_for_url` with `:with_path` is deprecated, please use `url` instead.
+  * Calling `direct_fog_url` with `:with_path` is deprecated, please use `url` instead.
 
 ### 1.0.0
 

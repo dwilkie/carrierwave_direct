@@ -2,7 +2,6 @@
 
 require "securerandom"
 require "carrierwave_direct/uploader/content_type"
-require "carrierwave_direct/uploader/direct_url"
 require "carrierwave_direct/policies/aws_base64_sha1"
 require "carrierwave_direct/policies/aws4_hmac_sha256"
 
@@ -26,7 +25,6 @@ module CarrierWaveDirect
     end
 
     include CarrierWaveDirect::Uploader::ContentType
-    include CarrierWaveDirect::Uploader::DirectUrl
 
     #ensure that region returns something. Since sig v4 it is required in the signing key & credentials
     def region
@@ -126,6 +124,10 @@ module CarrierWaveDirect
       filename_parts << guid if guid
       filename_parts << filename
       filename_parts.join("/")
+    end
+
+    def direct_fog_url
+      CarrierWave::Storage::Fog::File.new(self, CarrierWave::Storage::Fog.new(self), nil).public_url
     end
 
     def direct_fog_hash(policy_options = {})
