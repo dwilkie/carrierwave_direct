@@ -18,12 +18,12 @@ describe CarrierWaveDirect::Mount do
 
     describe "#has_video_upload?" do
       it "returns false when video does not have a key" do
-        allow(subject.video).to receive(:has_key?).and_return(false)
+        subject.video.key = nil
         expect(subject).to_not have_video_upload
       end
 
       it "returns true when video has a key" do
-        allow(subject.video).to receive(:has_key?).and_return(true)
+        subject.video.key = sample(:s3_key)
         expect(subject).to have_video_upload
       end
     end
