@@ -9,8 +9,6 @@ describe CarrierWaveDirect::Uploader do
   let(:subject) { DirectUploader.new }
   let(:mounted_model) { MountedClass.new }
   let(:mounted_subject) { DirectUploader.new(mounted_model, sample(:mounted_as)) }
-  let(:direct_subject) { DirectUploader.new }
-
 
   DirectUploader.fog_credentials.keys.each do |key|
     describe "##{key}" do
@@ -489,11 +487,11 @@ describe CarrierWaveDirect::Uploader do
     describe "#{sample(:mounted_as).to_s.capitalize}Uploader" do
       describe "##{sample(:mounted_as)}" do
         it "should be defined" do
-          expect(direct_subject).to be_respond_to(sample(:mounted_as))
+          expect(subject).to be_respond_to(sample(:mounted_as))
         end
 
         it "should return itself" do
-          expect(direct_subject.send(sample(:mounted_as))).to eq direct_subject
+          expect(subject.send(sample(:mounted_as))).to eq subject
         end
       end
 
