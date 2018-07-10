@@ -5,7 +5,7 @@ require 'data/sample_data'
 describe CarrierWaveDirect::Policies::Aws4HmacSha256 do
   let(:subject) { described_class.new(uploader) }
   let(:uploader) { DirectUploader.new }
-  let(:mounted_model) { double(sample(:mounted_model_name), video_identifier: sample(:stored_filename)) }
+  let(:mounted_model) { MountedClass.new }
   let(:mounted_subject) { DirectUploader.new(mounted_model, sample(:mounted_as)) }
 
   describe "#direct_fog_hash" do

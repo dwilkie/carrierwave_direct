@@ -7,7 +7,7 @@ describe CarrierWaveDirect::Uploader do
   include ModelHelpers
 
   let(:subject) { DirectUploader.new }
-  let(:mounted_model) { double(sample(:mounted_model_name), video_identifier: sample(:stored_filename)) }
+  let(:mounted_model) { MountedClass.new }
   let(:mounted_subject) { DirectUploader.new(mounted_model, sample(:mounted_as)) }
   let(:direct_subject) { DirectUploader.new }
 
@@ -74,8 +74,9 @@ describe CarrierWaveDirect::Uploader do
       context "but the uploaders url is '#{sample(:s3_file_url)}'" do
         before do
           allow(mounted_subject).to receive(:store_dir).and_return(sample(:store_dir))
-          allow(mounted_subject).to receive(:url).and_return(sample(:s3_file_url))
           allow(mounted_subject).to receive(:present?).and_return(true)
+          allow(mounted_model).to   receive(:video_identifier).and_return(sample(:stored_filename))
+          mounted_model.remote_video_url = sample(:s3_file_url)
         end
 
         it "should return '#{sample(:s3_key)}'" do
