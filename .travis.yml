@@ -5,10 +5,10 @@ rvm:
 
 script: 'bundle exec rspec spec'
 gemfile:
-  - Gemfile
   - gemfiles/4.2.gemfile
   - gemfiles/5.1.gemfile
-  
+  - gemfiles/5.2.gemfile
+
 # Move to containerized travis, see http://docs.travis-ci.com/user/migrating-from-legacy
 sudo: false
 cache: bundler
