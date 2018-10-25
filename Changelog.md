@@ -1,4 +1,4 @@
-### 2.1.0 (unreleased)
+### 2.1.0
 
 Features:
   * Refactor policies to seperate classes and add back the old policy for
