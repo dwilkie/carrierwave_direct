@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.add_dependency "carrierwave", '>= 1.0.0'
   s.add_dependency "fog-aws"
 
-  s.add_development_dependency "rspec"
+  s.add_development_dependency "rspec", '~> 3.0'
   s.add_development_dependency "timecop"
   s.add_development_dependency "rails", ">= 3.2.12"
   s.add_development_dependency "sqlite3"
