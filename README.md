@@ -117,7 +117,7 @@ end
 # See http://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-authentication-HTTPPOST.html for more information
 
 %form{:action => @uploader.direct_fog_url, :method => "post", :enctype => "multipart/form-data"}
-  - @object.direct_fog_hash.each do |key, value|
+  - @uploader.direct_fog_hash.each do |key, value|
     - if key != :uri
       %input{:type => "hidden", :name => key, :value => value}
   %input{:type => "hidden", :name => "success_action_redirect", :value => @uploader.success_action_redirect}
