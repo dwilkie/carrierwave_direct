@@ -117,15 +117,10 @@ end
 # See http://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-authentication-HTTPPOST.html for more information
 
 %form{:action => @uploader.direct_fog_url, :method => "post", :enctype => "multipart/form-data"}
-  %input{:name => "utf8", :type => "hidden"}
-  %input{:type => "hidden", :name => "key", :value => @uploader.key}
-  %input{:type => "hidden", :name => "acl", :value => @uploader.acl}
+  - @object.direct_fog_hash.each do |key, value|
+    - if key != :uri
+      %input{:type => "hidden", :name => key, :value => value}
   %input{:type => "hidden", :name => "success_action_redirect", :value => @uploader.success_action_redirect}
-  %input{:type => "hidden", :name => "policy", :value => @uploader.policy}
-  %input{:type => "hidden", :name => "x-amz-algorithm", :value => @uploader.algorithm}
-  %input{:type => "hidden", :name => "x-amz-credential", :value => @uploader.credential}
-  %input{:type => "hidden", :name => "x-amz-date", :value => @uploader.date}
-  %input{:type => "hidden", :name => "x-amz-signature", :value => @uploader.signature}
   %input{:name => "file", :type => "file"}
   %input{:type => "submit", :value => "Upload to S3"}
 ```
