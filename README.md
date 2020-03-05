@@ -421,9 +421,11 @@ CarrierWave.configure do |config|
                                                   # on s3, but you must include an input field named
                                                   # Content-Type on every direct upload form
 
-  config.use_action_status = true                 # defaults to false; if true, you must set success_action_status
-                                                  # in your uploader: 'uploader.success_action_status = "201"',
-                                                  # and set 'f.file_field :avatar, use_action_status: true'.
+  config.use_action_status = true                 # defaults to false; if true, you must set
+                                                  # success_action_status in your uploader:
+                                                  #   uploader.success_action_status = "201"
+                                                  # and add use_action_status to the file field:
+                                                  #   f.file_field :avatar, use_action_status: true'.
 end
 ```
 
