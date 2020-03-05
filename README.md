@@ -111,6 +111,7 @@ class UploaderTest < Sinatra::Base
   end
 end
 ```
+
 ```haml
 # index.haml
 # Now using AWS POST authentication V4
@@ -299,6 +300,7 @@ CarrierWaveDirect automatically gives you an accessible `key` attribute in your 
   <%= f.submit %>
 <% end %>
 ```
+
 then in your controller you can do something like this:
 
 ```ruby
@@ -354,6 +356,7 @@ Your users may find it convenient to upload a file from a location on the Intern
   <%= f.submit %>
 <% end %>
 ```
+
 ```ruby
 class User < ActiveRecord::Base
   def save_and_process_avatar(options = {})
@@ -366,6 +369,7 @@ class User < ActiveRecord::Base
   end
 end
 ```
+
 The methods `has_avatar_upload?`, `remote_avatar_net_url` and `has_remote_avatar_net_url?` are automatically added to your mounted model
 
 ## Validations
