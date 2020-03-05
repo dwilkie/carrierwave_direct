@@ -20,7 +20,9 @@ Please be aware that this gem (and S3 in general) only support single file uploa
 
 Install the latest release:
 
-    gem install carrierwave_direct
+```bash
+gem install carrierwave_direct
+```
 
 In Rails, add it to your Gemfile:
 
@@ -52,11 +54,15 @@ end
 
 If you haven't already done so generate an uploader
 
-    rails generate uploader Avatar
+```bash
+rails generate uploader Avatar
+```
 
 this should give you a file in:
 
-    app/uploaders/avatar_uploader.rb
+```bash
+app/uploaders/avatar_uploader.rb
+```
 
 Check out this file for some hints on how you can customize your uploader. It should look something like this:
 
@@ -564,12 +570,16 @@ If you're Rails app was newly generated *after* version 3.2.3 and your testing t
 
 Pull requests are very welcome. Before submitting a pull request, please make sure that your changes are well tested. Pull requests without tests *will not* be accepted.
 
-    gem install bundler
-    bundle install
+```bash
+gem install bundler
+bundle install
+```
 
 You should now be able to run the tests
 
-    bundle exec rake
+```bash
+bundle exec rake
+```
 
 ### Using the Sample Application
 
