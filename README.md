@@ -425,7 +425,7 @@ CarrierWave.configure do |config|
                                                   # success_action_status in your uploader:
                                                   #   uploader.success_action_status = "201"
                                                   # and add use_action_status to the file field:
-                                                  #   f.file_field :avatar, use_action_status: true'.
+                                                  #   f.file_field :avatar, use_action_status: true'
 end
 ```
 
