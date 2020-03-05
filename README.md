@@ -422,7 +422,7 @@ CarrierWave.configure do |config|
                                                   # Content-Type on every direct upload form
 
   config.use_action_status = true                 # defaults to false; if true you must set in your uploader
-                                                  # 'uploader.success_action_status = 201' and set
+                                                  # 'uploader.success_action_status = "201"' and set
                                                   # 'f.file_field :avatar, use_action_status: true' to works
                                                   # properly
 end
