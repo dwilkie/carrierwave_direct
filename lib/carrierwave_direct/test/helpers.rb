@@ -18,7 +18,7 @@ module CarrierWaveDirect
           options[:filename] = filename_parts.join(".")
         end
         options[:filename] ||= "filename"
-        valid_extension = uploader.extension_whitelist.first if uploader.extension_whitelist
+        valid_extension = uploader.extension_allowlist.first if uploader.extension_allowlist
         options[:extension] = options[:extension] ? options[:extension].gsub(".", "") : (valid_extension || "extension")
         key = options[:base].split("/")
         key.pop
