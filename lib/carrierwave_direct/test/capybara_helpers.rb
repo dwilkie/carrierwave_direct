@@ -18,7 +18,7 @@ module CarrierWaveDirect
         page.find("input[name='file']", visible: false).value
       end
 
-      def upload_directly(uploader, button_locator, options = {})
+      def upload_directly(uploader, button_locator, **options)
         options[:success] = true unless options[:success] == false
         options[:success] &&= !options[:fail]
 
@@ -33,9 +33,9 @@ module CarrierWaveDirect
             sample_key_args.unshift(uploader) if method(:sample_key).arity == -2
             options[:redirect_key] = sample_key(*sample_key_args)
           end
-          
+
           redirect_url_params = Rack::Utils.parse_nested_query(redirect_url.query)
-          
+
           redirect_url.query = Rack::Utils.build_nested_query({
             :bucket => uploader.fog_directory,
             :key => options[:redirect_key],
