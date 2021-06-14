@@ -15,8 +15,8 @@ describe CarrierWaveDirect::Test::CapybaraHelpers do
     allow(subject).to receive(:page).and_return(page)
   end
 
-  def find_element_value(css, value, options = nil)
-    if options
+  def find_element_value(css, value, **options)
+    if options.keys.any?
       allow(page).to receive(:find).with(css, options).and_return(selector)
     else
       allow(page).to receive(:find).with(css).and_return(selector)
@@ -36,10 +36,10 @@ describe CarrierWaveDirect::Test::CapybaraHelpers do
   describe "#upload_directly" do
     let(:uploader) { DirectUploader.new }
 
-    def upload_directly(options = {})
+    def upload_directly(**options)
       options[:button_locator] ||= ""
       button_locator = options.delete(:button_locator)
-      subject.upload_directly(uploader, button_locator, options)
+      subject.upload_directly(uploader, button_locator, **options)
     end
 
     def stub_common
