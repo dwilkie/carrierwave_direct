@@ -1,5 +1,10 @@
 ### Unreleased
 
+### 3.0.0
+  * Fixed Ruby 3 deprecation warnings
+  * [BREAKING CHANGE] Drop support for Carrierwave < 2.2.1 which renamed
+    extension_whitelist to extension_allowlist.
+
 ### 2.1.0
 
 Features:
